@@ -140,17 +140,17 @@ func TestCycle(t *testing.T) {
 	c.Contents[1] = NewWord(0205)          // HLT
 	c.Contents[1000] = NewWord(1)
 	c.Contents[1001] = NewWord(7)
-	c.Contents[1002] = NewWord(5)
-	c.Reg[I1] = 3
+	c.Contents[1002] = NewWord(2)
+	c.Contents[1003] = NewWord(7)
+	c.Contents[1004] = NewWord(6)
+	c.Contents[1005] = NewWord(3)
+	c.Contents[1006] = NewWord(1)
+	c.Contents[1007] = NewWord(4)
+	c.Contents[1008] = NewWord(5)
+	c.Contents[1009] = NewWord(2)
+	c.Reg[I1] = 10
 	c.next = 0
-	var err error
-	for {
-		t.Log(c.next)
-		if err = c.Cycle(); err != nil {
-			break
-		}
-	}
-	if err != ErrHalted {
+	if err := c.GoButton(); err != nil {
 		t.Error("got error:", err)
 	}
 	if c.Reg[A].Int() != 7 {
@@ -337,3 +337,43 @@ var (
 		NewWord(3009<<18 | 39),
 	}
 )
+
+func BenchmarkProgramM(b *testing.B) {
+	c := NewComputer()
+	copy(c.Contents[3000:], egCycle8)
+	c.Contents[0] = NewWord(3000<<18 | 39) // JMP 3000
+	c.Contents[1] = NewWord(0205)          // HLT
+	c.Contents[1000] = NewWord(1)
+	c.Contents[1001] = NewWord(7)
+	c.Contents[1002] = NewWord(2)
+	c.Contents[1003] = NewWord(7)
+	c.Contents[1004] = NewWord(6)
+	c.Contents[1005] = NewWord(3)
+	c.Contents[1006] = NewWord(1)
+	c.Contents[1007] = NewWord(4)
+	c.Contents[1008] = NewWord(5)
+	c.Contents[1009] = NewWord(2)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		c.Reg[I1] = 10
+		c.next = 0
+		if err := c.GoButton(); err != nil {
+			b.Fatal("got error:", err)
+		}
+	}
+}
+
+func BenchmarkCycle1000(b *testing.B) {
+	c := NewComputer()
+	for i := 0; i < 999; i++ {
+		c.Contents[i] = NewWord(0501)
+	}
+	c.Contents[1000] = NewWord(0205)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		c.next = 0
+		if err := c.GoButton(); err != nil {
+			b.Fatal("got error:", err)
+		}
+	}
+}
