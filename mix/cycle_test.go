@@ -91,6 +91,71 @@ func TestCycle(t *testing.T) {
 				i+1, c.Reg[X], op[5])
 		}
 	}
+
+	// SLA, SRA, SRAX, SLC, SRC
+	c.Reg[A] = NewWord(0102030405)
+	c.Reg[X] = NewWord(-0607101112)
+	c.next = 0
+	for i, op := range egCycle6 {
+		c.Contents[i] = op[0]
+		if err := c.Cycle(); err != nil {
+			t.Errorf("#%d: got error: %v", i+1, err)
+		}
+		if c.Reg[A] != op[1] {
+			t.Errorf("#%d: got A = %#v, want A = %#v",
+				i+1, c.Reg[A], op[1])
+			c.Reg[A] = op[1]
+		}
+		if c.Reg[X] != op[2] {
+			t.Errorf("#%d: got X = %#v, want X = %#v",
+				i+1, c.Reg[X], op[2])
+			c.Reg[X] = op[2]
+		}
+	}
+
+	// NUM, INCA1, CHAR
+	c.Reg[A] = NewWord(-0374047)
+	c.Reg[X] = NewWord(04571573636)
+	c.next = 0
+	for i, op := range egCycle7 {
+		c.Contents[i] = op[0]
+		if err := c.Cycle(); err != nil {
+			t.Errorf("#%d: got error: %v", i+1, err)
+		}
+		if c.Reg[A] != op[1] {
+			t.Errorf("#%d: got A = %#v, want A = %#v",
+				i+1, c.Reg[A], op[1])
+			c.Reg[A] = op[1]
+		}
+		if c.Reg[X] != op[2] {
+			t.Errorf("#%d: got X = %#v, want X = %#v",
+				i+1, c.Reg[X], op[2])
+			c.Reg[X] = op[2]
+		}
+	}
+
+	// Program M, Section 1.3.2
+	copy(c.Contents[3000:], egCycle8)
+	c.Contents[0] = NewWord(3000<<18 | 39) // JMP 3000
+	c.Contents[1] = NewWord(0205)          // HLT
+	c.Contents[1000] = NewWord(1)
+	c.Contents[1001] = NewWord(7)
+	c.Contents[1002] = NewWord(5)
+	c.Reg[I1] = 3
+	c.next = 0
+	var err error
+	for {
+		t.Log(c.next)
+		if err = c.Cycle(); err != nil {
+			break
+		}
+	}
+	if err != ErrHalted {
+		t.Error("got error:", err)
+	}
+	if c.Reg[A].Int() != 7 {
+		t.Errorf("got %#o (%v), want 7", c.Reg[A], c.Reg[A])
+	}
 }
 
 var (
@@ -211,5 +276,64 @@ var (
 			NewWord(617<<12 | 04001),
 			NewWord(-0101),
 		},
+	}
+
+	egCycle6 = [][3]Word{
+		{ // #1
+			NewWord(01000306),    // SRAX 1
+			NewWord(01020304),    // A
+			NewWord(-0506071011), // X
+		},
+		{ // #2
+			NewWord(02000006), // SLA 2
+			NewWord(0203040000),
+			NewWord(-0506071011),
+		},
+		{ // #3
+			NewWord(04000506), // SRC 4
+			NewWord(0607101102),
+			NewWord(-0304000005),
+		},
+		{ // #4
+			NewWord(02000106), // SRA 2
+			NewWord(060710),
+			NewWord(-0304000005),
+		},
+		{ // #5
+			NewWord(0765000406), // SLC 501
+			NewWord(06071003),
+			NewWord(-0400000500),
+		},
+	}
+
+	egCycle7 = [][3]Word{
+		{ // #1
+			NewWord(05), // NUM 0
+			NewWord(-12977700),
+			NewWord(04571573636),
+		},
+		{ // #2
+			NewWord(01000060), // INCA 1
+			NewWord(-12977699),
+			NewWord(04571573636),
+		},
+		{ // #3
+			NewWord(0105), // CHAR 0
+			NewWord(-03636374047),
+			NewWord(04545444747),
+		},
+	}
+
+	egCycle8 = []Word{
+		NewWord(3009<<18 | 0240),
+		NewWord(010263),
+		NewWord(3005<<18 | 39),
+		NewWord(1000<<18 | 030500 | 56),
+		NewWord(3007<<18 | 0700 | 39),
+		NewWord(030200 | 50),
+		NewWord(1000<<18 | 030500 | 8),
+		NewWord(01000100 | 51),
+		NewWord(3003<<18 | 0200 | 43),
+		NewWord(3009<<18 | 39),
 	}
 )

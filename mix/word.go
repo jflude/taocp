@@ -82,7 +82,11 @@ func (w Word) String() string {
 
 // GoString returns a representation of a MIX word as an unsigned integer.
 func (w Word) GoString() string {
-	return "0" + strconv.FormatUint(uint64(uint32(w)), 8)
+	var s string
+	if w.Int() != 0 {
+		s = "0"
+	}
+	return s + strconv.FormatUint(uint64(uint32(w)), 8)
 }
 
 // Field returns the value of field f as a MIX word.

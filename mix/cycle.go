@@ -12,6 +12,7 @@ func (c *Computer) Cycle() (err error) {
 		return ErrInvalidAddress
 	}
 	aa, i, f, op := c.Contents[c.next].Instruction()
+	c.next++
 	if i > 6 {
 		return ErrInvalidInstruction
 	}
@@ -83,8 +84,8 @@ func (c *Computer) Cycle() (err error) {
 			var a, x int
 			for i := 1; i <= 5; i++ {
 				f := FieldSpec(i, i)
-				a = 10*a + (c.Reg[A].Field(f).Int() & 07)
-				x = 10*x + (c.Reg[X].Field(f).Int() & 07)
+				a = 10*a + (c.Reg[A].Field(f).Int() % 10)
+				x = 10*x + (c.Reg[X].Field(f).Int() % 10)
 			}
 			v := a*100000 + x
 			c.Reg[A].SetField(FieldSpec(1, 5), NewWord(v))
@@ -124,13 +125,13 @@ func (c *Computer) Cycle() (err error) {
 			out := c.Reg[A].ShiftRight(m)
 			c.Reg[X].SetField(FieldSpec(1, m), out)
 		case 4: // SLC
-			m %= 6
+			m %= 5
 			outA := c.Reg[A].ShiftLeft(m)
 			outX := c.Reg[X].ShiftLeft(m)
 			c.Reg[A].SetField(FieldSpec(6-m, 5), outX)
 			c.Reg[X].SetField(FieldSpec(6-m, 5), outA)
 		case 5: // SRC
-			m %= 6
+			m %= 5
 			outA := c.Reg[A].ShiftRight(m)
 			outX := c.Reg[X].ShiftRight(m)
 			c.Reg[A].SetField(FieldSpec(1, m), outX)
@@ -325,7 +326,6 @@ func (c *Computer) Cycle() (err error) {
 		t = 2
 	}
 	c.elapsed += int64(t)
-	c.next++
 	return err
 }
 
@@ -357,7 +357,7 @@ func (c *Computer) addIndex(reg, v int) error {
 
 func (c *Computer) jump(address int, cond bool) {
 	if cond {
-		c.Reg[J] = NewWord(c.next + 1)
+		c.Reg[J] = NewWord(c.next)
 		c.next = address
 	}
 }
