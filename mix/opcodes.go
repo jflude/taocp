@@ -7,7 +7,7 @@ const (
 	SUB // FSUB
 	MUL // FMUL
 	DIV // FDIV
-	NUM // CHAR, HLT
+	NUM // CHAR, HLT, INT
 	SLA // SRA, SLAX, SRAX, SLC, SRC
 	MOVE
 	LDA
@@ -58,7 +58,7 @@ const (
 	INC5 // DEC5, ENT5, ENN5
 	INC6 // DEC6, ENT6, ENN6
 	INCX // DECX, ENTX, ENNX
-	CMPA // FCMPA
+	CMPA // FCMP
 	CMP1
 	CMP2
 	CMP3

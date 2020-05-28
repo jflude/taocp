@@ -104,6 +104,7 @@ func (c *Computer) Cycle() (err error) {
 		case 2: // HLT
 			err = ErrHalted
 		default:
+			// TODO: INT (f == 7), see Ex. 18, Section 1.4.4
 			return ErrInvalidInstruction
 		}
 		t = 1
@@ -313,7 +314,12 @@ func (c *Computer) Cycle() (err error) {
 			return ErrInvalidInstruction
 		}
 		t = 1
-	case op >= CMPA && op <= CMPX:
+	case op == CMPA:
+		if f == 6 {
+			return ErrNotImplemented
+		}
+		fallthrough
+	case op >= CMP1 && op <= CMPX:
 		reg := c.Reg[op-CMPA].Field(f).Int()
 		mem := c.Contents[m].Field(f).Int()
 		if reg < mem {
