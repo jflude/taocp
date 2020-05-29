@@ -7,8 +7,14 @@ import (
 	"testing"
 )
 
+const (
+	trace      = false
+	keepOutput = false
+)
+
 func TestCycle(t *testing.T) {
 	c := NewComputer()
+	c.trace = trace
 
 	// LDA
 	copy(c.Contents[:], egCycle1)
@@ -18,7 +24,7 @@ func TestCycle(t *testing.T) {
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: got error: %v", i+1, err)
 			c.next++
-			break
+			continue
 		}
 		if c.Reg[A] != v {
 			t.Errorf("#%d: got %#v, want %#v",
@@ -105,6 +111,8 @@ func TestCycle(t *testing.T) {
 		c.Contents[i] = op[0]
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: got error: %v", i+1, err)
+			c.next++
+			continue
 		}
 		if c.Reg[A] != op[1] {
 			t.Errorf("#%d: got A = %#v, want A = %#v",
@@ -126,6 +134,8 @@ func TestCycle(t *testing.T) {
 		c.Contents[i] = op[0]
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: got error: %v", i+1, err)
+			c.next++
+			continue
 		}
 		if c.Reg[A] != op[1] {
 			t.Errorf("#%d: got A = %#v, want A = %#v",
@@ -163,19 +173,23 @@ func TestCycle(t *testing.T) {
 	}
 
 	// Program P, Section 1.3.2
-	tmpDir, err := ioutil.TempDir("", "gnuth-mix-test")
-	if err != nil {
-		t.Fatal("got error:", err)
-	}
-	defer func() {
-		if err := os.RemoveAll(tmpDir); err != nil {
-			t.Error("got error:", err)
+	if !keepOutput {
+		tmpDir, err := ioutil.TempDir("", "gnuth-mix-test")
+		if err != nil {
+			t.Fatal("got error:", err)
 		}
-	}()
-	if err = os.Chdir(tmpDir); err != nil {
-		t.Fatal("got error:", err)
+		defer func() {
+			if err := os.RemoveAll(tmpDir); err != nil {
+				t.Error("got error:", err)
+			}
+		}()
+		if err = os.Chdir(tmpDir); err != nil {
+			t.Fatal("got error:", err)
+		}
 	}
-	c = NewComputer()
+	for i := range c.Contents {
+		c.Contents[i] = 0
+	}
 	copy(c.Contents[3000:], egCycle9)
 	copy(c.Contents[:], egCycle9a)
 	copy(c.Contents[1995:], egCycle9b)
@@ -190,7 +204,7 @@ func TestCycle(t *testing.T) {
 		t.Fatal("got error:", err)
 	}
 	if strings.Compare(string(b), okCycle9) != 0 {
-		t.Error("printer output is different")
+		t.Error("got: incorrect printer output")
 	}
 }
 
@@ -219,12 +233,13 @@ func BenchmarkProgramM(b *testing.B) {
 	}
 }
 
-func BenchmarkCycle1000(b *testing.B) {
+func Benchmark1000Cycles(b *testing.B) {
 	c := NewComputer()
-	for i := 0; i < 999; i++ {
-		c.Contents[i] = NewWord(0501)
+	for i := 0; i < 998; i += 2 {
+		c.Contents[i] = NewWord(0501)   // ADD 0
+		c.Contents[i+1] = NewWord(0502) // SUB 0
 	}
-	c.Contents[1000] = NewWord(0205)
+	c.Contents[999] = NewWord(0205) // HLT
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c.next = 0
@@ -306,8 +321,8 @@ var (
 	egCycle5 = [][]Word{
 		[]Word{ // #1
 			NewWord(01750000501),       // ADD 1000
-			NewWord(1234<<18 | 010226), // A
-			NewWord(0),                 // X
+			NewWord(1234<<18 | 010226), // A (before)
+			NewWord(0),                 // X (before)
 			NewWord(100<<18 | 050062),  // CONTENTS[1000]
 			NewWord(1334<<18 | 060310), // A (after)
 			NewWord(0),                 // X (after)
@@ -399,18 +414,19 @@ var (
 			NewWord(04545444747),
 		},
 	}
-
-	egCycle8 = []Word{
-		NewWord(3009<<18 | 0240),
-		NewWord(010263),
-		NewWord(3005<<18 | 39),
-		NewWord(1000<<18 | 030500 | 56),
-		NewWord(3007<<18 | 0700 | 39),
-		NewWord(030200 | 50),
-		NewWord(1000<<18 | 030500 | 8),
-		NewWord(01000100 | 51),
-		NewWord(3003<<18 | 0200 | 43),
-		NewWord(3009<<18 | 39),
+	//                                         * FIND THE MAXIMUM
+	//                                         X        EQU   1000
+	egCycle8 = []Word{ //                               ORIG  3000
+		NewWord(3009<<18 | 0240),       // MAXIMUM  STJ   EXIT
+		NewWord(010263),                // INIT     ENT3  0,1
+		NewWord(3005<<18 | 39),         //          JMP   CHANGEM
+		NewWord(1000<<18 | 030570),     // LOOP     CMPA  X,3
+		NewWord(3007<<18 | 0700 | 39),  //          JLE   *+3
+		NewWord(030200 | 50),           // CHANGEM  ENT2  0,3
+		NewWord(1000<<18 | 030500 | 8), //          LDA   X,3
+		NewWord(01000100 | 51),         //          DEC3  1
+		NewWord(3003<<18 | 0200 | 43),  //          J3P   LOOP
+		NewWord(3009<<18 | 39),         // EXIT     JMP   *
 	}
 
 	//                                     * EXAMPLE: TABLE OF PRIMES
