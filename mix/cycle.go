@@ -1,16 +1,23 @@
 package mix
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 func (c *Computer) Cycle() (err error) {
-	defer func() {
-		if err2, ok := recover().(error); ok {
-			err = err2
-		}
-	}()
 	if c.next < 0 || c.next >= MemorySize {
 		return ErrInvalidAddress
 	}
+	defer func(addr int) {
+		if err2, ok := recover().(error); ok {
+			err = err2
+		}
+		if err != nil {
+			err = fmt.Errorf("%w at %04d (%#v)",
+				err, addr, c.Contents[addr])
+		}
+	}(c.next)
 	aa, i, f, op := c.Contents[c.next].Instruction()
 	c.next++
 	if i > 6 {
@@ -178,7 +185,7 @@ func (c *Computer) Cycle() (err error) {
 		if f >= len(c.Devices) {
 			return ErrInvalidInstruction
 		}
-		c.jump(m, c.Devices[f].BusyUntil(c.elapsed) != 0)
+		err = c.jump(m, c.Devices[f].BusyUntil(c.elapsed) != 0)
 		t = 1
 	case op == IOC:
 		if f >= len(c.Devices) {
@@ -219,32 +226,35 @@ func (c *Computer) Cycle() (err error) {
 		if f >= len(c.Devices) {
 			return ErrInvalidInstruction
 		}
-		c.jump(m, c.Devices[f].BusyUntil(c.elapsed) == 0)
+		err = c.jump(m, c.Devices[f].BusyUntil(c.elapsed) == 0)
 		t = 1
 	case op == JMP:
 		switch f {
 		case 0: // JMP
-			c.jump(m, true)
+			err = c.jump(m, true)
 		case 1: // JSJ
+			if m < 0 || m >= MemorySize {
+				return ErrInvalidAddress
+			}
 			c.next = m
 		case 2: // JOV
-			c.jump(m, c.Overflow)
+			err = c.jump(m, c.Overflow)
 			c.Overflow = false
 		case 3: // JNV
-			c.jump(m, !c.Overflow)
+			err = c.jump(m, !c.Overflow)
 			c.Overflow = false
 		case 4: // JL
-			c.jump(m, c.Comparison == Less)
+			err = c.jump(m, c.Comparison == Less)
 		case 5: // JE
-			c.jump(m, c.Comparison == Equal)
+			err = c.jump(m, c.Comparison == Equal)
 		case 6: // JG
-			c.jump(m, c.Comparison == Greater)
+			err = c.jump(m, c.Comparison == Greater)
 		case 7: // JGE
-			c.jump(m, c.Comparison != Less)
+			err = c.jump(m, c.Comparison != Less)
 		case 8: // JNE
-			c.jump(m, c.Comparison != Equal)
+			err = c.jump(m, c.Comparison != Equal)
 		case 9: // JLE
-			c.jump(m, c.Comparison != Greater)
+			err = c.jump(m, c.Comparison != Greater)
 		default:
 			return ErrInvalidInstruction
 		}
@@ -253,17 +263,17 @@ func (c *Computer) Cycle() (err error) {
 		reg := c.Reg[op-JA].Int()
 		switch f {
 		case 0: // N
-			c.jump(m, reg < 0)
+			err = c.jump(m, reg < 0)
 		case 1: // Z
-			c.jump(m, reg == 0)
+			err = c.jump(m, reg == 0)
 		case 2: // P
-			c.jump(m, reg > 0)
+			err = c.jump(m, reg > 0)
 		case 3: // NN
-			c.jump(m, reg >= 0)
+			err = c.jump(m, reg >= 0)
 		case 4: // NE
-			c.jump(m, reg != 0)
+			err = c.jump(m, reg != 0)
 		case 5: // NP
-			c.jump(m, reg <= 0)
+			err = c.jump(m, reg <= 0)
 		default:
 			return ErrInvalidInstruction
 		}
@@ -361,11 +371,15 @@ func (c *Computer) addIndex(reg, v int) error {
 	return nil
 }
 
-func (c *Computer) jump(address int, cond bool) {
+func (c *Computer) jump(address int, cond bool) error {
 	if cond {
+		if address < 0 || address >= MemorySize {
+			return ErrInvalidAddress
+		}
 		c.Reg[J] = NewWord(c.next)
 		c.next = address
 	}
+	return nil
 }
 
 func (c *Computer) waitBusy(unit int) {

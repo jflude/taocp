@@ -2,8 +2,8 @@ package mix
 
 import (
 	"errors"
+	"fmt"
 	"math"
-	"strconv"
 )
 
 const (
@@ -77,16 +77,16 @@ func (w Word) String() string {
 	if int32(w) == signBit {
 		return "-0"
 	}
-	return strconv.Itoa(w.Int())
+	return fmt.Sprint(w.Int())
 }
 
 // GoString returns a representation of a MIX word as an unsigned integer.
 func (w Word) GoString() string {
-	var s string
-	if w.Int() != 0 {
-		s = "0"
+	s := "+"
+	if w&signBit != 0 {
+		s = "-"
 	}
-	return s + strconv.FormatUint(uint64(uint32(w)), 8)
+	return fmt.Sprintf("%s%#011o", s, uint64(uint32(w&^signBit)))
 }
 
 // Field returns the value of field f as a MIX word.
