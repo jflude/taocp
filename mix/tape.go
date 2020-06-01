@@ -55,23 +55,19 @@ func (t *Tape) Write(block []Word) (int64, error) {
 }
 
 func (t *Tape) Control(m int) (int64, error) {
-	var p, wh int
+	var pos, wh int
 	var dur int64
-	switch {
-	case m < 0:
-		p = -4 * t.BlockSize()
-		wh = io.SeekCurrent
-		dur = 30000
-	case m == 0:
-		p = 0
+	if m == 0 {
+		pos = 0
 		wh = io.SeekStart
 		dur = 60000000
-	case m > 0:
-		p = 4 * t.BlockSize()
+
+	} else {
+		pos = 4 * t.BlockSize() * m
 		wh = io.SeekCurrent
 		dur = 30000
 	}
-	_, err := t.f.Seek(int64(p), wh)
+	_, err := t.f.Seek(int64(pos), wh)
 	return dur, err
 }
 

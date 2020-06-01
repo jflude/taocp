@@ -160,7 +160,7 @@ func TestCycle(t *testing.T) {
 	c.Contents[1009] = NewWord(2)
 	c.Reg[I1] = 10
 	c.next = 0
-	if err := c.GoButton(); err != nil {
+	if err := c.resume(); err != nil {
 		t.Error("error:", err)
 	}
 	if c.Reg[A].Int() != 7 {
@@ -177,7 +177,7 @@ func TestCycle(t *testing.T) {
 	copy(c.Contents[2024:], egCycle9c)
 	copy(c.Contents[2049:], egCycle9d)
 	c.next = 3000
-	if err := c.GoButton(); err != nil {
+	if err := c.resume(); err != nil {
 		t.Error("error:", err)
 	}
 	b, err := ioutil.ReadFile("printer.mix")
@@ -208,7 +208,7 @@ func BenchmarkProgramM(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		c.Reg[I1] = 10
 		c.next = 0
-		if err := c.GoButton(); err != nil {
+		if err := c.resume(); err != nil {
 			b.Fatal("error:", err)
 		}
 	}
@@ -224,7 +224,7 @@ func Benchmark1000Cycles(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c.next = 0
-		if err := c.GoButton(); err != nil {
+		if err := c.resume(); err != nil {
 			b.Fatal("error:", err)
 		}
 	}

@@ -29,7 +29,7 @@ func (*CardReader) BlockSize() int {
 
 func (r *CardReader) Read(block []Word) (int64, error) {
 	buf := make([]byte, 5*r.BlockSize())
-	if _, err := r.rc.Read(buf); err != nil {
+	if _, err := io.ReadFull(r.rc, buf); err != nil {
 		return 0, err
 	}
 	s := string(buf)

@@ -8,12 +8,35 @@ import (
 )
 
 const (
+	// The CPU registers of the MIX computer.
+	A = iota
+	I1
+	I2
+	I3
+	I4
+	I5
+	I6
+	X
+	J
+	// Z
+
 	// Less, Equal and Greater are the possible values taken by the
 	// computer's comparison indicator.
 	Less    = -1
 	Equal   = 0
 	Greater = 1
+
+	// MemorySize is the number of memory cells in a MIX computer.
+	MemorySize = 4000
 )
+
+type CPU struct {
+	Reg        [10]Word
+	Overflow   bool
+	Comparison int
+}
+
+type Contents [MemorySize]Word
 
 type Computer struct {
 	*CPU
