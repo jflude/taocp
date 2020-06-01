@@ -1,5 +1,16 @@
 package mix
 
+func (c *Computer) jump(address int, cond bool) {
+	if !cond {
+		return
+	}
+	if address < 0 || address >= MemorySize {
+		panic(ErrInvalidAddress)
+	}
+	c.Reg[J] = NewWord(c.next + 1)
+	c.next = address - 1
+}
+
 func (c *Computer) jmp(aa Word, i, f, op, m int) int {
 	switch f {
 	case 0: // JMP
@@ -51,15 +62,4 @@ func (c *Computer) ja(aa Word, i, f, op, m int) int {
 		panic(ErrInvalidInstruction)
 	}
 	return 1
-}
-
-func (c *Computer) jump(address int, cond bool) {
-	if !cond {
-		return
-	}
-	if address < 0 || address >= MemorySize {
-		panic(ErrInvalidAddress)
-	}
-	c.Reg[J] = NewWord(c.next + 1)
-	c.next = address - 1
 }

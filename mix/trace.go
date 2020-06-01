@@ -1,9 +1,6 @@
 package mix
 
-import (
-	"fmt"
-	"unicode/utf8"
-)
+import "fmt"
 
 func (c *Computer) printTrace(m, next int) {
 	var ov, ci string
@@ -39,13 +36,12 @@ func (c *Computer) printTrace(m, next int) {
 		fmt.Printf("J:        %4v (%#v)      %4d: ?\n",
 			c.Reg[J], c.Reg[J], m)
 	}
-	b := make([]rune, len(c.Devices))
+	b := make([]byte, len(c.Devices))
 	for i := 0; i < 20; i++ {
-		if c.Devices[i].BusyUntil(c.elapsed) != 0 {
-			r, _ := utf8.DecodeRuneInString(c.Devices[i].Name())
-			b[i] += r
+		if c.Devices[i].BusyUntil() != 0 {
+			b[i] += c.Devices[i].Name()[0]
 		} else {
-			b[i] = '.'
+			b[i] += '.'
 		}
 	}
 	fmt.Printf("Elapsed: %d    Device: %s\n\n",

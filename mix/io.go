@@ -1,58 +1,55 @@
 package mix
 
-func (c *Computer) jbus(aa Word, i, f, op, m int) int {
-	if f >= len(c.Devices) {
-		panic(ErrInvalidInstruction)
+func (c *Computer) jbus(aa Word, i, f, op, m int) (int, error) {
+	if err := c.bindDevice(f); err != nil {
+		return 0, err
 	}
-	c.jump(m, c.Devices[f].BusyUntil(c.elapsed) != 0)
-	return 1
+	c.jump(m, c.Devices[f].BusyUntil() != 0)
+	return 1, nil
 }
 
-func (c *Computer) ioc(aa Word, i, f, op, m int) int {
-	if f >= len(c.Devices) {
-		panic(ErrInvalidInstruction)
+func (c *Computer) ioc(aa Word, i, f, op, m int) (int, error) {
+	if err := c.bindDevice(f); err != nil {
+		return 0, err
 	}
 	c.waitBusy(f)
-	c.Devices[f].Control(m)
-	return 1
+	return 1, c.Devices[f].Control(m)
 }
 
-func (c *Computer) in(aa Word, i, f, op, m int) int {
-	if f >= len(c.Devices) {
-		panic(ErrInvalidInstruction)
+func (c *Computer) in(aa Word, i, f, op, m int) (int, error) {
+	if err := c.bindDevice(f); err != nil {
+		return 0, err
 	}
 	n := m + c.Devices[f].BlockSize()
 	if m < 0 || n >= MemorySize {
-		panic(ErrInvalidAddress)
+		return 0, ErrInvalidAddress
 	}
 	c.waitBusy(f)
-	c.Devices[f].Read(c.Contents[m:n])
-	return 1
+	return 1, c.Devices[f].Read(c.Contents[m:n])
 }
 
-func (c *Computer) out(aa Word, i, f, op, m int) int {
-	if f >= len(c.Devices) {
-		panic(ErrInvalidInstruction)
+func (c *Computer) out(aa Word, i, f, op, m int) (int, error) {
+	if err := c.bindDevice(f); err != nil {
+		return 0, err
 	}
 	n := m + c.Devices[f].BlockSize()
 	if m < 0 || n >= MemorySize {
-		panic(ErrInvalidAddress)
+		return 0, ErrInvalidAddress
 	}
 	c.waitBusy(f)
-	c.Devices[f].Write(c.Contents[m:n])
-	return 1
+	return 1, c.Devices[f].Write(c.Contents[m:n])
 }
 
-func (c *Computer) jred(aa Word, i, f, op, m int) int {
-	if f >= len(c.Devices) {
-		panic(ErrInvalidInstruction)
+func (c *Computer) jred(aa Word, i, f, op, m int) (int, error) {
+	if err := c.bindDevice(f); err != nil {
+		return 0, err
 	}
-	c.jump(m, c.Devices[f].BusyUntil(c.elapsed) == 0)
-	return 1
+	c.jump(m, c.Devices[f].BusyUntil() == 0)
+	return 1, nil
 }
 
 func (c *Computer) waitBusy(unit int) {
-	if until := c.Devices[unit].BusyUntil(c.elapsed); until > 0 {
+	if until := c.Devices[unit].BusyUntil(); until > 0 {
 		c.elapsed = until
 	}
 }

@@ -2,19 +2,14 @@ package mix
 
 import (
 	"io/ioutil"
-	"os"
 	"strings"
 	"testing"
 )
 
-const (
-	trace      = false
-	keepOutput = false
-)
-
 func TestCycle(t *testing.T) {
-	c := NewComputer()
-	c.trace = trace
+	c, tmpDir := newSandbox(t, "")
+	defer closeSandbox(t, c, tmpDir)
+	//c.trace = true
 
 	// LDA
 	copy(c.Contents[:], egCycle1)
@@ -22,7 +17,7 @@ func TestCycle(t *testing.T) {
 	c.next = 0
 	for i, v := range okCycle1 {
 		if err := c.Cycle(); err != nil {
-			t.Errorf("#%d: got error: %v", i+1, err)
+			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
@@ -38,7 +33,7 @@ func TestCycle(t *testing.T) {
 	c.next = 0
 	for i, v := range okCycle2 {
 		if err := c.Cycle(); err != nil {
-			t.Errorf("#%d: got error: %v", i+1, err)
+			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
@@ -55,7 +50,7 @@ func TestCycle(t *testing.T) {
 	for i, v := range okCycle3 {
 		c.Contents[2000] = NewWord(-0102030405)
 		if err := c.Cycle(); err != nil {
-			t.Errorf("#%d: got error: %v", i+1, err)
+			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
@@ -72,7 +67,7 @@ func TestCycle(t *testing.T) {
 	for i, v := range okCycle4 {
 		c.Contents[2000] = NewWord(-0102030405)
 		if err := c.Cycle(); err != nil {
-			t.Errorf("#%d: got error: %v", i+1, err)
+			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
@@ -90,7 +85,7 @@ func TestCycle(t *testing.T) {
 		c.Contents[1000] = op[3]
 		c.next = 0
 		if err := c.Cycle(); err != nil {
-			t.Errorf("#%d: got error: %v", i+1, err)
+			t.Errorf("#%d: error: %v", i+1, err)
 			continue
 		}
 		if c.Reg[A] != op[4] {
@@ -110,7 +105,7 @@ func TestCycle(t *testing.T) {
 	for i, op := range egCycle6 {
 		c.Contents[i] = op[0]
 		if err := c.Cycle(); err != nil {
-			t.Errorf("#%d: got error: %v", i+1, err)
+			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
@@ -133,7 +128,7 @@ func TestCycle(t *testing.T) {
 	for i, op := range egCycle7 {
 		c.Contents[i] = op[0]
 		if err := c.Cycle(); err != nil {
-			t.Errorf("#%d: got error: %v", i+1, err)
+			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
@@ -166,27 +161,13 @@ func TestCycle(t *testing.T) {
 	c.Reg[I1] = 10
 	c.next = 0
 	if err := c.GoButton(); err != nil {
-		t.Error("got error:", err)
+		t.Error("error:", err)
 	}
 	if c.Reg[A].Int() != 7 {
 		t.Errorf("got %#o (%v), want 7", c.Reg[A], c.Reg[A])
 	}
 
 	// Program P, Section 1.3.2
-	if !keepOutput {
-		tmpDir, err := ioutil.TempDir("", "gnuth-mix-test")
-		if err != nil {
-			t.Fatal("got error:", err)
-		}
-		defer func() {
-			if err := os.RemoveAll(tmpDir); err != nil {
-				t.Error("got error:", err)
-			}
-		}()
-		if err = os.Chdir(tmpDir); err != nil {
-			t.Fatal("got error:", err)
-		}
-	}
 	for i := range c.Contents {
 		c.Contents[i] = 0
 	}
@@ -197,11 +178,11 @@ func TestCycle(t *testing.T) {
 	copy(c.Contents[2049:], egCycle9d)
 	c.next = 3000
 	if err := c.GoButton(); err != nil {
-		t.Error("got error:", err)
+		t.Error("error:", err)
 	}
-	b, err := ioutil.ReadFile("printer.out")
+	b, err := ioutil.ReadFile("printer.mix")
 	if err != nil {
-		t.Fatal("got error:", err)
+		t.Fatal("error:", err)
 	}
 	if strings.Compare(string(b), okCycle9) != 0 {
 		t.Error("got: incorrect printer output")
@@ -228,7 +209,7 @@ func BenchmarkProgramM(b *testing.B) {
 		c.Reg[I1] = 10
 		c.next = 0
 		if err := c.GoButton(); err != nil {
-			b.Fatal("got error:", err)
+			b.Fatal("error:", err)
 		}
 	}
 }
@@ -244,7 +225,7 @@ func Benchmark1000Cycles(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		c.next = 0
 		if err := c.GoButton(); err != nil {
-			b.Fatal("got error:", err)
+			b.Fatal("error:", err)
 		}
 	}
 }

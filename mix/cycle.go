@@ -54,15 +54,15 @@ func (c *Computer) Cycle() (err error) {
 	case op >= STA && op <= STZ:
 		t = c.sta(aa, i, f, op, m)
 	case op == JBUS:
-		t = c.jbus(aa, i, f, op, m)
+		t, err = c.jbus(aa, i, f, op, m)
 	case op == IOC:
-		t = c.ioc(aa, i, f, op, m)
+		t, err = c.ioc(aa, i, f, op, m)
 	case op == IN:
-		t = c.in(aa, i, f, op, m)
+		t, err = c.in(aa, i, f, op, m)
 	case op == OUT:
-		t = c.out(aa, i, f, op, m)
+		t, err = c.out(aa, i, f, op, m)
 	case op == JRED:
-		t = c.jred(aa, i, f, op, m)
+		t, err = c.jred(aa, i, f, op, m)
 	case op == JMP:
 		t = c.jmp(aa, i, f, op, m)
 	case op >= JA && op <= JX:
@@ -72,7 +72,9 @@ func (c *Computer) Cycle() (err error) {
 	case op >= CMPA && op <= CMPX:
 		t = c.cmpa(aa, i, f, op, m)
 	}
-	c.elapsed += int64(t)
-	c.next++
-	return nil
+	if err == nil {
+		c.elapsed += int64(t)
+		c.next++
+	}
+	return err
 }

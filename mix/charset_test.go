@@ -15,7 +15,7 @@ func TestConvertToUTF8(t *testing.T) {
 func TestConvertToMIX(t *testing.T) {
 	got, err := ConvertToMIX(egUTF8)
 	if err != nil {
-		t.Errorf("got error: %v", err)
+		t.Errorf("error: %v", err)
 	} else if !reflect.DeepEqual(got, egMIX) {
 		t.Errorf("got %#v, want %#v", got, egMIX)
 	}

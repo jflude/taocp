@@ -7,18 +7,17 @@ import (
 )
 
 const (
-	// The largest and smallest values that are representable by a
-	// five byte MIX word.
+	// The largest and smallest values that are representable
+	// by a MIX word.
 	MaxWord = 1<<30 - 1
 	MinWord = -MaxWord
 
-	// The largest and smallest values that are representable by a
-	// two byte MIX index registers and the jump register.
+	// The largest and smallest values that are representable
+	// by the MIX index registers and the jump register.
 	MaxIndex = 1<<12 - 1
 	MinIndex = -MaxIndex
 
-	signBit  = math.MinInt32
-	byteSize = 1 << 6
+	signBit = math.MinInt32
 )
 
 var ErrInvalidFieldSpec = errors.New("invalid field specification")
@@ -151,10 +150,10 @@ func (w *Word) ShiftRight(count int) Word {
 // Instruction extracts an instruction's address, index, field and opcode
 // from a MIX word.
 func (w Word) Instruction() (aa Word, i, f, c int) {
-	aa = Word((int32(w) >> fields[2].shift) & fields[2].reg)
-	i = int((int32(w) & fields[27].mem) >> fields[27].shift)
-	f = int((int32(w) & fields[36].mem) >> fields[36].shift)
-	c = int((int32(w) & fields[45].mem) >> fields[45].shift)
+	aa = Word((int32(w) >> fields[02].shift) & fields[02].reg)
+	i = int((int32(w) & fields[033].mem) >> fields[033].shift)
+	f = int((int32(w) & fields[044].mem) >> fields[044].shift)
+	c = int((int32(w) & fields[055].mem) >> fields[055].shift)
 	return
 }
 
