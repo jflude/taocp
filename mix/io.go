@@ -1,22 +1,22 @@
 package mix
 
-func (c *Computer) jbus(aa Word, i, f, op, m int) (int, error) {
+func (c *Computer) jbus(aa Word, i, f, op, m int) (int64, error) {
 	if err := c.bindDevice(f); err != nil {
 		return 0, err
 	}
-	c.jump(m, c.Devices[f].BusyUntil() != 0)
+	c.jump(m, c.isBusy(f))
 	return 1, nil
 }
 
-func (c *Computer) ioc(aa Word, i, f, op, m int) (int, error) {
+func (c *Computer) ioc(aa Word, i, f, op, m int) (int64, error) {
 	if err := c.bindDevice(f); err != nil {
 		return 0, err
 	}
-	c.waitBusy(f)
-	return 1, c.Devices[f].Control(m)
+	t, err := c.Devices[f].Control(m)
+	return c.calcTime(f, t, err)
 }
 
-func (c *Computer) in(aa Word, i, f, op, m int) (int, error) {
+func (c *Computer) in(aa Word, i, f, op, m int) (int64, error) {
 	if err := c.bindDevice(f); err != nil {
 		return 0, err
 	}
@@ -24,11 +24,11 @@ func (c *Computer) in(aa Word, i, f, op, m int) (int, error) {
 	if m < 0 || n >= MemorySize {
 		return 0, ErrInvalidAddress
 	}
-	c.waitBusy(f)
-	return 1, c.Devices[f].Read(c.Contents[m:n])
+	t, err := c.Devices[f].Read(c.Contents[m:n])
+	return c.calcTime(f, t, err)
 }
 
-func (c *Computer) out(aa Word, i, f, op, m int) (int, error) {
+func (c *Computer) out(aa Word, i, f, op, m int) (int64, error) {
 	if err := c.bindDevice(f); err != nil {
 		return 0, err
 	}
@@ -36,20 +36,14 @@ func (c *Computer) out(aa Word, i, f, op, m int) (int, error) {
 	if m < 0 || n >= MemorySize {
 		return 0, ErrInvalidAddress
 	}
-	c.waitBusy(f)
-	return 1, c.Devices[f].Write(c.Contents[m:n])
+	t, err := c.Devices[f].Write(c.Contents[m:n])
+	return c.calcTime(f, t, err)
 }
 
-func (c *Computer) jred(aa Word, i, f, op, m int) (int, error) {
+func (c *Computer) jred(aa Word, i, f, op, m int) (int64, error) {
 	if err := c.bindDevice(f); err != nil {
 		return 0, err
 	}
-	c.jump(m, c.Devices[f].BusyUntil() == 0)
+	c.jump(m, !c.isBusy(f))
 	return 1, nil
-}
-
-func (c *Computer) waitBusy(unit int) {
-	if until := c.Devices[unit].BusyUntil(); until > 0 {
-		c.elapsed = until
-	}
 }

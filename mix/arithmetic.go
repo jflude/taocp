@@ -1,6 +1,6 @@
 package mix
 
-func (c *Computer) add(aa Word, i, f, op, m int) int {
+func (c *Computer) add(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
 		panic(ErrNotImplemented)
 	}
@@ -8,7 +8,7 @@ func (c *Computer) add(aa Word, i, f, op, m int) int {
 	return 2
 }
 
-func (c *Computer) sub(aa Word, i, f, op, m int) int {
+func (c *Computer) sub(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
 		panic(ErrNotImplemented)
 	}
@@ -16,7 +16,7 @@ func (c *Computer) sub(aa Word, i, f, op, m int) int {
 	return 2
 }
 
-func (c *Computer) mul(aa Word, i, f, op, m int) int {
+func (c *Computer) mul(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
 		panic(ErrNotImplemented)
 	}
@@ -32,7 +32,7 @@ func (c *Computer) mul(aa Word, i, f, op, m int) int {
 	return 10
 }
 
-func (c *Computer) div(aa Word, i, f, op, m int) int {
+func (c *Computer) div(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
 		panic(ErrNotImplemented)
 	}

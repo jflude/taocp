@@ -7,11 +7,10 @@ import (
 )
 
 type CardPunch struct {
-	c  *Computer
 	wc io.WriteCloser
 }
 
-func NewCardPunch(c *Computer, wc io.WriteCloser) (*CardPunch, error) {
+func NewCardPunch(wc io.WriteCloser) (*CardPunch, error) {
 	if wc == nil {
 		var err error
 		wc, err = os.OpenFile("punch.mix",
@@ -20,7 +19,7 @@ func NewCardPunch(c *Computer, wc io.WriteCloser) (*CardPunch, error) {
 			return nil, err
 		}
 	}
-	return &CardPunch{c, wc}, nil
+	return &CardPunch{wc}, nil
 }
 
 func (*CardPunch) Name() string {
@@ -31,25 +30,21 @@ func (*CardPunch) BlockSize() int {
 	return 16
 }
 
-func (*CardPunch) Read([]Word) error {
-	return ErrInvalidOperation
+func (*CardPunch) Read([]Word) (int64, error) {
+	return 0, ErrInvalidOperation
 }
 
-func (p *CardPunch) Write(block []Word) error {
+func (p *CardPunch) Write(block []Word) (int64, error) {
 	s := ConvertToUTF8(block)
 	if !isPunchable(s) {
-		return ErrInvalidCharacter
+		return 0, ErrInvalidCharacter
 	}
 	_, err := p.wc.Write([]byte(s))
-	return err
+	return 600000, err
 }
 
-func (p *CardPunch) Control(m int) error {
-	return ErrInvalidControl
-}
-
-func (p *CardPunch) BusyUntil() int64 {
-	return 0
+func (p *CardPunch) Control(m int) (int64, error) {
+	return 0, ErrInvalidControl
 }
 
 func (p *CardPunch) Close() error {
@@ -57,5 +52,6 @@ func (p *CardPunch) Close() error {
 }
 
 func isPunchable(s string) bool {
-	return !strings.ContainsAny(s, "ΘΦΠ")
+	// see Ex. 26, Section 1.3.1 for characters which cannot be punched
+	return !strings.ContainsAny(s, "ΦΠ$<>@;:'")
 }

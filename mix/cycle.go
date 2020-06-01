@@ -29,7 +29,7 @@ func (c *Computer) Cycle() (err error) {
 	if c.trace {
 		c.printTrace(m, c.next)
 	}
-	var t int
+	var t int64
 	switch {
 	case op == NOP:
 		t = 1
@@ -73,7 +73,7 @@ func (c *Computer) Cycle() (err error) {
 		t = c.cmpa(aa, i, f, op, m)
 	}
 	if err == nil {
-		c.elapsed += int64(t)
+		c.elapsed += t
 		c.next++
 	}
 	return err

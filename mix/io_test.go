@@ -17,13 +17,13 @@ func TestIO(t *testing.T) {
 			buf[j] = NewWord(100*i + j)
 		}
 		c.Reg[X] = NewWord(10 * i)
-		if err := drum.Write(buf); err != nil {
+		if _, err := drum.Write(buf); err != nil {
 			t.Error("error:", err)
 		}
 	}
 	for i := 0; i < 10; i++ {
 		c.Reg[X] = NewWord(10 * i)
-		if err := drum.Read(buf); err != nil {
+		if _, err := drum.Read(buf); err != nil {
 			t.Error("error:", err)
 		}
 		for j, v := range buf {
@@ -46,21 +46,21 @@ func TestIO(t *testing.T) {
 		for j := range buf {
 			buf[j] = NewWord(100*i + j)
 		}
-		if err := tape.Write(buf); err != nil {
+		if _, err := tape.Write(buf); err != nil {
 			t.Error("error:", err)
 		}
 	}
-	if err := tape.Control(0); err != nil {
+	if _, err := tape.Control(0); err != nil {
 		t.Error("error:", err)
 	}
-	if err := tape.Control(1); err != nil {
+	if _, err := tape.Control(1); err != nil {
 		t.Error("error:", err)
 	}
-	if err := tape.Control(1); err != nil {
+	if _, err := tape.Control(1); err != nil {
 		t.Error("error:", err)
 	}
 	for i := 2; i < 10; i++ {
-		if err := tape.Read(buf); err != nil {
+		if _, err := tape.Read(buf); err != nil {
 			t.Error("error:", err)
 		}
 		for j, v := range buf {

@@ -9,13 +9,13 @@ import (
 )
 
 type Drum struct {
-	c    *Computer
 	f    *os.File
 	name string
+	c    *Computer
 	pos  int64
 }
 
-func NewDrum(c *Computer, f *os.File, unit int) (*Drum, error) {
+func NewDrum(f *os.File, unit int, c *Computer) (*Drum, error) {
 	n := fmt.Sprintf("DRUM%02d", unit)
 	if f == nil {
 		file := strings.ToLower(n) + ".mix"
@@ -25,7 +25,7 @@ func NewDrum(c *Computer, f *os.File, unit int) (*Drum, error) {
 			return nil, err
 		}
 	}
-	return &Drum{c, f, n, 0}, nil
+	return &Drum{f, n, c, 0}, nil
 }
 
 func (d *Drum) Name() string {
@@ -36,51 +36,50 @@ func (*Drum) BlockSize() int {
 	return 100
 }
 
-func (d *Drum) Read(block []Word) error {
-	if err := d.seekToX(); err != nil {
-		return err
+func (d *Drum) Read(block []Word) (int64, error) {
+	dur, err := d.seekToX()
+	if err != nil {
+		return 0, err
 	}
 	buf := make([]byte, 4*len(block))
 	if _, err := io.ReadFull(d.f, buf); err != nil {
-		return err
+		return 0, err
 	}
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
-	return nil
+	return 3000 + dur, nil
 }
 
-func (d *Drum) Write(block []Word) error {
-	if err := d.seekToX(); err != nil {
-		return err
+func (d *Drum) Write(block []Word) (int64, error) {
+	dur, err := d.seekToX()
+	if err != nil {
+		return 0, err
 	}
 	buf := make([]byte, 4*len(block))
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
-	_, err := d.f.Write(buf)
-	return err
+	_, err = d.f.Write(buf)
+	return 3000 + dur, err
 }
 
-func (d *Drum) Control(m int) error {
+func (d *Drum) Control(m int) (int64, error) {
 	if m != 0 {
-		return ErrInvalidControl
+		return 0, ErrInvalidControl
 	}
 	return d.seekToX()
-}
-
-func (d *Drum) BusyUntil() int64 {
-	return 0
 }
 
 func (d *Drum) Close() error {
 	return d.f.Close()
 }
 
-func (d *Drum) seekToX() (err error) {
+func (d *Drum) seekToX() (dur int64, err error) {
 	x := int64(d.c.Reg[X].Field(045).Int() * 4 * d.BlockSize())
 	if d.pos != x {
 		d.pos, err = d.f.Seek(x, io.SeekStart)
+		dur = 20000
 	}
 	return
 }

@@ -7,11 +7,10 @@ import (
 )
 
 type Printer struct {
-	c  *Computer
 	wc io.WriteCloser
 }
 
-func NewPrinter(c *Computer, wc io.WriteCloser) (*Printer, error) {
+func NewPrinter(wc io.WriteCloser) (*Printer, error) {
 	if wc == nil {
 		var err error
 		wc, err = os.OpenFile("printer.mix",
@@ -20,7 +19,7 @@ func NewPrinter(c *Computer, wc io.WriteCloser) (*Printer, error) {
 			return nil, err
 		}
 	}
-	return &Printer{c, wc}, nil
+	return &Printer{wc}, nil
 }
 
 func (*Printer) Name() string {
@@ -31,26 +30,22 @@ func (*Printer) BlockSize() int {
 	return 24
 }
 
-func (*Printer) Read([]Word) error {
-	return ErrInvalidOperation
+func (*Printer) Read([]Word) (int64, error) {
+	return 0, ErrInvalidOperation
 }
 
-func (p *Printer) Write(block []Word) error {
+func (p *Printer) Write(block []Word) (int64, error) {
 	line := strings.TrimRight(ConvertToUTF8(block), " ")
 	_, err := p.wc.Write([]byte(line + "\n"))
-	return err
+	return 400000, err
 }
 
-func (p *Printer) Control(m int) error {
+func (p *Printer) Control(m int) (int64, error) {
 	if m != 0 {
-		return ErrInvalidControl
+		return 0, ErrInvalidControl
 	}
 	_, err := p.wc.Write([]byte("\014")) // form feed
-	return err
-}
-
-func (p *Printer) BusyUntil() int64 {
-	return 0
+	return 1000000, err
 }
 
 func (p *Printer) Close() error {

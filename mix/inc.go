@@ -1,6 +1,6 @@
 package mix
 
-func (c *Computer) inca(aa Word, i, f, op, m int) int {
+func (c *Computer) inca(aa Word, i, f, op, m int) int64 {
 	switch f {
 	case 0: // INC
 		if op == INCA || op == INCX {

@@ -1,3 +1,4 @@
 *~
+*.mix
 cmd/mix/mix
 cmd/mixal/mixal

@@ -2,7 +2,7 @@ package mix
 
 import "strconv"
 
-func (c *Computer) num(aa Word, i, f, op, m int) int {
+func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	switch f {
 	case 0: // NUM
 		var a, x int

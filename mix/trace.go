@@ -38,12 +38,11 @@ func (c *Computer) printTrace(m, next int) {
 	}
 	b := make([]byte, len(c.Devices))
 	for i := 0; i < 20; i++ {
-		if c.Devices[i].BusyUntil() != 0 {
+		if c.isBusy(i) {
 			b[i] += c.Devices[i].Name()[0]
 		} else {
 			b[i] += '.'
 		}
 	}
-	fmt.Printf("Elapsed: %d    Device: %s\n\n",
-		c.elapsed, string(b))
+	fmt.Printf("Device:  %s   Elapsed: %d\n\n", string(b), c.elapsed)
 }

@@ -18,10 +18,11 @@ const (
 type Computer struct {
 	*CPU
 	*Contents
-	Devices []Peripheral
-	m, next int
-	trace   bool
-	elapsed int64
+	Devices   []Peripheral
+	busyUntil []int64
+	elapsed   int64
+	m, next   int
+	trace     bool
 }
 
 var (
@@ -35,9 +36,10 @@ var (
 
 func NewComputer() *Computer {
 	return &Computer{
-		CPU:      new(CPU),
-		Contents: new(Contents),
-		Devices:  make([]Peripheral, 20),
+		CPU:       new(CPU),
+		Contents:  new(Contents),
+		Devices:   make([]Peripheral, 20),
+		busyUntil: make([]int64, 20),
 	}
 }
 

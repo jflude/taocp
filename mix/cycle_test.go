@@ -449,8 +449,8 @@ var (
 		NewWord(0205),             //           HLT
 	}
 	//                                     * TABLES AND BUFFERS
-	egCycle9a = []Word{ //                          ORIG PRIME+1 (=0)
-		NewWord(2), //                          CON 2
+	egCycle9a = []Word{ //                          ORIG  PRIME+1 (=0)
+		NewWord(2), //                          CON   2
 	}
 	egCycle9b = []Word{ //                          ORIG  BUF0-5 (=1995)
 		NewWord(0611232627),  //       TITLE    ALF   FIRST

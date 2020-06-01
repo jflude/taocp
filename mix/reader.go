@@ -6,18 +6,17 @@ import (
 )
 
 type CardReader struct {
-	c  *Computer
 	rc io.ReadCloser
 }
 
-func NewCardReader(c *Computer, rc io.ReadCloser) (*CardReader, error) {
+func NewCardReader(rc io.ReadCloser) (*CardReader, error) {
 	if rc == nil {
 		var err error
 		if rc, err = os.Open("reader.mix"); err != nil {
 			return nil, err
 		}
 	}
-	return &CardReader{c, rc}, nil
+	return &CardReader{rc}, nil
 }
 
 func (*CardReader) Name() string {
@@ -28,35 +27,31 @@ func (*CardReader) BlockSize() int {
 	return 16
 }
 
-func (r *CardReader) Read(block []Word) error {
+func (r *CardReader) Read(block []Word) (int64, error) {
 	buf := make([]byte, 5*r.BlockSize())
 	if _, err := r.rc.Read(buf); err != nil {
-		return err
+		return 0, err
 	}
 	s := string(buf)
 	if !isPunchable(s) {
-		return ErrInvalidCharacter
+		return 0, ErrInvalidCharacter
 	}
 	m, err := ConvertToMIX(s)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	copy(block, m)
-	return nil
+	return 400000, nil
 }
 
-func (*CardReader) Write([]Word) error {
-	return ErrInvalidOperation
+func (*CardReader) Write([]Word) (int64, error) {
+	return 0, ErrInvalidOperation
 }
 
-func (r *CardReader) Control(m int) error {
-	return ErrInvalidControl
+func (r *CardReader) Control(m int) (int64, error) {
+	return 0, ErrInvalidControl
 }
 
-func (r *CardReader) BusyUntil() int64 {
-	return 0
-}
-
-func (c *CardReader) Close() error {
-	return c.rc.Close()
+func (r *CardReader) Close() error {
+	return r.rc.Close()
 }

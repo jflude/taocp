@@ -1,6 +1,6 @@
 package mix
 
-func (c *Computer) cmpa(aa Word, i, f, op, m int) int {
+func (c *Computer) cmpa(aa Word, i, f, op, m int) int64 {
 	if op == CMPA && f == 6 {
 		panic(ErrNotImplemented)
 	}

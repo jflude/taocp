@@ -9,12 +9,11 @@ import (
 )
 
 type Tape struct {
-	c    *Computer
 	f    *os.File
 	name string
 }
 
-func NewTape(c *Computer, f *os.File, unit int) (*Tape, error) {
+func NewTape(f *os.File, unit int) (*Tape, error) {
 	n := fmt.Sprintf("TAPE%02d", unit)
 	if f == nil {
 		file := strings.ToLower(n) + ".mix"
@@ -24,7 +23,7 @@ func NewTape(c *Computer, f *os.File, unit int) (*Tape, error) {
 			return nil, err
 		}
 	}
-	return &Tape{c, f, n}, nil
+	return &Tape{f, n}, nil
 }
 
 func (t *Tape) Name() string {
@@ -35,45 +34,45 @@ func (*Tape) BlockSize() int {
 	return 100
 }
 
-func (t *Tape) Read(block []Word) error {
+func (t *Tape) Read(block []Word) (int64, error) {
 	buf := make([]byte, 4*len(block))
 	if _, err := io.ReadFull(t.f, buf); err != nil {
-		return err
+		return 0, err
 	}
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
-	return nil
+	return 6000, nil
 }
 
-func (t *Tape) Write(block []Word) error {
+func (t *Tape) Write(block []Word) (int64, error) {
 	buf := make([]byte, 4*len(block))
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
 	_, err := t.f.Write(buf)
-	return err
+	return 6000, err
 }
 
-func (t *Tape) Control(m int) error {
+func (t *Tape) Control(m int) (int64, error) {
 	var p, wh int
+	var dur int64
 	switch {
 	case m < 0:
 		p = -4 * t.BlockSize()
 		wh = io.SeekCurrent
+		dur = 30000
 	case m == 0:
 		p = 0
 		wh = io.SeekStart
+		dur = 60000000
 	case m > 0:
 		p = 4 * t.BlockSize()
 		wh = io.SeekCurrent
+		dur = 30000
 	}
 	_, err := t.f.Seek(int64(p), wh)
-	return err
-}
-
-func (t *Tape) BusyUntil() int64 {
-	return 0
+	return dur, err
 }
 
 func (t *Tape) Close() error {

@@ -7,12 +7,11 @@ import (
 )
 
 type Teletype struct {
-	c   *Computer
 	rwc io.ReadWriteCloser
 }
 
-func NewTeletype(c *Computer, rwc io.ReadWriteCloser) (*Teletype, error) {
-	return &Teletype{c, rwc}, nil
+func NewTeletype(rwc io.ReadWriteCloser) (*Teletype, error) {
+	return &Teletype{rwc}, nil
 }
 
 func (*Teletype) Name() string {
@@ -23,7 +22,7 @@ func (*Teletype) BlockSize() int {
 	return 14
 }
 
-func (t *Teletype) Read(block []Word) error {
+func (t *Teletype) Read(block []Word) (int64, error) {
 	var r io.Reader
 	if t.rwc != nil {
 		r = t.rwc
@@ -32,17 +31,17 @@ func (t *Teletype) Read(block []Word) error {
 	}
 	buf := make([]byte, 5*t.BlockSize())
 	if _, err := r.Read(buf); err != nil {
-		return err
+		return 0, err
 	}
 	m, err := ConvertToMIX(string(buf))
 	if err != nil {
-		return err
+		return 0, err
 	}
 	copy(block, m)
-	return nil
+	return 7000000, nil
 }
 
-func (t *Teletype) Write(block []Word) error {
+func (t *Teletype) Write(block []Word) (int64, error) {
 	var w io.Writer
 	if t.rwc != nil {
 		w = t.rwc
@@ -51,12 +50,12 @@ func (t *Teletype) Write(block []Word) error {
 	}
 	line := strings.TrimRight(ConvertToUTF8(block), " ")
 	_, err := w.Write([]byte(line + "\n"))
-	return err
+	return 7000000, err
 }
 
-func (t *Teletype) Control(m int) error {
+func (t *Teletype) Control(m int) (int64, error) {
 	if m != 0 {
-		return ErrInvalidControl
+		return 0, ErrInvalidControl
 	}
 	var rwc io.ReadWriteCloser
 	if t.rwc != nil {
@@ -66,13 +65,9 @@ func (t *Teletype) Control(m int) error {
 	}
 	if s, ok := rwc.(io.Seeker); ok {
 		_, err := s.Seek(0, io.SeekStart)
-		return err
+		return 60000000, err
 	}
-	return ErrInvalidOperation
-}
-
-func (t *Teletype) BusyUntil() int64 {
-	return 0
+	return 0, ErrInvalidOperation
 }
 
 func (t *Teletype) Close() error {

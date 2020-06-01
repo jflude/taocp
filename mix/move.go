@@ -1,6 +1,6 @@
 package mix
 
-func (c *Computer) move(aa Word, i, f, op, m int) int {
+func (c *Computer) move(aa Word, i, f, op, m int) int64 {
 	to := c.Reg[I1].Int()
 	if m < 0 || m+f >= MemorySize ||
 		to < 0 || to+f >= MemorySize {
@@ -10,5 +10,5 @@ func (c *Computer) move(aa Word, i, f, op, m int) int {
 		c.Contents[to+n] = c.Contents[m+n]
 	}
 	c.Reg[I1] = NewWord(to + f)
-	return 1 + 2*int(f)
+	return 1 + 2*int64(f)
 }

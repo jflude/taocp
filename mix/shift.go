@@ -1,6 +1,6 @@
 package mix
 
-func (c *Computer) sla(aa Word, i, f, op, m int) int {
+func (c *Computer) sla(aa Word, i, f, op, m int) int64 {
 	if m < 0 {
 		panic(ErrInvalidInstruction)
 	}

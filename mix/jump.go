@@ -11,7 +11,7 @@ func (c *Computer) jump(address int, cond bool) {
 	c.next = address - 1
 }
 
-func (c *Computer) jmp(aa Word, i, f, op, m int) int {
+func (c *Computer) jmp(aa Word, i, f, op, m int) int64 {
 	switch f {
 	case 0: // JMP
 		c.jump(m, true)
@@ -43,7 +43,7 @@ func (c *Computer) jmp(aa Word, i, f, op, m int) int {
 	}
 	return 1
 }
-func (c *Computer) ja(aa Word, i, f, op, m int) int {
+func (c *Computer) ja(aa Word, i, f, op, m int) int64 {
 	r := c.Reg[op-JA].Int()
 	switch f {
 	case 0: // N
