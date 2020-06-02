@@ -190,7 +190,7 @@ func TestCycle(t *testing.T) {
 }
 
 func BenchmarkProgramM(b *testing.B) {
-	c := NewComputer()
+	c := NewComputer(nil)
 	copy(c.Contents[3000:], egCycle8)
 	c.Contents[0] = NewWord(3000<<18 | 39) // JMP 3000
 	c.Contents[1] = NewWord(0205)          // HLT
@@ -215,7 +215,7 @@ func BenchmarkProgramM(b *testing.B) {
 }
 
 func Benchmark1000Cycles(b *testing.B) {
-	c := NewComputer()
+	c := NewComputer(nil)
 	for i := 0; i < 998; i += 2 {
 		c.Contents[i] = NewWord(0501)   // ADD 0
 		c.Contents[i+1] = NewWord(0502) // SUB 0

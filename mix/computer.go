@@ -41,6 +41,7 @@ type Contents [MemorySize]Word
 type Computer struct {
 	*CPU
 	*Contents
+	*Binding
 	Devices   []Peripheral
 	busyUntil []int64
 	elapsed   int64
@@ -57,10 +58,14 @@ var (
 	ErrNotImplemented     = errors.New("not implemented")
 )
 
-func NewComputer() *Computer {
+func NewComputer(bind *Binding) *Computer {
+	if bind == nil {
+		bind = DefaultBinding
+	}
 	return &Computer{
 		CPU:       new(CPU),
 		Contents:  new(Contents),
+		Binding:   bind,
 		Devices:   make([]Peripheral, 20),
 		busyUntil: make([]int64, 20),
 	}

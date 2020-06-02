@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 )
 
 type Drum struct {
@@ -15,17 +14,12 @@ type Drum struct {
 	pos  int64
 }
 
-func NewDrum(f *os.File, unit int, c *Computer) (*Drum, error) {
-	n := fmt.Sprintf("DRUM%02d", unit)
-	if f == nil {
-		file := strings.ToLower(n) + ".mix"
-		var err error
-		f, err = os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
-		if err != nil {
-			return nil, err
-		}
+func NewDrum(file string, unit int, c *Computer) (*Drum, error) {
+	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		return nil, err
 	}
-	return &Drum{f, n, c, 0}, nil
+	return &Drum{f, fmt.Sprintf("DRUM%02d", unit), c, 0}, nil
 }
 
 func (d *Drum) Name() string {

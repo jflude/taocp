@@ -10,14 +10,10 @@ type Printer struct {
 	wc io.WriteCloser
 }
 
-func NewPrinter(wc io.WriteCloser) (*Printer, error) {
-	if wc == nil {
-		var err error
-		wc, err = os.OpenFile("printer.mix",
-			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		if err != nil {
-			return nil, err
-		}
+func NewPrinter(file string) (*Printer, error) {
+	wc, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		return nil, err
 	}
 	return &Printer{wc}, nil
 }

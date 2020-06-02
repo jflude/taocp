@@ -20,7 +20,7 @@ func newSandbox(t *testing.T, tmpDir string) (*Computer, string) {
 	if err = os.Chdir(tmpDir); err != nil {
 		t.Fatal("error:", err)
 	}
-	return NewComputer(), ret
+	return NewComputer(nil), ret
 }
 
 func closeSandbox(t *testing.T, c *Computer, tmpDir string) {

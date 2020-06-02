@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 )
 
 type Tape struct {
@@ -13,17 +12,12 @@ type Tape struct {
 	name string
 }
 
-func NewTape(f *os.File, unit int) (*Tape, error) {
-	n := fmt.Sprintf("TAPE%02d", unit)
-	if f == nil {
-		file := strings.ToLower(n) + ".mix"
-		var err error
-		f, err = os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
-		if err != nil {
-			return nil, err
-		}
+func NewTape(file string, unit int) (*Tape, error) {
+	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		return nil, err
 	}
-	return &Tape{f, n}, nil
+	return &Tape{f, fmt.Sprintf("TAPE%02d", unit)}, nil
 }
 
 func (t *Tape) Name() string {

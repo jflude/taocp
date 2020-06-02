@@ -9,12 +9,10 @@ type CardReader struct {
 	rc io.ReadCloser
 }
 
-func NewCardReader(rc io.ReadCloser) (*CardReader, error) {
-	if rc == nil {
-		var err error
-		if rc, err = os.Open("reader.mix"); err != nil {
-			return nil, err
-		}
+func NewCardReader(file string) (*CardReader, error) {
+	rc, err := os.Open(file)
+	if err != nil {
+		return nil, err
 	}
 	return &CardReader{rc}, nil
 }

@@ -10,14 +10,10 @@ type CardPunch struct {
 	wc io.WriteCloser
 }
 
-func NewCardPunch(wc io.WriteCloser) (*CardPunch, error) {
-	if wc == nil {
-		var err error
-		wc, err = os.OpenFile("punch.mix",
-			os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-		if err != nil {
-			return nil, err
-		}
+func NewCardPunch(file string) (*CardPunch, error) {
+	wc, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+	if err != nil {
+		return nil, err
 	}
 	return &CardPunch{wc}, nil
 }

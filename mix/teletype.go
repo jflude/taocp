@@ -10,7 +10,15 @@ type Teletype struct {
 	rwc io.ReadWriteCloser
 }
 
-func NewTeletype(rwc io.ReadWriteCloser) (*Teletype, error) {
+func NewTeletype(file string) (*Teletype, error) {
+	var rwc io.ReadWriteCloser
+	if file != "" {
+		var err error
+		rwc, err = os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return &Teletype{rwc}, nil
 }
 
