@@ -10,8 +10,8 @@ import (
 type Drum struct {
 	f    *os.File
 	name string
+	here int64
 	c    *Computer
-	pos  int64
 }
 
 func NewDrum(file string, unit int, c *Computer) (*Drum, error) {
@@ -19,7 +19,7 @@ func NewDrum(file string, unit int, c *Computer) (*Drum, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Drum{f, fmt.Sprintf("DRUM%02d", unit), c, 0}, nil
+	return &Drum{f, fmt.Sprintf("DRUM%02d", unit), 0, c}, nil
 }
 
 func (d *Drum) Name() string {
@@ -71,8 +71,8 @@ func (d *Drum) Close() error {
 
 func (d *Drum) seekToX() (dur int64, err error) {
 	x := int64(d.c.Reg[X].Field(045).Int() * 4 * d.BlockSize())
-	if d.pos != x {
-		d.pos, err = d.f.Seek(x, io.SeekStart)
+	if d.here != x {
+		d.here, err = d.f.Seek(x, io.SeekStart)
 		dur = 20000
 	}
 	return

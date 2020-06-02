@@ -10,6 +10,7 @@ import (
 type Tape struct {
 	f    *os.File
 	name string
+	here int64
 }
 
 func NewTape(file string, unit int) (*Tape, error) {
@@ -17,7 +18,7 @@ func NewTape(file string, unit int) (*Tape, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Tape{f, fmt.Sprintf("TAPE%02d", unit)}, nil
+	return &Tape{f, fmt.Sprintf("TAPE%02d", unit), 0}, nil
 }
 
 func (t *Tape) Name() string {
@@ -36,6 +37,7 @@ func (t *Tape) Read(block []Word) (int64, error) {
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
+	t.here += int64(4 * t.BlockSize())
 	return 6000, nil
 }
 
@@ -45,23 +47,29 @@ func (t *Tape) Write(block []Word) (int64, error) {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
 	_, err := t.f.Write(buf)
+	if err == nil {
+		t.here += int64(4 * t.BlockSize())
+	}
 	return 6000, err
 }
 
 func (t *Tape) Control(m int) (int64, error) {
-	var pos, wh int
-	var dur int64
+	var pos, dur int64
+	var wh int
 	if m == 0 {
 		pos = 0
 		wh = io.SeekStart
 		dur = 60000000
-
 	} else {
-		pos = 4 * t.BlockSize() * m
+		pos = int64(4 * t.BlockSize() * m)
+		if t.here+pos < 0 {
+			pos = -t.here
+		}
 		wh = io.SeekCurrent
 		dur = 30000
 	}
-	_, err := t.f.Seek(int64(pos), wh)
+	var err error
+	t.here, err = t.f.Seek(pos, wh)
 	return dur, err
 }
 
