@@ -31,7 +31,7 @@ func (r *CardReader) Read(block []Word) (int64, error) {
 		return 0, err
 	}
 	s := string(buf)
-	if !isPunchable(s) {
+	if !IsPunchable(s) {
 		return 0, ErrInvalidCharacter
 	}
 	m, err := ConvertToMIX(s)
