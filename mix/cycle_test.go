@@ -410,14 +410,14 @@ var (
 		NewWord(3009<<18 | 39),         // EXIT     JMP   *
 	}
 
-	//                                     * EXAMPLE: TABLE OF PRIMES
-	//                                     L        EQU   500
-	//                                     PRINTER  EQU   18
-	//                                     PRIME    EQU   -1
-	//                                     BUF0     EQU   2000
-	//                                     BUF1     EQU   BUF0+25
+	//                                    * EXAMPLE: TABLE OF PRIMES
+	//                                    L         EQU   500
+	//                                    PRINTER   EQU   18
+	//                                    PRIME     EQU   -1
+	//                                    BUF0      EQU   2000
+	//                                    BUF1      EQU   BUF0+25
 	egCycle9 = []Word{ //                           ORIG  3000
-		NewWord(02243),            //           IOC   0(PRINTER)
+		NewWord(02243),            // START     IOC   0(PRINTER)
 		NewWord(2050<<18 | 0511),  //           LD1   =1-L=
 		NewWord(2051<<18 | 0512),  //           LD2   =3=
 		NewWord(01000061),         // 2H        INC1  1
@@ -448,12 +448,12 @@ var (
 		NewWord(3019<<18 | 055),   //           J5N   2B
 		NewWord(0205),             //           HLT
 	}
-	//                                     * TABLES AND BUFFERS
+	//                                    * TABLES AND BUFFERS
 	egCycle9a = []Word{ //                          ORIG  PRIME+1 (=0)
 		NewWord(2), //                          CON   2
 	}
 	egCycle9b = []Word{ //                          ORIG  BUF0-5 (=1995)
-		NewWord(0611232627),  //       TITLE    ALF   FIRST
+		NewWord(0611232627),  //      TITLE     ALF   FIRST
 		NewWord(06113105),    //                ALF    FIVE
 		NewWord(010301704),   //                ALF    HUND
 		NewWord(02305040021), //                ALF   RED P

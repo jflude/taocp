@@ -7,26 +7,24 @@ import (
 	"github.com/jflude/gnuth/mix"
 )
 
-func TestOutput(t *testing.T) {
+func TestWriteCards(t *testing.T) {
 	var buf bytes.Buffer
-	egObject.outputCards(&buf, 3000)
+	egObject.writeCards(&buf)
 	if bytes.Compare(buf.Bytes(), okObject) != 0 {
 		t.Errorf("got: %q\nwant: %q", buf.Bytes(), okObject)
 	}
 }
 
 var egObject = object{
-	&chunk{
-		orig: 3000,
-		data: []mix.Word{
+	start: 3000,
+	orig:  []int{3000, 1000},
+	seg: [][]mix.Word{
+		{
 			mix.NewWord(1187),
 			mix.NewWord(1000<<18 | 02245),
 			mix.NewWord(133),
 		},
-	},
-	&chunk{
-		orig: 1000,
-		data: []mix.Word{
+		{
 			mix.NewWord(135582544),
 			mix.NewWord(6882509),
 			mix.NewWord(67108864),

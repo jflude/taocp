@@ -32,8 +32,8 @@ func (*CardPunch) Read([]Word) (int64, error) {
 
 func (p *CardPunch) Write(block []Word) (int64, error) {
 	s := ConvertToUTF8(block)
-	if !IsPunchable(s) {
-		return 0, ErrInvalidCharacter
+	if r, ok := IsPunchable(s); !ok {
+		return 0, charError(r)
 	}
 	_, err := p.wc.Write([]byte(s))
 	return 600000, err
@@ -47,9 +47,12 @@ func (p *CardPunch) Close() error {
 	return p.wc.Close()
 }
 
-func IsPunchable(s string) bool {
+func IsPunchable(s string) (rune, bool) {
 	// see Ex. 26, Section 1.3.1 for characters which cannot be punched
-	return !strings.ContainsAny(s, "ΦΠ$<>@;:'")
+	if i := strings.IndexAny(s, "ΦΠ$<>@;:'"); i != -1 {
+		return rune(s[i]), false
+	}
+	return 0, true
 }
 
 func OverPunch(digit rune) rune {

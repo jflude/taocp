@@ -7,32 +7,33 @@ import (
 	"github.com/jflude/gnuth/mix"
 )
 
-type chunk struct {
-	orig int
-	data []mix.Word
-}
+const wordsPerCard = 7
 
-type object []*chunk
+type object struct {
+	start int
+	orig  []int
+	seg   [][]mix.Word
+}
 
 var loader = ` O O6 Y O6    I   B= D O4 Z IQ Z I3 Z EN    E   EU 0BB= H IU   EJ  CA. ACB=   EU 1A-H V A=  CEU 0AEH 1AEN    E  CLU  ABG H IH A A= J B. A  9                    `
 var transfer = `TRANS0%04d                                                                      `
 
-func (obj object) outputCards(w io.Writer, start int) error {
+func (obj *object) writeCards(w io.Writer) error {
 	if _, err := io.WriteString(w, loader); err != nil {
 		return err
 	}
-	for _, chunk := range obj {
-		orig := chunk.orig
-		for i := 0; i < len(chunk.data); i += 7 {
-			n := len(chunk.data) - i
-			if n > 7 {
-				n = 7
+	for i := 0; i < len(obj.orig); i++ {
+		orig := obj.orig[i]
+		for j := 0; j < len(obj.seg[i]); j += wordsPerCard {
+			n := len(obj.seg[i]) - j
+			if n > wordsPerCard {
+				n = wordsPerCard
 			}
 			s := fmt.Sprintf("ABCDE%1d%04d", n, orig)
 			if _, err := io.WriteString(w, s); err != nil {
 				return err
 			}
-			for _, v := range chunk.data[i : i+n] {
+			for _, v := range obj.seg[i][j : j+n] {
 				s = fmt.Sprintf("%010d", v.Int())
 				if v.Sign() == -1 {
 					d := mix.OverPunch(rune(s[len(s)-1]))
@@ -43,7 +44,7 @@ func (obj object) outputCards(w io.Writer, start int) error {
 				}
 			}
 			orig += n
-			for i := n; i < 7; i++ {
+			for j := n; j < wordsPerCard; j++ {
 				_, err := io.WriteString(w, "          ")
 				if err != nil {
 					return err
@@ -51,6 +52,6 @@ func (obj object) outputCards(w io.Writer, start int) error {
 			}
 		}
 	}
-	_, err := io.WriteString(w, fmt.Sprintf(transfer, start))
+	_, err := io.WriteString(w, fmt.Sprintf(transfer, obj.start))
 	return err
 }

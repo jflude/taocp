@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-var ErrInvalidCharacter = errors.New("invalid character")
+var ErrInvalidChar = errors.New("invalid character")
 
 var mix2utf = []rune(` ABCDEFGHIΘJKLMNOPQRΦΠSTUVWXYZ0123456789.,()+-*/=$<>@;:'`)
 var utf2mix = make(map[rune]int)
@@ -29,16 +29,36 @@ func ConvertToUTF8(w []Word) string {
 func ConvertToMIX(s string) ([]Word, error) {
 	var w []Word
 	f := 0
-	for _, v := range s {
+	for _, r := range s {
 		if f = f%5 + 1; f == 1 {
 			w = append(w, NewWord(0))
 		}
-		c, ok := utf2mix[v]
+		c, ok := utf2mix[r]
 		if !ok {
-			return nil, fmt.Errorf("%w: %q",
-				ErrInvalidCharacter, string(v))
+			return nil, charError(r)
 		}
 		w[len(w)-1].SetField(FieldSpec(f, f), NewWord(c))
 	}
 	return w, nil
+}
+
+func charError(r rune) error {
+	return fmt.Errorf("%w: %#U", ErrInvalidChar, r)
+}
+
+func IsChar(r rune) bool {
+	_, ok := utf2mix[r]
+	return ok
+}
+
+func IsDigit(r rune) bool {
+	return r >= '0' && r <= '9'
+}
+
+func IsLetter(r rune) bool {
+	return (r >= 'A' && r <= 'Z') || r == 'Θ' || r == 'Φ' || r == 'Π'
+}
+
+func IsSpace(r rune) bool {
+	return r == ' '
 }
