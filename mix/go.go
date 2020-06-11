@@ -3,8 +3,8 @@ package mix
 import "errors"
 
 // GoButton starts the MIX computer, as described in Ex. 26, Section 1.3.1.
-// The machine can be only be bootstrapped from a card (unit 16) or a paper
-// tape (unit 19).
+// The machine can only be bootstrapped from the card reader (unit 16) or
+// the teletype's paper tape (unit 19).
 func (c *Computer) GoButton(unit int) error {
 	if unit != 16 && unit != 19 {
 		return ErrNotImplemented

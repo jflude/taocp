@@ -22,7 +22,7 @@ func TestCycle(t *testing.T) {
 			continue
 		}
 		if c.Reg[A] != v {
-			t.Errorf("#%d: got %#v, want %#v",
+			t.Errorf("#%d: got: %#v, want: %#v",
 				i+1, c.Reg[A], v)
 		}
 	}
@@ -38,7 +38,7 @@ func TestCycle(t *testing.T) {
 			continue
 		}
 		if c.Reg[I1+i] != v {
-			t.Errorf("#%d: got %#v, want %#v",
+			t.Errorf("#%d: got: %#v, want: %#v",
 				i+1, c.Reg[I1+i], v)
 		}
 	}
@@ -55,7 +55,7 @@ func TestCycle(t *testing.T) {
 			continue
 		}
 		if c.Contents[2000] != v {
-			t.Errorf("#%d: got %#v, want %#v",
+			t.Errorf("#%d: got: %#v, want: %#v",
 				i+1, c.Contents[2000], v)
 		}
 	}
@@ -72,7 +72,7 @@ func TestCycle(t *testing.T) {
 			continue
 		}
 		if c.Contents[2000] != v {
-			t.Errorf("#%d: got %#v, want %#v",
+			t.Errorf("#%d: got: %#v, want: %#v",
 				i+1, c.Contents[2000], v)
 		}
 	}
@@ -89,11 +89,11 @@ func TestCycle(t *testing.T) {
 			continue
 		}
 		if c.Reg[A] != op[4] {
-			t.Errorf("#%d: got A = %#v, want A = %#v",
+			t.Errorf("#%d: got: A = %#v, want: A = %#v",
 				i+1, c.Reg[A], op[4])
 		}
 		if c.Reg[X] != op[5] {
-			t.Errorf("#%d: got X = %#v, want X = %#v",
+			t.Errorf("#%d: got: X = %#v, want: X = %#v",
 				i+1, c.Reg[X], op[5])
 		}
 	}
@@ -110,12 +110,12 @@ func TestCycle(t *testing.T) {
 			continue
 		}
 		if c.Reg[A] != op[1] {
-			t.Errorf("#%d: got A = %#v, want A = %#v",
+			t.Errorf("#%d: got: A = %#v, want: A = %#v",
 				i+1, c.Reg[A], op[1])
 			c.Reg[A] = op[1]
 		}
 		if c.Reg[X] != op[2] {
-			t.Errorf("#%d: got X = %#v, want X = %#v",
+			t.Errorf("#%d: got: X = %#v, want: X = %#v",
 				i+1, c.Reg[X], op[2])
 			c.Reg[X] = op[2]
 		}
@@ -133,12 +133,12 @@ func TestCycle(t *testing.T) {
 			continue
 		}
 		if c.Reg[A] != op[1] {
-			t.Errorf("#%d: got A = %#v, want A = %#v",
+			t.Errorf("#%d: got: A = %#v, want: A = %#v",
 				i+1, c.Reg[A], op[1])
 			c.Reg[A] = op[1]
 		}
 		if c.Reg[X] != op[2] {
-			t.Errorf("#%d: got X = %#v, want X = %#v",
+			t.Errorf("#%d: got: X = %#v, want: X = %#v",
 				i+1, c.Reg[X], op[2])
 			c.Reg[X] = op[2]
 		}
@@ -164,7 +164,7 @@ func TestCycle(t *testing.T) {
 		t.Error("error:", err)
 	}
 	if c.Reg[A].Int() != 7 {
-		t.Errorf("got %#o (%v), want 7", c.Reg[A], c.Reg[A])
+		t.Errorf("got: %#o (%v), want: 7", c.Reg[A], c.Reg[A])
 	}
 
 	// Program P, Section 1.3.2

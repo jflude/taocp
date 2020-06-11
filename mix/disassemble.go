@@ -15,7 +15,7 @@ var (
 )
 
 func Disassemble(w Word) string {
-	aa, i, f, op := w.Instruction()
+	aa, i, f, op := w.UnpackOp()
 	switch {
 	case op == NOP:
 		return noArg("NOP")

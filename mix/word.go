@@ -109,6 +109,26 @@ func (w *Word) SetField(f int, val Word) {
 		(int32(val) & fields[f].sign))
 }
 
+// PackOp composes a MIX word from an MIX instruction's address, index, field
+// and opcode.
+func (w *Word) PackOp(aa Word, i, f, c int) {
+	*w = Word((int32(aa) & fields[02].sign) |
+		(int32(aa) << fields[02].shift & fields[02].mem) |
+		(int32(i) << fields[033].shift & fields[033].mem) |
+		(int32(f) << fields[044].shift & fields[044].mem) |
+		(int32(c) << fields[055].shift & fields[055].mem))
+}
+
+// UnpackOp extracts an MIX instruction's address, index, field and opcode
+// from a MIX word.
+func (w Word) UnpackOp() (aa Word, i, f, c int) {
+	aa = Word((int32(w) >> fields[02].shift) & fields[02].reg)
+	i = int((int32(w) & fields[033].mem) >> fields[033].shift)
+	f = int((int32(w) & fields[044].mem) >> fields[044].shift)
+	c = int((int32(w) & fields[055].mem) >> fields[055].shift)
+	return
+}
+
 func (w *Word) ShiftLeft(count int) Word {
 	if count == 0 {
 		return *w
@@ -145,16 +165,6 @@ func (w *Word) ShiftRight(count int) Word {
 	w.SetField(FieldSpec(count+1, 5), in)
 	w.SetField(FieldSpec(1, count), 0)
 	return out
-}
-
-// Instruction extracts an instruction's address, index, field and opcode
-// from a MIX word.
-func (w Word) Instruction() (aa Word, i, f, c int) {
-	aa = Word((int32(w) >> fields[02].shift) & fields[02].reg)
-	i = int((int32(w) & fields[033].mem) >> fields[033].shift)
-	f = int((int32(w) & fields[044].mem) >> fields[044].shift)
-	c = int((int32(w) & fields[055].mem) >> fields[055].shift)
-	return
 }
 
 var fields = [...]struct {

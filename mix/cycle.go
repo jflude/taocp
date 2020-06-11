@@ -15,7 +15,7 @@ func (c *Computer) Cycle() (err error) {
 				err, c.next, c.Contents[c.next])
 		}
 	}()
-	aa, i, f, op := c.Contents[c.next].Instruction()
+	aa, i, f, op := c.Contents[c.next].UnpackOp()
 	if i > 6 {
 		return ErrInvalidInstruction
 	}
