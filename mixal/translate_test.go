@@ -5,24 +5,23 @@ import (
 	"testing"
 )
 
-func TestReadProgram(t *testing.T) {
-	r := strings.NewReader(egReadProgram)
+func TestTranslate(t *testing.T) {
+	r := strings.NewReader(egTranslate)
 	var a asmb
-	if err := a.readProgram(r, func(a *asmb, loc, op, address string) {
-		t.Helper()
-		if loc != okReadProgram[a.count].loc ||
-			op != okReadProgram[a.count].op ||
-			address != okReadProgram[a.count].address {
+	if err := a.translate(r, func(a *asmb, loc, op, address string) {
+		if loc != okTranslate[a.count].loc ||
+			op != okTranslate[a.count].op ||
+			address != okTranslate[a.count].address {
 			t.Errorf("%d: got: %q, %q, %q, want: %v",
 				a.count, loc, op, address,
-				okReadProgram[a.count])
+				okTranslate[a.count])
 		}
 	}); err != nil {
 		t.Error("error:", err)
 	}
 }
 
-var egReadProgram = `* EXAMPLE: TABLE OF PRIMES (PROGRAM P, SECTION 1.3.2)
+var egTranslate = `* EXAMPLE: TABLE OF PRIMES
 L          EQU  500
 PRINTER    EQU  18
 PRIME      EQU  -1
@@ -75,7 +74,7 @@ TITLE      ALF  FIRST
            END  START
 `
 
-var okReadProgram = []struct {
+var okTranslate = []struct {
 	loc, op, address string
 }{
 	2:  {"L", "EQU", "500"},

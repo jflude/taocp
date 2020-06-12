@@ -1,5 +1,7 @@
 package mixal
 
+import "github.com/jflude/gnuth/mix"
+
 func parseLine(a *asmb, loc, op, address string) {
 	a.tokens = nil
 	a.input = loc
@@ -7,7 +9,12 @@ func parseLine(a *asmb, loc, op, address string) {
 		if !a.matchSymbol() {
 			a.syntaxError()
 		}
-		if _, ok := a.symbols[a.lastString()]; ok {
+		sym := a.lastString()
+		if isLocalSymbol(sym) {
+			if sym[len(sym)-1] != 'H' {
+				a.semanticError(ErrInvalidLocal)
+			}
+		} else if _, ok := a.symbols[sym]; ok {
 			a.semanticError(ErrRedefinedSymbol)
 		}
 	}
@@ -16,8 +23,9 @@ func parseLine(a *asmb, loc, op, address string) {
 		a.semanticError(ErrInvalidOperator)
 	}
 	if a.tokens[0].kind == symbol {
-		if s := a.lastString(); s != "EQU" {
-			a.symbols[s] = a.self
+		if a.lastString() != "EQU" {
+			a.symbols[a.tokens[0].val.(string)] = a.self
+			// TODO: fix-up any future refs seen so far
 		}
 	}
 	a.input = address
@@ -33,8 +41,14 @@ func parseLine(a *asmb, loc, op, address string) {
 	case "END":
 		a.parseEND()
 	default:
-		if !a.matchAPart() || !a.matchIPart() || !a.matchFPart() {
+		def := opcodes[a.lastString()]
+		a.c, a.f = def.c, def.f
+		a.i, a.aa = 0, 0
+		if !a.parseAPart() || !a.parseIPart() || !a.parseFPart() {
 			a.syntaxError()
 		}
+		var w mix.Word
+		w.PackOp(a.aa, a.i, a.f, a.c)
+		a.emit(w)
 	}
 }

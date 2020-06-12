@@ -3,24 +3,25 @@ package mixal
 import "github.com/jflude/gnuth/mix"
 
 func (a *asmb) parseEQU() {
-	if !a.matchWValue() {
+	if a.wVal = 0; !a.parseWValue() {
 		a.syntaxError()
 	}
-	// TODO
+	a.symbols[a.tokens[0].val.(string)] = a.wVal.Int()
 }
 
 func (a *asmb) parseORIG() {
-	if !a.matchWValue() {
+	if a.wVal = 0; !a.parseWValue() {
 		a.syntaxError()
 	}
-	// TODO
+	a.self = a.wVal.Int()
+	a.newSegment(a.self)
 }
 
 func (a *asmb) parseCON() {
-	if !a.matchWValue() {
+	if a.wVal = 0; !a.parseWValue() {
 		a.syntaxError()
 	}
-	// TODO
+	a.emit(a.wVal)
 }
 
 func (a *asmb) parseALF() {
@@ -32,8 +33,9 @@ func (a *asmb) parseALF() {
 }
 
 func (a *asmb) parseEND() {
-	if !a.matchWValue() {
+	if a.wVal = 0; !a.parseWValue() {
 		a.syntaxError()
 	}
-	// TODO
+	a.obj.start = a.wVal.Int()
+	// TODO: fix-up and emit literals and undefined symbols
 }

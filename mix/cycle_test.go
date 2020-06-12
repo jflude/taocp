@@ -232,12 +232,12 @@ func Benchmark1000Cycles(b *testing.B) {
 
 var (
 	egCycle1 = []Word{
-		NewWord(2000<<18 | 0510),  // LDA 2000
-		NewWord(2000<<18 | 01510), // LDA 2000(1:5)
-		NewWord(2000<<18 | 03510), // LDA 2000(3:5)
-		NewWord(2000<<18 | 0310),  // LDA 2000(0:3)
-		NewWord(2000<<18 | 04410), // LDA 2000(4:4)
-		NewWord(2000<<18 | 010),   // LDA 2000(0:0)
+		NewWord(2000<<18 | 0510),  // LDA  2000
+		NewWord(2000<<18 | 01510), // LDA  2000(1:5)
+		NewWord(2000<<18 | 03510), // LDA  2000(3:5)
+		NewWord(2000<<18 | 0310),  // LDA  2000(0:3)
+		NewWord(2000<<18 | 04410), // LDA  2000(4:4)
+		NewWord(2000<<18 | 010),   // LDA  2000(0:0)
 	}
 	okCycle1 = []Word{
 		NewWord(-(80<<18 | 030504)),
@@ -266,12 +266,12 @@ var (
 	}
 
 	egCycle3 = []Word{
-		NewWord(2000<<18 | 0530),  // STA 2000
-		NewWord(2000<<18 | 01530), // STA 2000(1:5)
-		NewWord(2000<<18 | 05530), // STA 2000(5:5)
-		NewWord(2000<<18 | 02230), // STA 2000(2:2)
-		NewWord(2000<<18 | 02330), // STA 2000(2:3)
-		NewWord(2000<<18 | 0130),  // STA 2000(0:1)
+		NewWord(2000<<18 | 0530),  // STA  2000
+		NewWord(2000<<18 | 01530), // STA  2000(1:5)
+		NewWord(2000<<18 | 05530), // STA  2000(5:5)
+		NewWord(2000<<18 | 02230), // STA  2000(2:2)
+		NewWord(2000<<18 | 02330), // STA  2000(2:3)
+		NewWord(2000<<18 | 0130),  // STA  2000(0:1)
 	}
 	okCycle3 = []Word{
 		NewWord(0607101100),
@@ -283,12 +283,12 @@ var (
 	}
 
 	egCycle4 = []Word{
-		NewWord(2000<<18 | 0531),  // ST1 2000
-		NewWord(2000<<18 | 01531), // ST1 2000(1:5)
-		NewWord(2000<<18 | 05531), // ST1 2000(5:5)
-		NewWord(2000<<18 | 02231), // ST1 2000(2:2)
-		NewWord(2000<<18 | 02331), // ST1 2000(2:3)
-		NewWord(2000<<18 | 0131),  // ST1 2000(0:1)
+		NewWord(2000<<18 | 0531),  // ST1  2000
+		NewWord(2000<<18 | 01531), // ST1  2000(1:5)
+		NewWord(2000<<18 | 05531), // ST1  2000(5:5)
+		NewWord(2000<<18 | 02231), // ST1  2000(2:2)
+		NewWord(2000<<18 | 02331), // ST1  2000(2:3)
+		NewWord(2000<<18 | 0131),  // ST1  2000(0:1)
 	}
 	okCycle4 = []Word{
 		NewWord(01100),
@@ -301,7 +301,7 @@ var (
 
 	egCycle5 = [][]Word{
 		[]Word{ // #1
-			NewWord(01750000501),       // ADD 1000
+			NewWord(01750000501),       // ADD  1000
 			NewWord(1234<<18 | 010226), // A (before)
 			NewWord(0),                 // X (before)
 			NewWord(100<<18 | 050062),  // CONTENTS[1000]
@@ -309,7 +309,7 @@ var (
 			NewWord(0),                 // X (after)
 		},
 		[]Word{ // #2
-			NewWord(01750000502), // SUB 1000
+			NewWord(01750000502), // SUB  1000
 			NewWord(-(1234<<18 | 9)),
 			NewWord(0),
 			NewWord(-(2000<<18 | (150 << 6))),
@@ -317,7 +317,7 @@ var (
 			NewWord(0),
 		},
 		[]Word{ // #3
-			NewWord(01750001103), // MUL 1000(1:1)
+			NewWord(01750001103), // MUL  1000(1:1)
 			NewWord(-112),
 			NewWord(0),
 			NewWord(0200000000),
@@ -325,7 +325,7 @@ var (
 			NewWord(-224),
 		},
 		[]Word{ // #4
-			NewWord(01750000503), // MUL 1000
+			NewWord(01750000503), // MUL  1000
 			NewWord(-(50<<24 | 112<<6 | 4)),
 			NewWord(0),
 			NewWord(-0200000000),
@@ -333,7 +333,7 @@ var (
 			NewWord(8 << 24),
 		},
 		[]Word{ // #5
-			NewWord(01750000504), // DIV 1000
+			NewWord(01750000504), // DIV  1000
 			NewWord(0),
 			NewWord(17),
 			NewWord(3),
@@ -341,7 +341,7 @@ var (
 			NewWord(2),
 		},
 		[]Word{ // #6
-			NewWord(01750000504), // DIV 1000
+			NewWord(01750000504), // DIV  1000
 			NewWord(0).Negate(),
 			NewWord(1235<<18 | 0301),
 			NewWord(-0200),
@@ -357,22 +357,22 @@ var (
 			NewWord(-0506071011), // X
 		},
 		{ // #2
-			NewWord(02000006), // SLA 2
+			NewWord(02000006), // SLA  2
 			NewWord(0203040000),
 			NewWord(-0506071011),
 		},
 		{ // #3
-			NewWord(04000506), // SRC 4
+			NewWord(04000506), // SRC  4
 			NewWord(0607101102),
 			NewWord(-0304000005),
 		},
 		{ // #4
-			NewWord(02000106), // SRA 2
+			NewWord(02000106), // SRA  2
 			NewWord(060710),
 			NewWord(-0304000005),
 		},
 		{ // #5
-			NewWord(0765000406), // SLC 501
+			NewWord(0765000406), // SLC  501
 			NewWord(06071003),
 			NewWord(-0400000500),
 		},
@@ -380,7 +380,7 @@ var (
 
 	egCycle7 = [][3]Word{
 		{ // #1
-			NewWord(05), // NUM 0
+			NewWord(05), // NUM  0
 			NewWord(-12977700),
 			NewWord(04571573636),
 		},
@@ -396,76 +396,76 @@ var (
 		},
 	}
 	//                                         * FIND THE MAXIMUM
-	//                                         X        EQU   1000
-	egCycle8 = []Word{ //                               ORIG  3000
-		NewWord(3009<<18 | 0240),       // MAXIMUM  STJ   EXIT
-		NewWord(010263),                // INIT     ENT3  0,1
-		NewWord(3005<<18 | 39),         //          JMP   CHANGEM
-		NewWord(1000<<18 | 030570),     // LOOP     CMPA  X,3
-		NewWord(3007<<18 | 0700 | 39),  //          JLE   *+3
-		NewWord(030200 | 50),           // CHANGEM  ENT2  0,3
-		NewWord(1000<<18 | 030500 | 8), //          LDA   X,3
-		NewWord(01000100 | 51),         //          DEC3  1
-		NewWord(3003<<18 | 0200 | 43),  //          J3P   LOOP
-		NewWord(3009<<18 | 39),         // EXIT     JMP   *
+	//                                         X        EQU  1000
+	egCycle8 = []Word{ //                               ORIG 3000
+		NewWord(3009<<18 | 0240),       // MAXIMUM  STJ  EXIT
+		NewWord(010263),                // INIT     ENT3 0,1
+		NewWord(3005<<18 | 39),         //          JMP  CHANGEM
+		NewWord(1000<<18 | 030570),     // LOOP     CMPA X,3
+		NewWord(3007<<18 | 0700 | 39),  //          JLE  *+3
+		NewWord(030200 | 50),           // CHANGEM  ENT2 0,3
+		NewWord(1000<<18 | 030500 | 8), //          LDA  X,3
+		NewWord(01000100 | 51),         //          DEC3 1
+		NewWord(3003<<18 | 0200 | 43),  //          J3P  LOOP
+		NewWord(3009<<18 | 39),         // EXIT     JMP  *
 	}
 
 	//                                    * EXAMPLE: TABLE OF PRIMES
-	//                                    L         EQU   500
-	//                                    PRINTER   EQU   18
-	//                                    PRIME     EQU   -1
-	//                                    BUF0      EQU   2000
-	//                                    BUF1      EQU   BUF0+25
-	egCycle9 = []Word{ //                           ORIG  3000
-		NewWord(02243),            // START     IOC   0(PRINTER)
-		NewWord(2050<<18 | 0511),  //           LD1   =1-L=
-		NewWord(2051<<18 | 0512),  //           LD2   =3=
-		NewWord(01000061),         // 2H        INC1  1
-		NewWord(499<<18 | 010532), //           ST2   PRIME+L,1
-		NewWord(3016<<18 | 0151),  //           J1Z   2F
-		NewWord(02000062),         // 4H        INC2  2
-		NewWord(02000263),         //           ENT3  2
-		NewWord(0260),             // 6H        ENTA  0
-		NewWord(020267),           //           ENTX  0,2
-		NewWord(-01030504),        //           DIV   PRIME,3
-		NewWord(3006<<18 | 0157),  //           JXZ   4B
-		NewWord(-01030570),        //           CMPA  PRIME,3
-		NewWord(01000063),         //           INC3  1
-		NewWord(3008<<18 | 0647),  //           JG    6B
-		NewWord(3003<<18 | 047),   //           JMP   2B
-		NewWord(1995<<18 | 02245), // 2H        OUT   TITLE(PRINTER)
-		NewWord(2035<<18 | 0264),  //           ENT4  BUF1+10
-		NewWord(-062000265),       //           ENT5  -50
-		NewWord(501<<18 | 065),    // 2H        INC5  L+1
-		NewWord(-01050510),        // 4H        LDA   PRIME,5
+	//                                    L         EQU  500
+	//                                    PRINTER   EQU  18
+	//                                    PRIME     EQU  -1
+	//                                    BUF0      EQU  2000
+	//                                    BUF1      EQU  BUF0+25
+	egCycle9 = []Word{ //                           ORIG 3000
+		NewWord(02243),            // START     IOC  0(PRINTER)
+		NewWord(2050<<18 | 0511),  //           LD1  =1-L=
+		NewWord(2051<<18 | 0512),  //           LD2  =3=
+		NewWord(01000061),         // 2H        INC1 1
+		NewWord(499<<18 | 010532), //           ST2  PRIME+L,1
+		NewWord(3016<<18 | 0151),  //           J1Z  2F
+		NewWord(02000062),         // 4H        INC2 2
+		NewWord(02000263),         //           ENT3 2
+		NewWord(0260),             // 6H        ENTA 0
+		NewWord(020267),           //           ENTX 0,2
+		NewWord(-01030504),        //           DIV  PRIME,3
+		NewWord(3006<<18 | 0157),  //           JXZ  4B
+		NewWord(-01030570),        //           CMPA PRIME,3
+		NewWord(01000063),         //           INC3 1
+		NewWord(3008<<18 | 0647),  //           JG   6B
+		NewWord(3003<<18 | 047),   //           JMP  2B
+		NewWord(1995<<18 | 02245), // 2H        OUT  TITLE(PRINTER)
+		NewWord(2035<<18 | 0264),  //           ENT4 BUF1+10
+		NewWord(-062000265),       //           ENT5 -50
+		NewWord(501<<18 | 065),    // 2H        INC5 L+1
+		NewWord(-01050510),        // 4H        LDA  PRIME,5
 		NewWord(0105),             //           CHAR
-		NewWord(041437),           //           STX   0,4(1:4)
-		NewWord(01000164),         //           DEC4  1
-		NewWord(062000165),        //           DEC5  50
-		NewWord(3020<<18 | 0255),  //           J5P   4B
-		NewWord(042245),           //           OUT   0,4(PRINTER)
-		NewWord(030040514),        //           LD4   24,4
-		NewWord(3019<<18 | 055),   //           J5N   2B
+		NewWord(041437),           //           STX  0,4(1:4)
+		NewWord(01000164),         //           DEC4 1
+		NewWord(062000165),        //           DEC5 50
+		NewWord(3020<<18 | 0255),  //           J5P  4B
+		NewWord(042245),           //           OUT  0,4(PRINTER)
+		NewWord(030040514),        //           LD4  24,4
+		NewWord(3019<<18 | 055),   //           J5N  2B
 		NewWord(0205),             //           HLT
 	}
 	//                                    * TABLES AND BUFFERS
-	egCycle9a = []Word{ //                          ORIG  PRIME+1 (=0)
-		NewWord(2), //                          CON   2
+	egCycle9a = []Word{ //                          ORIG PRIME+1 (=0)
+		NewWord(2), //                          CON  2
 	}
-	egCycle9b = []Word{ //                          ORIG  BUF0-5 (=1995)
-		NewWord(0611232627),  //      TITLE     ALF   FIRST
-		NewWord(06113105),    //                ALF    FIVE
-		NewWord(010301704),   //                ALF    HUND
-		NewWord(02305040021), //                ALF   RED P
-		NewWord(02311160526), //                ALF   RIMES
+	egCycle9b = []Word{ //                          ORIG BUF0-5 (=1995)
+		NewWord(0611232627),  //      TITLE     ALF  FIRST
+		NewWord(06113105),    //                ALF   FIVE
+		NewWord(010301704),   //                ALF   HUND
+		NewWord(02305040021), //                ALF  RED P
+		NewWord(02311160526), //                ALF  RIMES
 	}
-	egCycle9c = []Word{ //                          ORIG  BUF0+24 (=2024)
-		NewWord(2035), //                       CON   BUF1+10
+	egCycle9c = []Word{ //                          ORIG BUF0+24 (=2024)
+		NewWord(2035), //                       CON  BUF1+10
 	}
-	egCycle9d = []Word{ //                          ORIG  BUF1+24 (=2049)
-		NewWord(2010), //                       CON   BUF0+10
-		NewWord(-499), //                       CON   1-L
-		NewWord(3),    //                       CON   3
+	egCycle9d = []Word{ //                          ORIG BUF1+24 (=2049)
+		NewWord(2010), //                       CON  BUF0+10
+		NewWord(-499), //                       CON  1-L
+		NewWord(3),    //                       CON  3
 	}
 
 	okCycle9 = "\014" + `FIRST FIVE HUNDRED PRIMES

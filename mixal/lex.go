@@ -27,11 +27,27 @@ func (a *asmb) lastString() string {
 	return a.tokens[len(a.tokens)-1].val.(string)
 }
 
-func extractColumns(line string, from, to int, trim bool) string {
-	if len(line) < from {
+func (a *asmb) lastQuantity() int {
+	switch t := a.tokens[len(a.tokens)-1]; t.kind {
+	case symbol:
+		if n, ok := a.symbols[t.val.(string)]; ok {
+			return n
+		}
+		panic(ErrInternalError)
+	case asterisk:
+		fallthrough
+	case number:
+		return t.val.(int)
+	default:
+		panic(ErrInternalError)
+	}
+}
+
+func (a *asmb) extractColumns(from, to int, trim bool) string {
+	if len(a.input) < from {
 		return ""
 	}
-	s := line[from-1:]
+	s := a.input[from-1:]
 	if len(s) > to-from+1 {
 		s = s[:to-from+1]
 	}

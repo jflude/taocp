@@ -2,67 +2,68 @@ package mixal
 
 import "testing"
 
-func TestMatching(t *testing.T) {
-	asmbMatch.symbols = make(map[string]int)
-	asmbMatch.symbols["L"] = 2000
+func TestLexical(t *testing.T) {
+	asmbLex.symbols = make(map[string]int)
+	asmbLex.symbols["L"] = 2000
 	for i := 0; i < len(egMatch); i++ {
-		asmbMatch.input = egMatch[i].input
-		asmbMatch.tokens = nil
-		asmbMatch.self = 3000
+		asmbLex.self = 3000
+		asmbLex.input = egMatch[i].input
+		asmbLex.tokens = nil
+
 		ok := egMatch[i].lexer()
-		if !ok || asmbMatch.input != okMatch[i].remain {
+		if !ok || asmbLex.input != okMatch[i].remain {
 			t.Errorf(`%d: got: %q, %v, want: %q, true`,
-				i+1, asmbMatch.input, ok, okMatch[i].remain)
+				i+1, asmbLex.input, ok, okMatch[i].remain)
 		}
-		if len(asmbMatch.tokens) == 0 {
+		if len(asmbLex.tokens) == 0 {
 			t.Errorf("%d: got: nil, want: %v",
 				i+1, okMatch[i].tok)
 			continue
 		}
 		for j, v := range okMatch[i].tok {
-			if j >= len(asmbMatch.tokens) {
+			if j >= len(asmbLex.tokens) {
 				t.Errorf("%d: got: nil, want: %v", i+1, v)
 				break
 			}
-			if v != asmbMatch.tokens[j] {
+			if v != asmbLex.tokens[j] {
 				t.Errorf("%d: got: %v, want: %v",
-					i+1, asmbMatch.tokens[j], v)
+					i+1, asmbLex.tokens[j], v)
 				break
 			}
 		}
 	}
 }
 
-var asmbMatch asmb
+var asmbLex asmb
 
 var egMatch = []struct {
 	input string
 	lexer func() bool
 }{
-	{"BUF1 ", asmbMatch.matchSymbol},
-	{"12345678900 ", asmbMatch.matchNumber},
-	{"JAZ", asmbMatch.matchOperator},
-	{"* ", asmbMatch.matchAsterisk},
-	{"*** X", asmbMatch.matchExpr},
-	{"-1+5*20//6+* Y", asmbMatch.matchExpr},
-	{"(1:5) Z", asmbMatch.matchFPart},
-	{"1000(1:3),2000(4:5) X", asmbMatch.matchWValue},
-	{"=1-L= Y", asmbMatch.matchLiteral},
+	{"BUF1 ", asmbLex.matchSymbol},                 // #1
+	{"12345678900 ", asmbLex.matchNumber},          // #2
+	{"JAZ", asmbLex.matchOperator},                 // #3
+	{"* ", asmbLex.matchAsterisk},                  // #4
+	{"*** X", asmbLex.parseExpr},                   // #5
+	{"-1+5*20//6+* Y", asmbLex.parseExpr},          // #6
+	{"(1:5) Z", asmbLex.parseFPart},                // #7
+	{"1000(1:3),2000(4:5) X", asmbLex.parseWValue}, // #8
+	{"=1-L= Y", asmbLex.parseLiteral},              // #9
 }
 
 var okMatch = []struct {
 	remain string
 	tok    []token
 }{
-	{" ", []token{{symbol, "BUF1"}}},
-	{"0 ", []token{{number, 1234567890}}},
-	{"", []token{{operator, "JAZ"}}},
-	{" ", []token{{asterisk, 3000}}},
-	{" X", []token{
+	{" ", []token{{symbol, "BUF1"}}},      // #1
+	{"0 ", []token{{number, 1234567890}}}, // #2
+	{"", []token{{operator, "JAZ"}}},      // #3
+	{" ", []token{{asterisk, 3000}}},      // #4
+	{" X", []token{ // #5
 		{asterisk, 3000},
 		{'*', nil},
 		{asterisk, 3000}}},
-	{" Y", []token{
+	{" Y", []token{ // #6
 		{'-', nil},
 		{number, 1},
 		{'+', nil},
@@ -73,13 +74,13 @@ var okMatch = []struct {
 		{number, 6},
 		{'+', nil},
 		{asterisk, 3000}}},
-	{" Z", []token{
+	{" Z", []token{ // #7
 		{'(', nil},
 		{number, 1},
 		{':', nil},
 		{number, 5},
 		{')', nil}}},
-	{" X", []token{
+	{" X", []token{ // #8
 		{number, 1000},
 		{'(', nil},
 		{number, 1},
@@ -93,7 +94,7 @@ var okMatch = []struct {
 		{':', nil},
 		{number, 5},
 		{')', nil}}},
-	{" Y", []token{
+	{" Y", []token{ // #9
 		{'=', nil},
 		{number, 1},
 		{'-', nil},
