@@ -1,7 +1,6 @@
 package mix
 
 import (
-	"errors"
 	"fmt"
 	"math"
 )
@@ -19,18 +18,6 @@ const (
 
 	signBit = math.MinInt32
 )
-
-var ErrInvalidFieldSpec = errors.New("invalid field specification")
-
-func FieldSpec(left, right int) int {
-	return 8*left + right
-}
-
-func validateFieldSpec(f int) {
-	if f >= len(fields) || fields[f].shift == -1 {
-		panic(ErrInvalidFieldSpec)
-	}
-}
 
 // Word represents a MIX machine word, which consists of five 6-bit bytes
 // and a sign bit.
@@ -57,6 +44,7 @@ func (w Word) Int() int {
 	return int(w & MaxWord)
 }
 
+// Sign returns the sign of a MIX word, +1 for positive, -1 for negative.
 func (w Word) Sign() int {
 	if w&signBit == 0 {
 		return 1
@@ -88,47 +76,82 @@ func (w Word) GoString() string {
 	return fmt.Sprintf("%s%#011o", s, uint64(uint32(w&^signBit)))
 }
 
-// Field returns the value of field f as a MIX word.
-func (w Word) Field(f int) Word {
-	if f == 5 {
-		return w
+// AddWord adds an integer to a MIX word, returning the result as a MIX word,
+// and whether overflow occured.  See Section 1.3.1.
+func AddWord(w Word, v int) (result Word, overflow bool) {
+	v += w.Int()
+	if v < MinWord || v > MaxWord {
+		overflow = true
+		v &= MaxWord
 	}
-	validateFieldSpec(f)
-	return Word((int32(w) >> fields[f].shift) & fields[f].reg)
-}
-
-// SetField changes the field f of the MIX word w to the given value.
-func (w *Word) SetField(f int, val Word) {
-	if f == 5 {
-		*w = val
-		return
+	if v == 0 {
+		w.SetField(FieldSpec(1, 5), 0)
+	} else {
+		w = NewWord(v)
 	}
-	validateFieldSpec(f)
-	*w = Word((int32(*w) &^ fields[f].mem) |
-		((int32(val) << fields[f].shift) & fields[f].mem) |
-		(int32(val) & fields[f].sign))
+	return w, overflow
 }
 
-// PackOp composes a MIX word from an MIX instruction's address, index, field
-// and opcode.
-func (w *Word) PackOp(aa Word, i, f, c int) {
-	*w = Word((int32(aa) & fields[02].sign) |
-		(int32(aa) << fields[02].shift & fields[02].mem) |
-		(int32(i) << fields[033].shift & fields[033].mem) |
-		(int32(f) << fields[044].shift & fields[044].mem) |
-		(int32(c) << fields[055].shift & fields[055].mem))
+// SubWord subtracts an integer from a MIX word, returning the result as a
+// MIX word, and whether overflow occured.  See Section 1.3.1.
+func SubWord(w Word, v int) (result Word, overflow bool) {
+	return AddWord(w, -v)
 }
 
-// UnpackOp extracts an MIX instruction's address, index, field and opcode
-// from a MIX word.
-func (w Word) UnpackOp() (aa Word, i, f, c int) {
-	aa = Word((int32(w) >> fields[02].shift) & fields[02].reg)
-	i = int((int32(w) & fields[033].mem) >> fields[033].shift)
-	f = int((int32(w) & fields[044].mem) >> fields[044].shift)
-	c = int((int32(w) & fields[055].mem) >> fields[055].shift)
+// MulWord multiples an integer by a MIX word, returning the product as a
+// double-precision MIX word.  See Section 1.3.1.
+func MulWord(w Word, v int) (high, low Word) {
+	p := int64(w.Int()) * int64(v)
+	n := uint64(abs64(p))
+	high = NewWord(int((n >> 30) & MaxWord))
+	low = NewWord(int(n & MaxWord))
+	if p < 0 {
+		high = high.Negate()
+		low = low.Negate()
+	}
 	return
 }
 
+func abs64(v int64) int64 {
+	if v < 0 {
+		return -v
+	}
+	return v
+}
+
+// DivWord divides a double-precision MIX word by an integer, returning the
+// quotient and remainder as MIX words, and whether overflow or division by
+// zero occured.  See Section 1.3.1.
+func DivWord(high, low Word, v int) (quot, rem Word, overflow bool) {
+	if v == 0 || abs(high.Int()) >= abs(v) {
+		overflow = true
+		return
+	}
+	d := int64(abs(high.Int()))<<30 | int64(abs(low.Int()))
+	s := high.Sign()
+	if s == -1 {
+		d = -d
+	}
+	q, r := d/int64(v), d%int64(v)
+	if (s == -1 && r >= 0) || (s == 1 && r < 0) {
+		r = -r
+	}
+	quot, rem = NewWord(int(q)), NewWord(int(abs64(r)))
+	if s == -1 {
+		rem = rem.Negate()
+	}
+	return
+}
+
+func abs(v int) int {
+	if v < 0 {
+		return -v
+	}
+	return v
+}
+
+// ShiftLeft shifts the MIX word w left by the given number of bytes,
+// returning the bytes shifted out.
 func (w *Word) ShiftLeft(count int) Word {
 	if count == 0 {
 		return *w
@@ -148,6 +171,8 @@ func (w *Word) ShiftLeft(count int) Word {
 	return out
 }
 
+// ShiftRight shifts the MIX word w right by the given number of bytes,
+// returning the bytes shifted out.
 func (w *Word) ShiftRight(count int) Word {
 	if count == 0 {
 		return *w
@@ -165,58 +190,4 @@ func (w *Word) ShiftRight(count int) Word {
 	w.SetField(FieldSpec(count+1, 5), in)
 	w.SetField(FieldSpec(1, count), 0)
 	return out
-}
-
-var fields = [...]struct {
-	mem   int32 // memory mask
-	reg   int32 // register mask
-	sign  int32 // sign affected
-	shift int   // how much to shift to align receiver and source
-}{
-	{signBit, signBit, signBit, 0},                              // [0:0]
-	{07700000000 | signBit, 00000000077 | signBit, signBit, 24}, // [0:1]
-	{07777000000 | signBit, 00000007777 | signBit, signBit, 18}, // [0:2]
-	{07777770000 | signBit, 00000777777 | signBit, signBit, 12}, // [0:3]
-	{07777777700 | signBit, 00077777777 | signBit, signBit, 6},  // [0:4]
-	{07777777777 | signBit, 07777777777 | signBit, signBit, 0},  // [0:5]
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{07700000000, 000000000077, 0, 24}, // [1:1]
-	{07777000000, 000000007777, 0, 18}, // [1:2]
-	{07777770000, 000000777777, 0, 12}, // [1:3]
-	{07777777700, 000077777777, 0, 6},  // [1:4]
-	{07777777777, 007777777777, 0, 0},  // [1:5]
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{00077000000, 000000000077, 0, 18}, // [2:2]
-	{00077770000, 000000007777, 0, 12}, // [2:3]
-	{00077777700, 000000777777, 0, 6},  // [2:4]
-	{00077777777, 000077777777, 0, 0},  // [2:5]
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{00000770000, 000000000077, 0, 12}, // [3:3]
-	{00000777700, 000000007777, 0, 6},  // [3:4]
-	{00000777777, 000000777777, 0, 0},  // [3:5]
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{00000007700, 000000000077, 0, 6}, // [4:4]
-	{00000007777, 000000007777, 0, 0}, // [4:5]
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{0, 0, 0, -1},
-	{00000000077, 000000000077, 0, 0}, // [5:5]
 }
