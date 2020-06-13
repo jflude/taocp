@@ -5,13 +5,8 @@ import "github.com/jflude/gnuth/mix"
 func parseLine(a *asmb, loc, op, address string) {
 	a.tokens = nil
 	a.input = loc
-	if a.input != "" {
-		if a.matchDefinedSymbol() {
-			a.semanticError(ErrRedefinedSymbol)
-		}
-		if !a.matchFutureRef() {
-			a.syntaxError()
-		}
+	if a.input != "" && !a.matchUndefinedSymbol() {
+		a.syntaxError()
 	}
 	a.input = op
 	if !a.matchOperator() {

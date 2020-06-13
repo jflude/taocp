@@ -11,7 +11,7 @@ import (
 func main() {
 	log.SetFlags(0)
 	if err := run(); err != nil {
-		log.Println("error:", err)
+		log.Fatalln("error:", err)
 	}
 }
 
