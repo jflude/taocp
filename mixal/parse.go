@@ -6,27 +6,21 @@ func parseLine(a *asmb, loc, op, address string) {
 	a.tokens = nil
 	a.input = loc
 	if a.input != "" {
-		if !a.matchSymbol() {
-			a.syntaxError()
-		}
-		sym := a.lastString()
-		if isLocalSymbol(sym) {
-			if sym[len(sym)-1] != 'H' {
-				a.semanticError(ErrInvalidLocal)
-			}
-		} else if _, ok := a.symbols[sym]; ok {
+		if a.matchDefinedSymbol() {
 			a.semanticError(ErrRedefinedSymbol)
+		}
+		if !a.matchFutureRef() {
+			a.syntaxError()
 		}
 	}
 	a.input = op
 	if !a.matchOperator() {
 		a.semanticError(ErrInvalidOperator)
 	}
-	if a.tokens[0].kind == symbol {
-		if a.lastString() != "EQU" {
-			a.symbols[a.tokens[0].val.(string)] = a.self
-			// TODO: fix-up any future refs seen so far
-		}
+	if a.tokens[0].kind == symbol && a.lastString() != "EQU" {
+		sym := a.tokens[0].val.(string)
+		a.symbols[sym] = mix.NewWord(a.self)
+		a.patchFixUps(sym)
 	}
 	a.input = address
 	switch a.lastString() {

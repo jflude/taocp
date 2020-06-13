@@ -19,7 +19,8 @@ func (a *asmb) translate(r io.Reader,
 			err = a.specifyError(err)
 		}
 	}()
-	a.symbols = make(map[string]int)
+	a.symbols = make(map[string]mix.Word)
+	a.fixups = make(map[string][]int)
 	a.newSegment(0)
 	sc := bufio.NewScanner(r)
 	for sc.Scan() {

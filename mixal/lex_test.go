@@ -1,10 +1,15 @@
 package mixal
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/jflude/gnuth/mix"
+)
 
 func TestLexical(t *testing.T) {
-	asmbLex.symbols = make(map[string]int)
-	asmbLex.symbols["L"] = 2000
+	asmbLex.symbols = make(map[string]mix.Word)
+	asmbLex.symbols["L"] = mix.NewWord(2000)
+	asmbLex.fixups = make(map[string][]int)
 	for i := 0; i < len(egMatch); i++ {
 		asmbLex.self = 3000
 		asmbLex.input = egMatch[i].input
@@ -40,7 +45,7 @@ var egMatch = []struct {
 	input string
 	lexer func() bool
 }{
-	{"BUF1 ", asmbLex.matchSymbol},                 // #1
+	{"BUF1 ", asmbLex.matchFutureRef},              // #1
 	{"12345678900 ", asmbLex.matchNumber},          // #2
 	{"JAZ", asmbLex.matchOperator},                 // #3
 	{"* ", asmbLex.matchAsterisk},                  // #4

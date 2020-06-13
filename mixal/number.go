@@ -8,12 +8,13 @@ import (
 
 func (a *asmb) matchNumber() bool {
 	var i int
-	for i = 0; i < 10; i++ {
-		if i >= len(a.input) || !mix.IsDigit(rune(a.input[i])) {
+	var r rune
+	for i = 0; i < 10 && i < len(a.input); i++ {
+		if r = rune(a.input[i]); !mix.IsDigit(r) {
 			break
 		}
 	}
-	if i == 0 {
+	if i == 0 || mix.IsLetter(r) {
 		return false
 	}
 	n, err := strconv.Atoi(a.input[:i])

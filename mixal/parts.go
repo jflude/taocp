@@ -1,15 +1,17 @@
 package mixal
 
+import "fmt"
+
 func (a *asmb) parseAPart() bool {
 	if a.exprVal = nil; a.parseExpr() {
 		a.aa = *a.exprVal
 		return true
 	}
-	if a.matchSymbol() {
-		if _, ok := a.symbols[a.lastString()]; ok {
-			return false
-		}
-		// TODO: mark as a future ref needing a fix-up
+	if a.parseLiteral() {
+		return true
+	}
+	if a.matchFutureRef() {
+		a.addFixUp(a.lastString())
 	}
 	return true
 }
@@ -41,6 +43,9 @@ func (a *asmb) parseLiteral() bool {
 	if a.wVal = 0; !a.parseWValue() || !a.matchChar('=') {
 		return false
 	}
-	// TODO: create future ref for literal and record value to be emitted
+	sym := fmt.Sprintf("_%d", a.label)
+	a.label++
+	a.literals = append(a.literals, literal{sym, a.wVal})
+	a.addFixUp(sym)
 	return true
 }

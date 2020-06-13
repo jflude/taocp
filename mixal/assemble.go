@@ -8,16 +8,26 @@ import (
 	"github.com/jflude/gnuth/mix"
 )
 
+type literal struct {
+	sym string
+	val mix.Word
+}
+
 type asmb struct {
-	obj         object
-	input       string
-	tokens      []token
-	symbols     map[string]int
-	self, count int
-	exprOp      int
-	exprVal     *mix.Word
-	wVal, aa    mix.Word
-	i, f, c     int
+	obj      object
+	input    string
+	tokens   []token
+	symbols  map[string]mix.Word
+	fixups   map[string][]int
+	literals []literal
+	count    int
+	self     int
+	label    int
+	exprOp   int
+	exprVal  *mix.Word
+	wVal     mix.Word
+	aa       mix.Word
+	i, f, c  int
 }
 
 func Assemble(r io.Reader, w io.Writer) error {

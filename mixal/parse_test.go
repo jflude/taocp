@@ -10,20 +10,23 @@ import (
 
 func TestParsing(t *testing.T) {
 	r := strings.NewReader(egTranslate)
+	lastEmit := 0
 	var a asmb
-	var lastWord *mix.Word
 	if err := a.translate(r, func(a *asmb, loc, op, address string) {
 		t.Logf("input: %d: %s %s %s", a.count, loc, op, address)
 		parseLine(a, loc, op, address)
 		t.Log("token:", a.tokens)
 		seg := a.obj.seg[len(a.obj.seg)-1]
-		if seg != nil && lastWord != &seg[len(seg)-1] {
-			t.Logf(" emit: %d: %#o",
-				a.obj.orig[len(a.obj.seg)-1]+len(seg)-1,
-				seg[len(seg)-1])
-			lastWord = &seg[len(seg)-1]
+		orig := a.obj.orig[len(a.obj.seg)-1]
+		if seg != nil {
+			if lastEmit > len(seg)-1 {
+				lastEmit = 0
+			}
+			for ; lastEmit <= len(seg)-1; lastEmit++ {
+				t.Logf(" emit: %d: %#o", orig+lastEmit,
+					seg[lastEmit])
+			}
 		}
-		t.Log()
 	}); err != nil {
 		t.Fatal("error:", err)
 	}

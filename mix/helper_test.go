@@ -7,7 +7,6 @@ import (
 )
 
 func newSandbox(t *testing.T, tmpDir string) (*Computer, string) {
-	t.Helper()
 	var ret string
 	var err error
 	if tmpDir == "" {
@@ -24,7 +23,6 @@ func newSandbox(t *testing.T, tmpDir string) (*Computer, string) {
 }
 
 func closeSandbox(t *testing.T, c *Computer, tmpDir string) {
-	t.Helper()
 	if err := c.Shutdown(); err != nil {
 		t.Error("error:", err)
 	}

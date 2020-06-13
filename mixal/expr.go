@@ -1,18 +1,7 @@
 package mixal
 
 func (a *asmb) parseAtomic() bool {
-	if a.matchNumber() {
-		a.evalArg(a.lastQuantity())
-		return true
-	}
-	if a.matchSymbol() {
-		if _, ok := a.symbols[a.lastString()]; !ok {
-			return false
-		}
-		a.evalArg(a.lastQuantity())
-		return true
-	}
-	if a.matchAsterisk() {
+	if a.matchNumber() || a.matchDefinedSymbol() || a.matchAsterisk() {
 		a.evalArg(a.lastQuantity())
 		return true
 	}
@@ -25,7 +14,7 @@ func (a *asmb) parseAtomic() bool {
 func (a *asmb) parseExpr() bool {
 	if a.parseAtomic() {
 		if a.matchBinaryOp() {
-			a.evalOp(a.lastKind())
+			a.exprOp = a.lastKind()
 			return a.parseExpr()
 		}
 		return true
@@ -34,7 +23,7 @@ func (a *asmb) parseExpr() bool {
 		if k := a.lastKind(); k == '+' || k == '-' {
 			// convert unary +/- to binary +/- with implied zero
 			a.evalArg(0)
-			a.evalOp(a.lastKind())
+			a.exprOp = k
 			return a.parseExpr()
 		}
 	}

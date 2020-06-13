@@ -6,7 +6,9 @@ func (a *asmb) parseEQU() {
 	if a.wVal = 0; !a.parseWValue() {
 		a.syntaxError()
 	}
-	a.symbols[a.tokens[0].val.(string)] = a.wVal.Int()
+	sym := a.tokens[0].val.(string)
+	a.symbols[sym] = a.wVal
+	a.patchFixUps(sym)
 }
 
 func (a *asmb) parseORIG() {
@@ -37,5 +39,14 @@ func (a *asmb) parseEND() {
 		a.syntaxError()
 	}
 	a.obj.start = a.wVal.Int()
-	// TODO: fix-up and emit literals and undefined symbols
+	for _, lit := range a.literals {
+		a.symbols[lit.sym] = mix.NewWord(a.self)
+		a.patchFixUps(lit.sym)
+		a.emit(lit.val)
+	}
+	for k := range a.fixups {
+		a.symbols[k] = mix.NewWord(a.self)
+		a.patchFixUps(k)
+		a.emit(0)
+	}
 }

@@ -28,7 +28,3 @@ func (a *asmb) evalArg(arg int) {
 		panic(ErrInternalError)
 	}
 }
-
-func (a *asmb) evalOp(kind int) {
-	a.exprOp = kind
-}

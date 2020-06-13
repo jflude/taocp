@@ -18,14 +18,23 @@ type object struct {
 var loader = ` O O6 Y O6    I   B= D O4 Z IQ Z I3 Z EN    E   EU 0BB= H IU   EJ  CA. ACB=   EU 1A-H V A=  CEU 0AEH 1AEN    E  CLU  ABG H IH A A= J B. A  9                    `
 var transfer = `TRANS0%04d                                                                      `
 
-func (obj *object) writeCards(w io.Writer) error {
+func (o *object) findWord(address int) *mix.Word {
+	for i := 0; i < len(o.orig); i++ {
+		if address >= o.orig[i] && address < o.orig[i]+len(o.seg[i]) {
+			return &o.seg[i][address-o.orig[i]]
+		}
+	}
+	return nil
+}
+
+func (o *object) writeCards(w io.Writer) error {
 	if _, err := io.WriteString(w, loader); err != nil {
 		return err
 	}
-	for i := 0; i < len(obj.orig); i++ {
-		orig := obj.orig[i]
-		for j := 0; j < len(obj.seg[i]); j += wordsPerCard {
-			n := len(obj.seg[i]) - j
+	for i := 0; i < len(o.orig); i++ {
+		orig := o.orig[i]
+		for j := 0; j < len(o.seg[i]); j += wordsPerCard {
+			n := len(o.seg[i]) - j
 			if n > wordsPerCard {
 				n = wordsPerCard
 			}
@@ -33,7 +42,7 @@ func (obj *object) writeCards(w io.Writer) error {
 			if _, err := io.WriteString(w, s); err != nil {
 				return err
 			}
-			for _, v := range obj.seg[i][j : j+n] {
+			for _, v := range o.seg[i][j : j+n] {
 				s = fmt.Sprintf("%010d", v.Int())
 				if v.Sign() == -1 {
 					d := mix.OverPunch(rune(s[len(s)-1]))
@@ -52,6 +61,6 @@ func (obj *object) writeCards(w io.Writer) error {
 			}
 		}
 	}
-	_, err := io.WriteString(w, fmt.Sprintf(transfer, obj.start))
+	_, err := io.WriteString(w, fmt.Sprintf(transfer, o.start))
 	return err
 }
