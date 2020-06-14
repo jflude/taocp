@@ -56,5 +56,6 @@ func IsPunchable(s string) (rune, bool) {
 }
 
 func OverPunch(digit rune) rune {
+	// see Ex. 26, Section 1.3.1 for digits which have been overpunched
 	return []rune("ΘJKLMNOPQR")[digit-'0']
 }

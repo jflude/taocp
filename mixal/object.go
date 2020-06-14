@@ -43,7 +43,7 @@ func (o *object) writeCards(w io.Writer) error {
 				return err
 			}
 			for _, v := range o.seg[i][j : j+n] {
-				s = fmt.Sprintf("%010d", v.Int())
+				s = fmt.Sprintf("%010d", abs(v.Int()))
 				if v.Sign() == -1 {
 					d := mix.OverPunch(rune(s[len(s)-1]))
 					s = s[:len(s)-1] + string(d)
@@ -63,4 +63,11 @@ func (o *object) writeCards(w io.Writer) error {
 	}
 	_, err := io.WriteString(w, fmt.Sprintf(transfer, o.start))
 	return err
+}
+
+func abs(v int) int {
+	if v < 0 {
+		return -v
+	}
+	return v
 }
