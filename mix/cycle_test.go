@@ -144,8 +144,28 @@ func TestCycle(t *testing.T) {
 		}
 	}
 
+	// NUM (overflow, etc)
+	c.Contents[0] = NUM
+	for i, op := range egCycle8 {
+		c.Reg[A] = op[0]
+		c.Reg[X] = op[1]
+		c.Overflow = false
+		c.next = 0
+		if err := c.Cycle(); err != nil {
+			t.Errorf("#%d: error: %v", i+1, err)
+			continue
+		}
+		if c.Overflow {
+			c.Reg[A] = c.Reg[A].Negate()
+		}
+		if c.Reg[A] != op[2] {
+			t.Errorf("#%d: got: A = %#v, want: A = %#v",
+				i+1, c.Reg[A], op[2])
+		}
+	}
+
 	// Program M, Section 1.3.2
-	copy(c.Contents[3000:], egCycle8)
+	copy(c.Contents[3000:], egCycle9)
 	c.Contents[0] = NewWord(3000<<18 | 39) // JMP 3000
 	c.Contents[1] = NewWord(0205)          // HLT
 	c.Contents[1000] = NewWord(1)
@@ -171,11 +191,11 @@ func TestCycle(t *testing.T) {
 	for i := range c.Contents {
 		c.Contents[i] = 0
 	}
-	copy(c.Contents[3000:], egCycle9)
-	copy(c.Contents[:], egCycle9a)
-	copy(c.Contents[1995:], egCycle9b)
-	copy(c.Contents[2024:], egCycle9c)
-	copy(c.Contents[2049:], egCycle9d)
+	copy(c.Contents[3000:], egCycle10)
+	copy(c.Contents[:], egCycle10a)
+	copy(c.Contents[1995:], egCycle10b)
+	copy(c.Contents[2024:], egCycle10c)
+	copy(c.Contents[2049:], egCycle10d)
 	c.next = 3000
 	if err := c.resume(); err != nil {
 		t.Error("error:", err)
@@ -184,14 +204,14 @@ func TestCycle(t *testing.T) {
 	if err != nil {
 		t.Fatal("error:", err)
 	}
-	if strings.Compare(string(b), okCycle9) != 0 {
+	if strings.Compare(string(b), okCycle10) != 0 {
 		t.Error("got: incorrect printer output")
 	}
 }
 
 func BenchmarkProgramM(b *testing.B) {
 	c := NewComputer(nil)
-	copy(c.Contents[3000:], egCycle8)
+	copy(c.Contents[3000:], egCycle9)
 	c.Contents[0] = NewWord(3000<<18 | 39) // JMP 3000
 	c.Contents[1] = NewWord(0205)          // HLT
 	c.Contents[1000] = NewWord(1)
@@ -380,7 +400,7 @@ var (
 
 	egCycle7 = [][3]Word{
 		{ // #1
-			NewWord(05), // NUM  0
+			NewWord(05), // NUM
 			NewWord(-12977700),
 			NewWord(04571573636),
 		},
@@ -390,14 +410,28 @@ var (
 			NewWord(04571573636),
 		},
 		{ // #3
-			NewWord(0105), // CHAR 0
+			NewWord(0105), // CHAR
 			NewWord(-03636374047),
 			NewWord(04545444747),
 		},
 	}
+
+	egCycle8 = [][3]Word{
+		{ // #1
+			NewWord(-03736363636), // A (before)
+			NewWord(-03636363637), // X (before)
+			NewWord(-1000000001),  // A (after, negated if overflow)
+		},
+		{ // #2
+			NewWord(-04747474747),
+			NewWord(04747474747),
+			NewWord(02402761777),
+		},
+	}
+
 	//                                         * FIND THE MAXIMUM
 	//                                         X        EQU  1000
-	egCycle8 = []Word{ //                               ORIG 3000
+	egCycle9 = []Word{ //                               ORIG 3000
 		NewWord(3009<<18 | 0240),       // MAXIMUM  STJ  EXIT
 		NewWord(010263),                // INIT     ENT3 0,1
 		NewWord(3005<<18 | 39),         //          JMP  CHANGEM
@@ -416,7 +450,7 @@ var (
 	//                                    PRIME     EQU  -1
 	//                                    BUF0      EQU  2000
 	//                                    BUF1      EQU  BUF0+25
-	egCycle9 = []Word{ //                           ORIG 3000
+	egCycle10 = []Word{ //                          ORIG 3000
 		NewWord(02243),            // START     IOC  0(PRINTER)
 		NewWord(2050<<18 | 0511),  //           LD1  =1-L=
 		NewWord(2051<<18 | 0512),  //           LD2  =3=
@@ -449,26 +483,26 @@ var (
 		NewWord(0205),             //           HLT
 	}
 	//                                    * TABLES AND BUFFERS
-	egCycle9a = []Word{ //                          ORIG PRIME+1 (=0)
+	egCycle10a = []Word{ //                         ORIG PRIME+1 (=0)
 		NewWord(2), //                          CON  2
 	}
-	egCycle9b = []Word{ //                          ORIG BUF0-5 (=1995)
+	egCycle10b = []Word{ //                         ORIG BUF0-5 (=1995)
 		NewWord(0611232627),  //      TITLE     ALF  FIRST
 		NewWord(06113105),    //                ALF   FIVE
 		NewWord(010301704),   //                ALF   HUND
 		NewWord(02305040021), //                ALF  RED P
 		NewWord(02311160526), //                ALF  RIMES
 	}
-	egCycle9c = []Word{ //                          ORIG BUF0+24 (=2024)
+	egCycle10c = []Word{ //                         ORIG BUF0+24 (=2024)
 		NewWord(2035), //                       CON  BUF1+10
 	}
-	egCycle9d = []Word{ //                          ORIG BUF1+24 (=2049)
+	egCycle10d = []Word{ //                         ORIG BUF1+24 (=2049)
 		NewWord(2010), //                       CON  BUF0+10
 		NewWord(-499), //                       CON  1-L
 		NewWord(3),    //                       CON  3
 	}
 
-	okCycle9 = "\014" + `FIRST FIVE HUNDRED PRIMES
+	okCycle10 = "\014" + `FIRST FIVE HUNDRED PRIMES
      0002 0233 0547 0877 1229 1597 1993 2371 2749 3187
      0003 0239 0557 0881 1231 1601 1997 2377 2753 3191
      0005 0241 0563 0883 1237 1607 1999 2381 2767 3203

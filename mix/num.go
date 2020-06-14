@@ -5,14 +5,18 @@ import "strconv"
 func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	switch f {
 	case 0: // NUM
-		var a, x int
+		var a, x int64
 		for i := 1; i <= 5; i++ {
 			f := FieldSpec(i, i)
-			a = 10*a + (c.Reg[A].Field(f).Int() % 10)
-			x = 10*x + (c.Reg[X].Field(f).Int() % 10)
+			a = 10*a + int64(c.Reg[A].Field(f).Int())%10
+			x = 10*x + int64(c.Reg[X].Field(f).Int())%10
 		}
-		v := a*100000 + x
-		c.Reg[A].SetField(FieldSpec(1, 5), NewWord(v))
+		a = a*100000 + x
+		if a > MaxWord {
+			a %= MaxWord + 1
+			c.Overflow = true
+		}
+		c.Reg[A].SetField(FieldSpec(1, 5), NewWord(int(a)))
 	case 1: // CHAR
 		v := strconv.Itoa(c.Reg[A].Field(FieldSpec(1, 5)).Int())
 		if l := len(v); l < 10 {
@@ -27,7 +31,8 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 		}
 	case 2: // HLT
 		panic(ErrHalted)
-	//case 3: // TODO: INT (f == 7), see Ex. 18, Section 1.4.4
+	case 7: // INT
+		fallthrough // TODO: see Ex. 18, Section 1.4.4
 	default:
 		panic(ErrInvalidInstruction)
 	}

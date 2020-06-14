@@ -7,8 +7,12 @@ func (c *Computer) Cycle() (err error) {
 		return ErrInvalidAddress
 	}
 	defer func() {
-		if err2, ok := recover().(error); ok {
-			err = err2
+		if r := recover(); r != nil {
+			if err2, ok := r.(error); ok {
+				err = err2
+			} else {
+				panic(r)
+			}
 		}
 		if err != nil {
 			err = fmt.Errorf("%w at %04d (%#v)",
