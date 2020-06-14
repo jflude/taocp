@@ -9,6 +9,9 @@ func (c *Computer) GoButton(unit int) error {
 	if unit != 16 && unit != 19 {
 		return ErrNotImplemented
 	}
+	for i := 0; i < MemorySize; i++ {
+		c.Contents[i] = 0
+	}
 	if _, err := c.in(0, 0, unit, IN, 0); err != nil {
 		return err
 	}
