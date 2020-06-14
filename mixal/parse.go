@@ -10,7 +10,7 @@ func parseLine(a *asmb, loc, op, address string) {
 	}
 	a.input = op
 	if !a.matchOperator() {
-		a.semanticError(ErrInvalidOperator)
+		a.syntaxError()
 	}
 	if a.tokens[0].kind == symbol && a.lastString() != "EQU" {
 		sym := a.tokens[0].val.(string)
@@ -39,5 +39,8 @@ func parseLine(a *asmb, loc, op, address string) {
 		var w mix.Word
 		w.PackOp(a.aa, a.i, a.f, a.c)
 		a.emit(w)
+	}
+	if a.input != "" {
+		a.syntaxError()
 	}
 }

@@ -31,6 +31,7 @@ func (a *asmb) parseALF() {
 	if err != nil {
 		parseError(err, a.input)
 	}
+	a.input = ""
 	a.emit(w[0])
 }
 

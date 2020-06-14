@@ -10,7 +10,6 @@ var (
 	ErrSyntaxError     = errors.New("syntax error")
 	ErrRedefinedSymbol = errors.New("redefined symbol")
 	ErrInvalidLocal    = errors.New("invalid local symbol")
-	ErrInvalidOperator = errors.New("invalid operator")
 	ErrInternalError   = errors.New("internal error")
 )
 
