@@ -2,7 +2,7 @@ package mixal
 
 import "github.com/jflude/gnuth/mix"
 
-func (a *asmb) matchSymbol(category func(*string) bool) bool {
+func (a *asmb) matchSymbol(criterion func(*string) bool) bool {
 	var letter bool
 	var i int
 	for i = 0; i < 10 && i < len(a.input); i++ {
@@ -16,7 +16,7 @@ func (a *asmb) matchSymbol(category func(*string) bool) bool {
 		return false
 	}
 	sym := a.input[:i]
-	if !category(&sym) {
+	if !criterion(&sym) {
 		return false
 	}
 	a.addToken(symbol, sym)

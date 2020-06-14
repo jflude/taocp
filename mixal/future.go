@@ -9,7 +9,7 @@ func (a *asmb) matchFutureRef() bool {
 			case 'F':
 				*sym = (*sym)[:1] + "H"
 			case 'H':
-				a.semanticError(ErrInvalidLocal)
+				parseError(ErrInvalidLocal, *sym)
 			}
 		} else if _, ok := a.symbols[*sym]; ok {
 			return false
