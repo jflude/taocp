@@ -2,10 +2,7 @@
 // "The Art of Computer Programming, Vol. 1" (second edition).
 package mix
 
-import (
-	"errors"
-	"log"
-)
+import "log"
 
 const (
 	// The CPU registers of the MIX computer.
@@ -48,15 +45,6 @@ type Computer struct {
 	m, next   int
 	trace     bool
 }
-
-var (
-	// Errors returned by the CPU.
-	ErrHalted             = errors.New("halted")
-	ErrInvalidAddress     = errors.New("invalid address")
-	ErrInvalidIndex       = errors.New("invalid index")
-	ErrInvalidInstruction = errors.New("invalid instruction")
-	ErrNotImplemented     = errors.New("not implemented")
-)
 
 func NewComputer(bind *Binding) *Computer {
 	if bind == nil {

@@ -1,6 +1,11 @@
 package mix
 
-import "strconv"
+import (
+	"errors"
+	"strconv"
+)
+
+var ErrHalted = errors.New("halted")
 
 func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	switch f {

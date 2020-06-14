@@ -5,13 +5,7 @@ import (
 	"fmt"
 )
 
-var (
-	ErrFormatError     = errors.New("format error")
-	ErrSyntaxError     = errors.New("syntax error")
-	ErrRedefinedSymbol = errors.New("redefined symbol")
-	ErrInvalidLocal    = errors.New("invalid local symbol")
-	ErrInternalError   = errors.New("internal error")
-)
+var ErrSyntaxError = errors.New("syntax error")
 
 func parseError(err error, text string) {
 	panic(fmt.Errorf("%w: %q", err, text))

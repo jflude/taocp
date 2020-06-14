@@ -2,6 +2,8 @@ package mix
 
 import "errors"
 
+var ErrNotImplemented = errors.New("not implemented")
+
 // GoButton starts the MIX computer, as described in Ex. 26, Section 1.3.1.
 // The machine can only be bootstrapped from the card reader (unit 16) or
 // the teletype's paper tape (unit 19).

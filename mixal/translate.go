@@ -9,6 +9,11 @@ import (
 	"github.com/jflude/gnuth/mix"
 )
 
+var (
+	ErrFormatError   = errors.New("format error")
+	ErrInternalError = errors.New("internal error")
+)
+
 func (a *asmb) translate(r io.Reader,
 	parser func(*asmb, string, string, string)) (err error) {
 	defer func() {

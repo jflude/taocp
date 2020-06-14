@@ -29,13 +29,13 @@ func (a *asmb) lastString() string {
 
 func (a *asmb) lastQuantity() int {
 	switch t := a.tokens[len(a.tokens)-1]; t.kind {
+	case number, asterisk:
+		return t.val.(int)
 	case symbol:
 		if n, ok := a.symbols[t.val.(string)]; ok {
 			return n.Int()
 		}
 		panic(ErrInternalError)
-	case number, asterisk:
-		return t.val.(int)
 	default:
 		panic(ErrInternalError)
 	}

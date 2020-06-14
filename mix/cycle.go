@@ -1,6 +1,15 @@
 package mix
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrInvalidAddress     = errors.New("invalid address")
+	ErrInvalidIndex       = errors.New("invalid index")
+	ErrInvalidInstruction = errors.New("invalid instruction")
+)
 
 func (c *Computer) Cycle() (err error) {
 	if c.next < 0 || c.next >= MemorySize {
