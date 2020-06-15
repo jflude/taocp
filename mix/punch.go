@@ -27,7 +27,7 @@ func (*CardPunch) BlockSize() int {
 }
 
 func (*CardPunch) Read([]Word) (int64, error) {
-	return 0, ErrInvalidOperation
+	return 0, ErrInvalidCommand
 }
 
 func (p *CardPunch) Write(block []Word) (int64, error) {
@@ -40,7 +40,7 @@ func (p *CardPunch) Write(block []Word) (int64, error) {
 }
 
 func (p *CardPunch) Control(m int) (int64, error) {
-	return 0, ErrInvalidControl
+	return 0, ErrInvalidCommand
 }
 
 func (p *CardPunch) Close() error {

@@ -39,7 +39,7 @@ func (c *Computer) jmp(aa Word, i, f, op, m int) int64 {
 	case 9: // JLE
 		c.jump(m, c.Comparison != Greater)
 	default:
-		panic(ErrInvalidInstruction)
+		panic(ErrInvalidOp)
 	}
 	return 1
 }
@@ -58,8 +58,13 @@ func (c *Computer) ja(aa Word, i, f, op, m int) int64 {
 		c.jump(m, r != 0)
 	case 5: // NP
 		c.jump(m, r <= 0)
+	case 6, 7: // E, O
+		if op == JA || op == JX {
+			panic(ErrNotImplemented) // TODO: see Section 4.5.2
+		}
+		fallthrough
 	default:
-		panic(ErrInvalidInstruction)
+		panic(ErrInvalidOp)
 	}
 	return 1
 }

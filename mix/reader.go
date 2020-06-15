@@ -43,11 +43,11 @@ func (r *CardReader) Read(block []Word) (int64, error) {
 }
 
 func (*CardReader) Write([]Word) (int64, error) {
-	return 0, ErrInvalidOperation
+	return 0, ErrInvalidCommand
 }
 
 func (r *CardReader) Control(m int) (int64, error) {
-	return 0, ErrInvalidControl
+	return 0, ErrInvalidCommand
 }
 
 func (r *CardReader) Close() error {

@@ -1,5 +1,7 @@
 package mix
 
+import "errors"
+
 type Binding [20]string
 
 var (
@@ -25,7 +27,8 @@ var (
 		"printer.mix",
 		"",
 	}
-	DefaultBinding = &defBind
+	DefaultBinding   = &defBind
+	ErrInvalidDevice = errors.New("mix: invalid I/O device")
 )
 
 func (c *Computer) bindDevice(unit int) error {

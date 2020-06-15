@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	ErrInvalidAddress     = errors.New("invalid address")
-	ErrInvalidIndex       = errors.New("invalid index")
-	ErrInvalidInstruction = errors.New("invalid instruction")
+	ErrInvalidAddress = errors.New("mix: invalid address")
+	ErrInvalidIndex   = errors.New("mix: invalid index")
+	ErrInvalidOp      = errors.New("mix: invalid operation")
 )
 
 func (c *Computer) Cycle() (err error) {
@@ -30,7 +30,7 @@ func (c *Computer) Cycle() (err error) {
 	}()
 	aa, i, f, op := c.Contents[mBase+c.next].UnpackOp()
 	if i > 6 {
-		return ErrInvalidInstruction
+		return ErrInvalidOp
 	}
 	m := aa.Int()
 	if i > 0 {
@@ -85,9 +85,13 @@ func (c *Computer) Cycle() (err error) {
 	case op >= CMPA && op <= CMPX:
 		t = c.cmpa(aa, i, f, op, m)
 	}
-	if err == nil {
-		c.elapsed += t
-		c.next++
+	if err != nil {
+		return err
 	}
-	return err
+	c.elapsed += t
+	c.next++
+	if !c.ctrl {
+		// TODO: check for an interrupt
+	}
+	return nil
 }

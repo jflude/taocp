@@ -27,7 +27,7 @@ func (*Printer) BlockSize() int {
 }
 
 func (*Printer) Read([]Word) (int64, error) {
-	return 0, ErrInvalidOperation
+	return 0, ErrInvalidCommand
 }
 
 func (p *Printer) Write(block []Word) (int64, error) {
@@ -38,7 +38,7 @@ func (p *Printer) Write(block []Word) (int64, error) {
 
 func (p *Printer) Control(m int) (int64, error) {
 	if m != 0 {
-		return 0, ErrInvalidControl
+		return 0, ErrInvalidCommand
 	}
 	_, err := p.wc.Write([]byte("\014")) // form feed
 	return 1000000, err

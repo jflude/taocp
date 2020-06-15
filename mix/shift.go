@@ -2,7 +2,7 @@ package mix
 
 func (c *Computer) sla(aa Word, i, f, op, m int) int64 {
 	if m < 0 {
-		panic(ErrInvalidInstruction)
+		panic(ErrInvalidOp)
 	}
 	switch f {
 	case 0: // SLA
@@ -29,8 +29,10 @@ func (c *Computer) sla(aa Word, i, f, op, m int) int64 {
 		outX := c.Reg[X].ShiftRight(m)
 		c.Reg[A].SetField(FieldSpec(1, m), outX)
 		c.Reg[X].SetField(FieldSpec(1, m), outA)
+	case 6, 7: // SLB, SRB
+		panic(ErrNotImplemented) // TODO: see Section 4.5.2
 	default:
-		panic(ErrInvalidInstruction)
+		panic(ErrInvalidOp)
 	}
 	return 2
 }

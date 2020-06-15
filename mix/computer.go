@@ -1,5 +1,5 @@
-// Package mix simulates the MIX computer described in Donald Knuth's
-// "The Art of Computer Programming, Vol. 1" (second edition).
+// Package mix simulates the MIX computer described in
+// Donald Knuth's "The Art of Computer Programming".
 package mix
 
 import "log"
@@ -38,7 +38,7 @@ type Computer struct {
 	busyUntil   []int64
 	elapsed     int64
 	m, next     int
-	intr, trace bool
+	ctrl, trace bool
 }
 
 func NewComputer(bind *Binding) *Computer {
@@ -68,7 +68,7 @@ func (c *Computer) Shutdown() error {
 }
 
 func (c *Computer) validAddress(address int) bool {
-	if c.intr {
+	if c.ctrl {
 		return address > -MemorySize && address < MemorySize
 	} else {
 		return address >= 0 && address < MemorySize

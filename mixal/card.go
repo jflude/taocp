@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	ErrFormatError   = errors.New("format error")
-	ErrInternalError = errors.New("internal error")
+	ErrFormatError   = errors.New("mixal: format error")
+	ErrInternalError = errors.New("mixal: internal error")
 )
 
 func (a *asmb) processCard(line string, parse parseFunc) (err error) {

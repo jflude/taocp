@@ -63,7 +63,7 @@ func (t *Teletype) Write(block []Word) (int64, error) {
 
 func (t *Teletype) Control(m int) (int64, error) {
 	if m != 0 {
-		return 0, ErrInvalidControl
+		return 0, ErrInvalidCommand
 	}
 	var rwc io.ReadWriteCloser
 	if t.rwc != nil {
@@ -75,7 +75,7 @@ func (t *Teletype) Control(m int) (int64, error) {
 		_, err := s.Seek(0, io.SeekStart)
 		return 60000000, err
 	}
-	return 0, ErrInvalidOperation
+	return 0, ErrInvalidCommand
 }
 
 func (t *Teletype) Close() error {

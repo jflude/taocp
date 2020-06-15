@@ -26,7 +26,7 @@ func (c *Computer) inca(aa Word, i, f, op, m int) int64 {
 				SetField(FieldSpec(0, 0), aa.Negate())
 		}
 	default:
-		panic(ErrInvalidInstruction)
+		panic(ErrInvalidOp)
 	}
 	return 1
 }

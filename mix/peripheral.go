@@ -11,12 +11,9 @@ type Peripheral interface {
 	Close() error
 }
 
-var (
-	// Errors returned by peripheral devices.
-	ErrInvalidDevice    = errors.New("invalid I/O device")
-	ErrInvalidControl   = errors.New("invalid I/O control")
-	ErrInvalidOperation = errors.New("invalid I/O operation")
-)
+// ErrInvalidCommand is returned when an I/O device is asked to do something
+// it does not support, eg. requesting input from the printer.
+var ErrInvalidCommand = errors.New("mix: invalid I/O command")
 
 func (c *Computer) isBusy(unit int) bool {
 	return c.busyUntil[unit] > c.elapsed
@@ -26,9 +23,9 @@ func (c *Computer) calcTime(unit int, t int64, err error) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	var dur int64 = 1
-	if c.busyUntil[unit] > c.elapsed {
-		dur += c.busyUntil[unit] - c.elapsed
+	dur := c.busyUntil[unit] - c.elapsed + 1
+	if dur < 1 {
+		dur = 1
 	}
 	c.busyUntil[unit] = c.elapsed + dur + t
 	return dur, nil

@@ -1,5 +1,5 @@
-// Package mixal is an assembler for the MIX computer as simulated by the
-// mix package.
+// Package mixal is an assembler for the MIX computer described in
+// Donald Knuth's "The Art of Computer Programming".
 package mixal
 
 import (

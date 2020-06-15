@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-var ErrInvalidChar = errors.New("invalid character")
+var ErrInvalidChar = errors.New("mix: invalid character")
 
 var mix2utf = []rune(` ABCDEFGHIΘJKLMNOPQRΦΠSTUVWXYZ0123456789.,()+-*/=$<>@;:'`)
 var utf2mix = make(map[rune]int)

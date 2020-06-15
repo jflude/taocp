@@ -5,12 +5,13 @@ import "fmt"
 var (
 	regs   = []string{"A", "1", "2", "3", "4", "5", "6", "X", "J", "Z"}
 	arith  = []string{"ADD", "SUB", "MUL", "DIV"}
-	nums   = []string{"NUM", "CHAR", "HLT" /*, "INT"*/}
-	shifts = []string{"SLA", "SRA", "SLAX", "SRAX", "SLC", "SRC"}
-	ios    = []string{"JBUS", "IOC", "IN", "OUT", "JRED"}
-	jumps  = []string{"JMP", "JSJ", "JOV", "JNV",
+	nums   = []string{"NUM", "CHAR", "HLT", "", "", "", "", "INT"}
+	shifts = []string{"SLA", "SRA", "SLAX", "SRAX",
+		"SLC", "SRC", "SLB", "SRB"}
+	ios   = []string{"JBUS", "IOC", "IN", "OUT", "JRED"}
+	jumps = []string{"JMP", "JSJ", "JOV", "JNV",
 		"JL", "JE", "JG", "JGE", "JNE", "JLE"}
-	conds = []string{"N", "Z", "P", "NN", "NE", "NP"}
+	conds = []string{"N", "Z", "P", "NN", "NE", "NP", "E", "O"}
 	incs  = []string{"INC", "DEC", "ENT", "ENN"}
 )
 
@@ -26,7 +27,7 @@ func Disassemble(w Word) string {
 		}
 		return hasSpec(s, aa, i, f)
 	case op == NUM:
-		if f < len(nums) {
+		if f < len(nums) && nums[f] != "" {
 			return noArg(nums[f])
 		}
 	case op == SLA:

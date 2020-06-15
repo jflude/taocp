@@ -2,7 +2,7 @@ package mixal
 
 import "errors"
 
-var ErrUndefinedLocal = errors.New("undefined local symbol")
+var ErrUndefinedLocal = errors.New("mixal: undefined local symbol")
 
 func (a *asmb) matchDefinedSymbol() bool {
 	return a.matchSymbol(func(sym *string) bool {

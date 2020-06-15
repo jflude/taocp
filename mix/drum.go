@@ -60,7 +60,7 @@ func (d *Drum) Write(block []Word) (int64, error) {
 
 func (d *Drum) Control(m int) (int64, error) {
 	if m != 0 {
-		return 0, ErrInvalidControl
+		return 0, ErrInvalidCommand
 	}
 	return d.seekToX()
 }

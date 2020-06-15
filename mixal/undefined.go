@@ -3,8 +3,8 @@ package mixal
 import "errors"
 
 var (
-	ErrInvalidLocal    = errors.New("invalid local symbol")
-	ErrRedefinedSymbol = errors.New("redefined symbol")
+	ErrInvalidLocal    = errors.New("mixal: invalid local symbol")
+	ErrRedefinedSymbol = errors.New("mixal: redefined symbol")
 )
 
 func (a *asmb) matchUndefinedSymbol() bool {

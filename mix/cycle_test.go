@@ -12,7 +12,7 @@ func TestCycle(t *testing.T) {
 	c.trace = testing.Verbose()
 
 	// LDA
-	copy(c.Contents[mBase:], egCycle1)
+	copy(c.Contents[mBase+0:], egCycle1)
 	c.Contents[mBase+2000] = NewWord(-(80<<18 | 030504))
 	c.next = 0
 	for i, v := range okCycle1 {
@@ -28,7 +28,7 @@ func TestCycle(t *testing.T) {
 	}
 
 	// LD[1-6]N
-	copy(c.Contents[mBase:], egCycle2)
+	copy(c.Contents[mBase+0:], egCycle2)
 	c.Contents[mBase+2000] = NewWord(-01234)
 	c.next = 0
 	for i, v := range okCycle2 {
@@ -44,7 +44,7 @@ func TestCycle(t *testing.T) {
 	}
 
 	// STA
-	copy(c.Contents[mBase:], egCycle3)
+	copy(c.Contents[mBase+0:], egCycle3)
 	c.Reg[A] = NewWord(0607101100)
 	c.next = 0
 	for i, v := range okCycle3 {
@@ -61,7 +61,7 @@ func TestCycle(t *testing.T) {
 	}
 
 	// ST1
-	copy(c.Contents[mBase:], egCycle4)
+	copy(c.Contents[mBase+0:], egCycle4)
 	c.Reg[I1] = NewWord(01100)
 	c.next = 0
 	for i, v := range okCycle4 {
@@ -192,7 +192,7 @@ func TestCycle(t *testing.T) {
 		c.Contents[i] = 0
 	}
 	copy(c.Contents[mBase+3000:], egCycle10)
-	copy(c.Contents, egCycle10a)
+	copy(c.Contents[mBase+0:], egCycle10a)
 	copy(c.Contents[mBase+1995:], egCycle10b)
 	copy(c.Contents[mBase+2024:], egCycle10c)
 	copy(c.Contents[mBase+2049:], egCycle10d)

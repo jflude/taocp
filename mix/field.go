@@ -2,7 +2,7 @@ package mix
 
 import "errors"
 
-var ErrInvalidFieldSpec = errors.New("invalid field specification")
+var ErrInvalidFieldSpec = errors.New("mix: invalid field specification")
 
 // FieldSpec returns the integer equivalent of a MIX field specification.
 func FieldSpec(left, right int) int {

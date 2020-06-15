@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-var ErrHalted = errors.New("halted")
+var ErrHalted = errors.New("mix: halted")
 
 func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	switch f {
@@ -39,7 +39,7 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	case 7: // INT
 		panic(ErrNotImplemented) // TODO: see Ex. 18, Section 1.4.4
 	default:
-		panic(ErrInvalidInstruction)
+		panic(ErrInvalidOp)
 	}
 	return 1
 }

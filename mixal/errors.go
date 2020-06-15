@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-var ErrSyntaxError = errors.New("syntax error")
+var ErrSyntaxError = errors.New("mixal: syntax error")
 
 func parseError(err error, text string) {
 	panic(fmt.Errorf("%w: %q", err, text))
