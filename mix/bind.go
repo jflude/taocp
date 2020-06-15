@@ -14,14 +14,14 @@ var (
 		"tape05.mix",
 		"tape06.mix",
 		"tape07.mix",
-		"drum08.mix",
-		"drum09.mix",
-		"drum10.mix",
-		"drum11.mix",
-		"drum12.mix",
-		"drum13.mix",
-		"drum14.mix",
-		"drum15.mix",
+		"disc08.mix",
+		"disc09.mix",
+		"disc10.mix",
+		"disc11.mix",
+		"disc12.mix",
+		"disc13.mix",
+		"disc14.mix",
+		"disc15.mix",
 		"reader.mix",
 		"punch.mix",
 		"printer.mix",
@@ -45,7 +45,7 @@ func (c *Computer) bindDevice(unit int) error {
 	case unit >= 0 && unit <= 7:
 		p, err = NewTape(f, unit)
 	case unit >= 8 && unit <= 15:
-		p, err = NewDrum(f, unit, c)
+		p, err = NewDisc(f, unit, c)
 	case unit == 16:
 		p, err = NewCardReader(f)
 	case unit == 17:
