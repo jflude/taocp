@@ -9,11 +9,11 @@ import (
 func TestCycle(t *testing.T) {
 	c, tmpDir := newSandbox(t, "")
 	defer closeSandbox(t, c, tmpDir)
-	//c.trace = true
+	c.trace = testing.Verbose()
 
 	// LDA
-	copy(c.Contents[:], egCycle1)
-	c.Contents[2000] = NewWord(-(80<<18 | 030504))
+	copy(c.Contents[mBase:], egCycle1)
+	c.Contents[mBase+2000] = NewWord(-(80<<18 | 030504))
 	c.next = 0
 	for i, v := range okCycle1 {
 		if err := c.Cycle(); err != nil {
@@ -28,8 +28,8 @@ func TestCycle(t *testing.T) {
 	}
 
 	// LD[1-6]N
-	copy(c.Contents[:], egCycle2)
-	c.Contents[2000] = NewWord(-01234)
+	copy(c.Contents[mBase:], egCycle2)
+	c.Contents[mBase+2000] = NewWord(-01234)
 	c.next = 0
 	for i, v := range okCycle2 {
 		if err := c.Cycle(); err != nil {
@@ -44,45 +44,45 @@ func TestCycle(t *testing.T) {
 	}
 
 	// STA
-	copy(c.Contents[:], egCycle3)
+	copy(c.Contents[mBase:], egCycle3)
 	c.Reg[A] = NewWord(0607101100)
 	c.next = 0
 	for i, v := range okCycle3 {
-		c.Contents[2000] = NewWord(-0102030405)
+		c.Contents[mBase+2000] = NewWord(-0102030405)
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
-		if c.Contents[2000] != v {
+		if c.Contents[mBase+2000] != v {
 			t.Errorf("#%d: got: %#v, want: %#v",
-				i+1, c.Contents[2000], v)
+				i+1, c.Contents[mBase+2000], v)
 		}
 	}
 
 	// ST1
-	copy(c.Contents[:], egCycle4)
+	copy(c.Contents[mBase:], egCycle4)
 	c.Reg[I1] = NewWord(01100)
 	c.next = 0
 	for i, v := range okCycle4 {
-		c.Contents[2000] = NewWord(-0102030405)
+		c.Contents[mBase+2000] = NewWord(-0102030405)
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
 			continue
 		}
-		if c.Contents[2000] != v {
+		if c.Contents[mBase+2000] != v {
 			t.Errorf("#%d: got: %#v, want: %#v",
-				i+1, c.Contents[2000], v)
+				i+1, c.Contents[mBase+2000], v)
 		}
 	}
 
 	// ADD, SUB, MUL, DIV
 	for i, op := range egCycle5 {
-		c.Contents[0] = op[0]
+		c.Contents[mBase+0] = op[0]
 		c.Reg[A] = op[1]
 		c.Reg[X] = op[2]
-		c.Contents[1000] = op[3]
+		c.Contents[mBase+1000] = op[3]
 		c.next = 0
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: error: %v", i+1, err)
@@ -103,7 +103,7 @@ func TestCycle(t *testing.T) {
 	c.Reg[X] = NewWord(-0607101112)
 	c.next = 0
 	for i, op := range egCycle6 {
-		c.Contents[i] = op[0]
+		c.Contents[mBase+i] = op[0]
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
@@ -126,7 +126,7 @@ func TestCycle(t *testing.T) {
 	c.Reg[X] = NewWord(04571573636)
 	c.next = 0
 	for i, op := range egCycle7 {
-		c.Contents[i] = op[0]
+		c.Contents[mBase+i] = op[0]
 		if err := c.Cycle(); err != nil {
 			t.Errorf("#%d: error: %v", i+1, err)
 			c.next++
@@ -145,7 +145,7 @@ func TestCycle(t *testing.T) {
 	}
 
 	// NUM (overflow, etc)
-	c.Contents[0] = NUM
+	c.Contents[mBase+0] = NUM
 	for i, op := range egCycle8 {
 		c.Reg[A] = op[0]
 		c.Reg[X] = op[1]
@@ -165,19 +165,19 @@ func TestCycle(t *testing.T) {
 	}
 
 	// Program M, Section 1.3.2
-	copy(c.Contents[3000:], egCycle9)
-	c.Contents[0] = NewWord(3000<<18 | 39) // JMP 3000
-	c.Contents[1] = NewWord(0205)          // HLT
-	c.Contents[1000] = NewWord(1)
-	c.Contents[1001] = NewWord(7)
-	c.Contents[1002] = NewWord(2)
-	c.Contents[1003] = NewWord(7)
-	c.Contents[1004] = NewWord(6)
-	c.Contents[1005] = NewWord(3)
-	c.Contents[1006] = NewWord(1)
-	c.Contents[1007] = NewWord(4)
-	c.Contents[1008] = NewWord(5)
-	c.Contents[1009] = NewWord(2)
+	copy(c.Contents[mBase+3000:], egCycle9)
+	c.Contents[mBase+0] = NewWord(3000<<18 | 39) // JMP 3000
+	c.Contents[mBase+1] = NewWord(0205)          // HLT
+	c.Contents[mBase+1000] = NewWord(1)
+	c.Contents[mBase+1001] = NewWord(7)
+	c.Contents[mBase+1002] = NewWord(2)
+	c.Contents[mBase+1003] = NewWord(7)
+	c.Contents[mBase+1004] = NewWord(6)
+	c.Contents[mBase+1005] = NewWord(3)
+	c.Contents[mBase+1006] = NewWord(1)
+	c.Contents[mBase+1007] = NewWord(4)
+	c.Contents[mBase+1008] = NewWord(5)
+	c.Contents[mBase+1009] = NewWord(2)
 	c.Reg[I1] = 10
 	c.next = 0
 	if err := c.resume(); err != nil {
@@ -188,14 +188,14 @@ func TestCycle(t *testing.T) {
 	}
 
 	// Program P, Section 1.3.2
-	for i := range c.Contents {
+	for i := 0; i < len(c.Contents); i++ {
 		c.Contents[i] = 0
 	}
-	copy(c.Contents[3000:], egCycle10)
-	copy(c.Contents[:], egCycle10a)
-	copy(c.Contents[1995:], egCycle10b)
-	copy(c.Contents[2024:], egCycle10c)
-	copy(c.Contents[2049:], egCycle10d)
+	copy(c.Contents[mBase+3000:], egCycle10)
+	copy(c.Contents, egCycle10a)
+	copy(c.Contents[mBase+1995:], egCycle10b)
+	copy(c.Contents[mBase+2024:], egCycle10c)
+	copy(c.Contents[mBase+2049:], egCycle10d)
 	c.next = 3000
 	if err := c.resume(); err != nil {
 		t.Error("error:", err)
@@ -211,19 +211,19 @@ func TestCycle(t *testing.T) {
 
 func BenchmarkProgramM(b *testing.B) {
 	c := NewComputer(nil)
-	copy(c.Contents[3000:], egCycle9)
-	c.Contents[0] = NewWord(3000<<18 | 39) // JMP 3000
-	c.Contents[1] = NewWord(0205)          // HLT
-	c.Contents[1000] = NewWord(1)
-	c.Contents[1001] = NewWord(7)
-	c.Contents[1002] = NewWord(2)
-	c.Contents[1003] = NewWord(7)
-	c.Contents[1004] = NewWord(6)
-	c.Contents[1005] = NewWord(3)
-	c.Contents[1006] = NewWord(1)
-	c.Contents[1007] = NewWord(4)
-	c.Contents[1008] = NewWord(5)
-	c.Contents[1009] = NewWord(2)
+	copy(c.Contents[mBase+3000:], egCycle9)
+	c.Contents[mBase+0] = NewWord(3000<<18 | 39) // JMP 3000
+	c.Contents[mBase+1] = NewWord(0205)          // HLT
+	c.Contents[mBase+1000] = NewWord(1)
+	c.Contents[mBase+1001] = NewWord(7)
+	c.Contents[mBase+1002] = NewWord(2)
+	c.Contents[mBase+1003] = NewWord(7)
+	c.Contents[mBase+1004] = NewWord(6)
+	c.Contents[mBase+1005] = NewWord(3)
+	c.Contents[mBase+1006] = NewWord(1)
+	c.Contents[mBase+1007] = NewWord(4)
+	c.Contents[mBase+1008] = NewWord(5)
+	c.Contents[mBase+1009] = NewWord(2)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c.Reg[I1] = 10
@@ -237,10 +237,10 @@ func BenchmarkProgramM(b *testing.B) {
 func Benchmark1000Cycles(b *testing.B) {
 	c := NewComputer(nil)
 	for i := 0; i < 998; i += 2 {
-		c.Contents[i] = NewWord(0501)   // ADD 0
-		c.Contents[i+1] = NewWord(0502) // SUB 0
+		c.Contents[mBase+i] = NewWord(0501)   // ADD 0
+		c.Contents[mBase+i+1] = NewWord(0502) // SUB 0
 	}
-	c.Contents[999] = NewWord(0205) // HLT
+	c.Contents[mBase+999] = NewWord(0205) // HLT
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c.next = 0

@@ -23,27 +23,22 @@ const (
 	Equal   = 0
 	Greater = 1
 
-	// MemorySize is the number of memory cells in a MIX computer.
+	// MemorySize is the number of memory cells in a regular MIX computer.
 	MemorySize = 4000
+	mBase      = MemorySize - 1
 )
 
-type CPU struct {
-	Reg        [10]Word
-	Overflow   bool
-	Comparison int
-}
-
-type Contents [MemorySize]Word
-
 type Computer struct {
-	*CPU
-	*Contents
 	*Binding
-	Devices   []Peripheral
-	busyUntil []int64
-	elapsed   int64
-	m, next   int
-	trace     bool
+	Reg         [10]Word
+	Overflow    bool
+	Comparison  int
+	Contents    []Word
+	Devices     []Peripheral
+	busyUntil   []int64
+	elapsed     int64
+	m, next     int
+	intr, trace bool
 }
 
 func NewComputer(bind *Binding) *Computer {
@@ -51,9 +46,8 @@ func NewComputer(bind *Binding) *Computer {
 		bind = DefaultBinding
 	}
 	return &Computer{
-		CPU:       new(CPU),
-		Contents:  new(Contents),
 		Binding:   bind,
+		Contents:  make([]Word, 2*MemorySize-1),
 		Devices:   make([]Peripheral, 20),
 		busyUntil: make([]int64, 20),
 	}
@@ -71,4 +65,12 @@ func (c *Computer) Shutdown() error {
 		}
 	}
 	return err
+}
+
+func (c *Computer) validAddress(address int) bool {
+	if c.intr {
+		return address > -MemorySize && address < MemorySize
+	} else {
+		return address >= 0 && address < MemorySize
+	}
 }

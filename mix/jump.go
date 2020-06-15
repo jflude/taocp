@@ -4,7 +4,7 @@ func (c *Computer) jump(address int, cond bool) {
 	if !cond {
 		return
 	}
-	if address < 0 || address >= MemorySize {
+	if !c.validAddress(address) {
 		panic(ErrInvalidAddress)
 	}
 	c.Reg[J] = NewWord(c.next + 1)
@@ -16,7 +16,7 @@ func (c *Computer) jmp(aa Word, i, f, op, m int) int64 {
 	case 0: // JMP
 		c.jump(m, true)
 	case 1: // JSJ
-		if m < 0 || m >= MemorySize {
+		if !c.validAddress(m) {
 			panic(ErrInvalidAddress)
 		}
 		c.next = m - 1

@@ -9,7 +9,7 @@ import (
 func TestGoButton(t *testing.T) {
 	c, tmpDir := newSandbox(t, "")
 	defer closeSandbox(t, c, tmpDir)
-	//c.trace = true
+	c.trace = testing.Verbose()
 
 	deck := make([]byte, 4*5*16) // four cards of 80 characters each
 	copy(deck[0:], egCardLoader[0])

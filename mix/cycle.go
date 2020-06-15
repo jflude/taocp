@@ -12,7 +12,7 @@ var (
 )
 
 func (c *Computer) Cycle() (err error) {
-	if c.next < 0 || c.next >= MemorySize {
+	if !c.validAddress(c.next) {
 		return ErrInvalidAddress
 	}
 	defer func() {
@@ -25,10 +25,10 @@ func (c *Computer) Cycle() (err error) {
 		}
 		if err != nil {
 			err = fmt.Errorf("%w at %04d (%#v)",
-				err, c.next, c.Contents[c.next])
+				err, c.next, c.Contents[mBase+c.next])
 		}
 	}()
-	aa, i, f, op := c.Contents[c.next].UnpackOp()
+	aa, i, f, op := c.Contents[mBase+c.next].UnpackOp()
 	if i > 6 {
 		return ErrInvalidInstruction
 	}

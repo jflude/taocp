@@ -5,12 +5,12 @@ func (c *Computer) move(aa Word, i, f, op, m int) int64 {
 		return 1
 	}
 	to := c.Reg[I1].Int()
-	if m < 0 || m+f >= MemorySize ||
-		to < 0 || to+f >= MemorySize {
+	if !c.validAddress(m) || !c.validAddress(m+f) ||
+		!c.validAddress(to) || !c.validAddress(to+f) {
 		panic(ErrInvalidAddress)
 	}
-	for n := 0; n < f; n++ {
-		c.Contents[to+n] = c.Contents[m+n]
+	for j := 0; j < f; j++ {
+		c.Contents[mBase+to+j] = c.Contents[mBase+m+j]
 	}
 	c.Reg[I1] = NewWord(to + f)
 	return 1 + 2*int64(f)

@@ -37,7 +37,7 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	case 2: // HLT
 		panic(ErrHalted)
 	case 7: // INT
-		fallthrough // TODO: see Ex. 18, Section 1.4.4
+		panic(ErrNotImplemented) // TODO: see Ex. 18, Section 1.4.4
 	default:
 		panic(ErrInvalidInstruction)
 	}

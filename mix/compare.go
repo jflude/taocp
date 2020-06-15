@@ -5,7 +5,7 @@ func (c *Computer) cmpa(aa Word, i, f, op, m int) int64 {
 		panic(ErrNotImplemented)
 	}
 	reg := c.Reg[op-CMPA].Field(f).Int()
-	mem := c.Contents[m].Field(f).Int()
+	mem := c.Contents[mBase+m].Field(f).Int()
 	if reg < mem {
 		c.Comparison = Less
 	} else if reg > mem {

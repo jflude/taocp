@@ -18,7 +18,7 @@ var opcodes = map[string]struct {
 	"NUM":  {mix.NUM, 0},
 	"CHAR": {mix.NUM, 1},
 	"HLT":  {mix.NUM, 2},
-	//"INT":  {mix.NUM, 3},
+	"INT":  {mix.NUM, 7},
 	"SLA":  {mix.SLA, 0},
 	"SRA":  {mix.SLA, 1},
 	"SLAX": {mix.SLA, 2},

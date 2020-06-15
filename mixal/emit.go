@@ -10,7 +10,7 @@ func (a *asmb) newSegment(orig int) {
 func (a *asmb) emit(w mix.Word) {
 	i := len(a.obj.seg) - 1
 	a.obj.seg[i] = append(a.obj.seg[i], w)
-	if a.self++; a.self >= mix.MemorySize {
+	if a.self++; abs(a.self) >= mix.MemorySize {
 		panic(mix.ErrInvalidAddress)
 	}
 }

@@ -18,12 +18,14 @@ func (c *Computer) printTrace(m, next int) {
 	}
 	fmt.Printf(" A: %10v (%#v)  OP: %4d: %s\n X: %10v (%#v)  OV: %s\n"+
 		"I1:       %4v (%#v)  CI: %s\n",
-		c.Reg[A], c.Reg[A], next, Disassemble(c.Contents[next]),
+		c.Reg[A], c.Reg[A], next,
+		Disassemble(c.Contents[mBase+next]),
 		c.Reg[X], c.Reg[X], ov, c.Reg[I1], c.Reg[I1], ci)
 	for i := 2; i <= 6; i, m = i+1, m+1 {
-		if m >= 0 && m < MemorySize {
+		if c.validAddress(m) {
 			fmt.Printf("I%d:       %4v (%#v)      %4d: %#v\n",
-				i, c.Reg[i], c.Reg[i], m, c.Contents[m])
+				i, c.Reg[i], c.Reg[i], m,
+				c.Contents[mBase+m])
 		} else {
 			fmt.Printf("I%d:       %4v (%#v)      %4d: ?\n",
 				i, c.Reg[i], c.Reg[i], m)
@@ -31,7 +33,7 @@ func (c *Computer) printTrace(m, next int) {
 	}
 	if m >= 0 && m < MemorySize {
 		fmt.Printf("J:        %4v (%#v)      %4d: %#v\n",
-			c.Reg[J], c.Reg[J], m, c.Contents[m])
+			c.Reg[J], c.Reg[J], m, c.Contents[mBase+m])
 	} else {
 		fmt.Printf("J:        %4v (%#v)      %4d: ?\n",
 			c.Reg[J], c.Reg[J], m)
