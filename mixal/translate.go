@@ -2,59 +2,26 @@ package mixal
 
 import (
 	"bufio"
-	"errors"
 	"io"
-	"strings"
+	"log"
 
 	"github.com/jflude/gnuth/mix"
 )
 
-var (
-	ErrFormatError   = errors.New("format error")
-	ErrInternalError = errors.New("internal error")
-)
+type parseFunc func(*asmb, string, string, string)
 
-func (a *asmb) translate(r io.Reader,
-	parser func(*asmb, string, string, string)) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			if err = r.(error); errors.Is(err, ErrInternalError) {
-				panic(err)
-			}
-			err = a.specifyError(err)
-		}
-	}()
+func (a *asmb) translate(r io.Reader, parse parseFunc) error {
 	a.symbols = make(map[string]mix.Word)
 	a.fixups = make(map[string][]int)
-	a.newSegment(0)
+	var err error
 	sc := bufio.NewScanner(r)
 	for sc.Scan() {
-		a.input = sc.Text()
-		a.count++
-		if len(a.input) == 0 {
-			panic(ErrFormatError)
-		}
-		if _, err := mix.ConvertToMIX(a.input); err != nil {
-			panic(err)
-		}
-		if a.input[0] == '*' {
-			continue
-		}
-		if a.extractColumns(11, 11, true) != "" ||
-			a.extractColumns(16, 16, true) != "" {
-			panic(ErrFormatError)
-		}
-		loc := a.extractColumns(1, 10, true)
-		op := a.extractColumns(12, 15, true)
-		address := a.extractColumns(17, 80, false)
-		if op == "ALF" {
-			if len(address) > 5 {
-				address = address[:5]
+		if err2 := a.processCard(sc.Text(), parse); err2 != nil {
+			if err != nil {
+				log.Println("error:", err)
 			}
-		} else if sp := strings.IndexByte(address, ' '); sp != -1 {
-			address = address[:sp]
+			err = err2
 		}
-		parser(a, loc, op, address)
 	}
-	return nil
+	return err
 }

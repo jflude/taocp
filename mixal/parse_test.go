@@ -16,16 +16,17 @@ func TestParsing(t *testing.T) {
 		t.Logf("input: %d: %s %s %s", a.count, loc, op, address)
 		parseLine(a, loc, op, address)
 		t.Log("token:", a.tokens)
-		seg := a.obj.seg[len(a.obj.seg)-1]
+		if a.obj.orig == nil {
+			return
+		}
 		orig := a.obj.orig[len(a.obj.seg)-1]
-		if seg != nil {
-			if lastEmit > len(seg)-1 {
-				lastEmit = 0
-			}
-			for ; lastEmit <= len(seg)-1; lastEmit++ {
-				t.Logf(" emit: %d: %#o", orig+lastEmit,
-					seg[lastEmit])
-			}
+		seg := a.obj.seg[len(a.obj.seg)-1]
+		if lastEmit > len(seg)-1 {
+			lastEmit = 0
+		}
+		for ; lastEmit <= len(seg)-1; lastEmit++ {
+			t.Logf(" emit: %d: %#o", orig+lastEmit,
+				seg[lastEmit])
 		}
 	}); err != nil {
 		t.Fatal("error:", err)
@@ -61,9 +62,8 @@ outer:
 
 var okParsing = object{
 	start: 3000,
-	orig:  []int{0, 3000, 0, 1995, 2024, 2049},
+	orig:  []int{3000, 0, 1995, 2024, 2049},
 	seg: [][]mix.Word{
-		nil,
 		//                                        * EXAMPLE: TABLE OF PRIMES
 		//                                        L         EQU   500
 		//                                        PRINTER   EQU   18

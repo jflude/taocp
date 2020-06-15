@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"errors"
+	"io"
 	"log"
 	"os"
 
@@ -23,9 +25,14 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	var buf bytes.Buffer
+	if err := mixal.Assemble(in, &buf); err != nil {
+		return err
+	}
 	out, err := os.Create("reader.mix")
 	if err != nil {
 		return err
 	}
-	return mixal.Assemble(in, out)
+	_, err = io.Copy(out, &buf)
+	return err
 }

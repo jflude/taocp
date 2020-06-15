@@ -19,6 +19,6 @@ func (a *asmb) semanticError(err error) {
 	parseError(err, a.lastString())
 }
 
-func (a *asmb) specifyError(err error) error {
-	return fmt.Errorf("%w in line %d", err, a.count)
+func (a *asmb) specifyError(err error, line string) error {
+	return fmt.Errorf("%w in line %d: %s", err, a.count, line)
 }

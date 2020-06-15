@@ -3,15 +3,15 @@ package mixal
 import "fmt"
 
 func (a *asmb) parseAPart() bool {
-	if a.exprVal = nil; a.parseExpr() {
-		a.aa = *a.exprVal
-		return true
-	}
 	if a.parseLiteral() {
 		return true
 	}
 	if a.matchFutureRef() {
 		a.addFixUp(a.lastString())
+		return true
+	}
+	if a.exprVal = nil; a.parseExpr() {
+		a.aa = *a.exprVal
 	}
 	return true
 }
