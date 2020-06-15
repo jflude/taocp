@@ -8,6 +8,9 @@ func (a *asmb) newSegment(orig int) {
 }
 
 func (a *asmb) emit(w mix.Word) {
+	if a.obj.orig == nil {
+		a.newSegment(0)
+	}
 	i := len(a.obj.seg) - 1
 	a.obj.seg[i] = append(a.obj.seg[i], w)
 	if a.self++; abs(a.self) >= mix.MemorySize {
