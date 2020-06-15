@@ -2,16 +2,22 @@ package mix
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"os"
 )
+
+// see https://www.ibm.com/ibm/history/exhibits/storage/storage_2420.html
+const maxTapeBlock = 300000
 
 type Tape struct {
 	f    *os.File
 	name string
 	here int64
 }
+
+var ErrInvalidBlock = errors.New("mix: invalid block")
 
 func NewTape(file string, unit int) (*Tape, error) {
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
@@ -30,6 +36,9 @@ func (*Tape) BlockSize() int {
 }
 
 func (t *Tape) Read(block []Word) (int64, error) {
+	if t.isPastEnd(4 * int64(t.BlockSize())) {
+		return 0, ErrInvalidBlock
+	}
 	buf := make([]byte, 4*len(block))
 	if _, err := io.ReadFull(t.f, buf); err != nil {
 		return 0, err
@@ -38,10 +47,13 @@ func (t *Tape) Read(block []Word) (int64, error) {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
 	t.here += int64(4 * t.BlockSize())
-	return 6000, nil
+	return 6000, nil // TODO: check timing
 }
 
 func (t *Tape) Write(block []Word) (int64, error) {
+	if t.isPastEnd(4 * int64(t.BlockSize())) {
+		return 0, ErrInvalidBlock
+	}
 	buf := make([]byte, 4*len(block))
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
@@ -50,29 +62,36 @@ func (t *Tape) Write(block []Word) (int64, error) {
 	if err == nil {
 		t.here += int64(4 * t.BlockSize())
 	}
-	return 6000, err
+	return 6000, err // TODO: check timing
 }
 
 func (t *Tape) Control(m int) (int64, error) {
-	var pos, dur int64
+	var off, dur int64
 	var wh int
 	if m == 0 {
-		pos = 0
+		off = 0
 		wh = io.SeekStart
-		dur = 60000000
+		dur = 60000000 // TODO: check timing
 	} else {
-		pos = int64(4 * t.BlockSize() * m)
-		if t.here+pos < 0 {
-			pos = -t.here
+		off = int64(4 * t.BlockSize() * m)
+		if t.isPastEnd(off) {
+			return 0, ErrInvalidBlock
+		}
+		if t.here+off < 0 {
+			off = -t.here
 		}
 		wh = io.SeekCurrent
-		dur = 30000
+		dur = 30000 // TODO: check timing
 	}
 	var err error
-	t.here, err = t.f.Seek(pos, wh)
+	t.here, err = t.f.Seek(off, wh)
 	return dur, err
 }
 
 func (t *Tape) Close() error {
 	return t.f.Close()
+}
+
+func (t *Tape) isPastEnd(offset int64) bool {
+	return t.here+offset > 4*int64(t.BlockSize())*maxTapeBlock
 }

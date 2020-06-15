@@ -7,6 +7,9 @@ import (
 	"os"
 )
 
+// see https://www.ibm.com/ibm/history/exhibits/storage/storage_2314.html
+const maxDiscBlock = 50000
+
 type Disc struct {
 	f    *os.File
 	name string
@@ -42,7 +45,7 @@ func (d *Disc) Read(block []Word) (int64, error) {
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
-	return 3000 + dur, nil
+	return 3000 + dur, nil // TODO: check timing
 }
 
 func (d *Disc) Write(block []Word) (int64, error) {
@@ -55,7 +58,7 @@ func (d *Disc) Write(block []Word) (int64, error) {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
 	_, err = d.f.Write(buf)
-	return 3000 + dur, err
+	return 3000 + dur, err // TODO: check timing
 }
 
 func (d *Disc) Control(m int) (int64, error) {
@@ -70,10 +73,14 @@ func (d *Disc) Close() error {
 }
 
 func (d *Disc) seekToX() (dur int64, err error) {
-	x := int64(d.c.Reg[X].Field(045).Int() * 4 * d.BlockSize())
+	x := abs64(int64(d.c.Reg[X].Int()))
+	if x > maxDiscBlock {
+		return 0, ErrInvalidBlock
+	}
+	x *= 4 * int64(d.BlockSize())
 	if d.here != x {
 		d.here, err = d.f.Seek(x, io.SeekStart)
-		dur = 20000
+		dur = 20000 // TODO: check timing
 	}
 	return
 }

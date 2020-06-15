@@ -41,6 +41,7 @@ func (t *Teletype) Read(block []Word) (int64, error) {
 	if _, err := r.Read(buf); err != nil {
 		return 0, err
 	}
+	// TODO: pad with spaces after a short line terminated with a CR
 	m, err := ConvertToMIX(string(buf))
 	if err != nil {
 		return 0, err

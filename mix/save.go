@@ -1,11 +1,9 @@
 package mix
 
 func (c *Computer) Save() error {
-	// TODO
-	return ErrNotImplemented
+	return ErrNotImplemented // TODO
 }
 
 func (c *Computer) Restore() error {
-	// TODO
-	return ErrNotImplemented
+	return ErrNotImplemented // TODO
 }
