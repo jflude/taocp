@@ -8,7 +8,6 @@ import (
 	"os"
 )
 
-// see https://www.ibm.com/ibm/history/exhibits/storage/storage_2420.html
 const maxTapeBlock = 300000
 
 type Tape struct {
@@ -19,6 +18,7 @@ type Tape struct {
 
 var ErrInvalidBlock = errors.New("mix: invalid block")
 
+// see https://www.ibm.com/ibm/history/exhibits/storage/storage_2420.html
 func NewTape(file string, unit int) (*Tape, error) {
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {

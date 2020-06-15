@@ -10,6 +10,7 @@ type CardPunch struct {
 	wc io.WriteCloser
 }
 
+// see https://en.wikipedia.org/wiki/IBM_2540
 func NewCardPunch(file string) (*CardPunch, error) {
 	wc, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
@@ -35,7 +36,7 @@ func (p *CardPunch) Write(block []Word) (int64, error) {
 	if r, ok := IsPunchable(s); !ok {
 		return 0, charError(r)
 	}
-	_, err := p.wc.Write([]byte(s))
+	_, err := io.WriteString(p.wc, s)
 	return 600000, err
 }
 

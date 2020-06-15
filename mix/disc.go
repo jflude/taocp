@@ -7,7 +7,6 @@ import (
 	"os"
 )
 
-// see https://www.ibm.com/ibm/history/exhibits/storage/storage_2314.html
 const maxDiscBlock = 50000
 
 type Disc struct {
@@ -17,6 +16,7 @@ type Disc struct {
 	c    *Computer
 }
 
+// see https://www.ibm.com/ibm/history/exhibits/storage/storage_2314.html
 func NewDisc(file string, unit int, c *Computer) (*Disc, error) {
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {

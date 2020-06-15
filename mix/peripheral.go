@@ -19,14 +19,15 @@ func (c *Computer) isBusy(unit int) bool {
 	return c.busyUntil[unit] > c.Elapsed
 }
 
-func (c *Computer) calcTime(unit int, t int64, err error) (int64, error) {
+// TODO: check timings of all I/O operations to see if typical for ~1970
+func (c *Computer) calcTiming(unit int, t int64, err error) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	dur := c.busyUntil[unit] - c.Elapsed + 1
-	if dur < 1 {
-		dur = 1
+	delay := c.busyUntil[unit] - c.Elapsed + 1
+	if delay < 1 {
+		delay = 1
 	}
-	c.busyUntil[unit] = c.Elapsed + dur + t
-	return dur, nil
+	c.busyUntil[unit] = c.Elapsed + delay + t
+	return delay, nil
 }

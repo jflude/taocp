@@ -3,13 +3,13 @@ package mix
 import (
 	"io"
 	"os"
-	"strings"
 )
 
 type Teletype struct {
 	rwc io.ReadWriteCloser
 }
 
+// see https://en.wikipedia.org/wiki/Teletype_Model_33
 func NewTeletype(file string) (*Teletype, error) {
 	var rwc io.ReadWriteCloser
 	if file != "" {
@@ -38,15 +38,20 @@ func (t *Teletype) Read(block []Word) (int64, error) {
 		r = os.Stdin
 	}
 	buf := make([]byte, 5*t.BlockSize())
-	if _, err := r.Read(buf); err != nil {
+	if n, err := r.Read(buf); n == 0 {
 		return 0, err
 	}
-	// TODO: pad with spaces after a short line terminated with a CR
+	if buf[len(buf)-1] == '\010' {
+		buf = buf[:len(buf)-1]
+	}
 	m, err := ConvertToMIX(string(buf))
 	if err != nil {
 		return 0, err
 	}
 	copy(block, m)
+	for i := len(m); i < len(block); i++ {
+		block[i] = NewWord(0)
+	}
 	return 7000000, nil
 }
 
@@ -57,9 +62,7 @@ func (t *Teletype) Write(block []Word) (int64, error) {
 	} else {
 		w = os.Stdout
 	}
-	line := strings.TrimRight(ConvertToUTF8(block), " ")
-	_, err := w.Write([]byte(line + "\n"))
-	return 7000000, err
+	return 7000000, trimWrite(w, block)
 }
 
 func (t *Teletype) Control(m int) (int64, error) {

@@ -13,7 +13,7 @@ func (c *Computer) ioc(aa Word, i, f, op, m int) (int64, error) {
 		return 0, err
 	}
 	t, err := c.Devices[f].Control(m)
-	return c.calcTime(f, t, err)
+	return c.calcTiming(f, t, err)
 }
 
 func (c *Computer) in(aa Word, i, f, op, m int) (int64, error) {
@@ -25,7 +25,7 @@ func (c *Computer) in(aa Word, i, f, op, m int) (int64, error) {
 		return 0, ErrInvalidAddress
 	}
 	t, err := c.Devices[f].Read(c.Contents[mBase+m : mBase+n])
-	return c.calcTime(f, t, err)
+	return c.calcTiming(f, t, err)
 }
 
 func (c *Computer) out(aa Word, i, f, op, m int) (int64, error) {
@@ -37,7 +37,7 @@ func (c *Computer) out(aa Word, i, f, op, m int) (int64, error) {
 		return 0, ErrInvalidAddress
 	}
 	t, err := c.Devices[f].Write(c.Contents[mBase+m : mBase+n])
-	return c.calcTime(f, t, err)
+	return c.calcTiming(f, t, err)
 }
 
 func (c *Computer) jred(aa Word, i, f, op, m int) (int64, error) {

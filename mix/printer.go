@@ -10,6 +10,7 @@ type Printer struct {
 	wc io.WriteCloser
 }
 
+// see https://en.wikipedia.org/wiki/IBM_1403
 func NewPrinter(file string) (*Printer, error) {
 	wc, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
@@ -31,9 +32,7 @@ func (*Printer) Read([]Word) (int64, error) {
 }
 
 func (p *Printer) Write(block []Word) (int64, error) {
-	line := strings.TrimRight(ConvertToUTF8(block), " ")
-	_, err := p.wc.Write([]byte(line + "\n"))
-	return 400000, err
+	return 400000, trimWrite(p.wc, block)
 }
 
 func (p *Printer) Control(m int) (int64, error) {
@@ -46,4 +45,10 @@ func (p *Printer) Control(m int) (int64, error) {
 
 func (p *Printer) Close() error {
 	return p.wc.Close()
+}
+
+func trimWrite(w io.Writer, block []Word) error {
+	line := strings.TrimRight(ConvertToUTF8(block), " ") + "\n"
+	_, err := io.WriteString(w, line)
+	return err
 }
