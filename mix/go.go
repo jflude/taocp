@@ -19,7 +19,7 @@ func (c *Computer) GoButton(unit int) error {
 	}
 	c.Reg[J] = 0
 	c.next = 0
-	c.elapsed = 0
+	c.Elapsed = 0
 	c.busyUntil[unit] = 0
 	return c.resume()
 }

@@ -22,6 +22,7 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 			c.Overflow = true
 		}
 		c.Reg[A].SetField(FieldSpec(1, 5), NewWord(int(a)))
+		return 10
 	case 1: // CHAR
 		v := strconv.Itoa(c.Reg[A].Field(FieldSpec(1, 5)).Int())
 		if l := len(v); l < 10 {
@@ -34,9 +35,22 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 			c.Reg[A].SetField(f, a)
 			c.Reg[X].SetField(f, x)
 		}
+		return 10
 	case 2: // HLT
+		c.Elapsed++
+		c.next++
 		panic(ErrHalted)
-	case 7: // INT
+	case 3: // AND
+		panic(ErrNotImplemented) // TODO: see Section 4.5.4
+	case 4: // OR
+		panic(ErrNotImplemented) // TODO: see Section 6.4
+	case 5: // XOR
+		panic(ErrNotImplemented) // TODO: see Ex. 28, Section 2.5
+	case 6: // FLOT
+		panic(ErrNotImplemented) // TODO: see Section 4.2.1
+	case 7: // FIX
+		panic(ErrNotImplemented) // TODO: see Section 4.2.1
+	case 9: // INT
 		panic(ErrNotImplemented) // TODO: see Ex. 18, Section 1.4.4
 	default:
 		panic(ErrInvalidOp)

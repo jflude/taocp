@@ -46,5 +46,5 @@ func (c *Computer) printTrace(m, next int) {
 			b[i] += '.'
 		}
 	}
-	fmt.Printf("Device:  %s   Elapsed: %d\n\n", string(b), c.elapsed)
+	fmt.Printf("Device:  %s   Elapsed: %d\n\n", string(b), c.Elapsed)
 }

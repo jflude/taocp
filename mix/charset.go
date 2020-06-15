@@ -7,7 +7,7 @@ import (
 
 var ErrInvalidChar = errors.New("mix: invalid character")
 
-var mix2utf = []rune(` ABCDEFGHIΘJKLMNOPQRΦΠSTUVWXYZ0123456789.,()+-*/=$<>@;:'`)
+var mix2utf = []rune(` ABCDEFGHIΔJKLMNOPQRΣΠSTUVWXYZ0123456789.,()+-*/=$<>@;:'`)
 var utf2mix = make(map[rune]int)
 
 func init() {
@@ -56,7 +56,7 @@ func IsDigit(r rune) bool {
 }
 
 func IsLetter(r rune) bool {
-	return (r >= 'A' && r <= 'Z') || r == 'Θ' || r == 'Φ' || r == 'Π'
+	return (r >= 'A' && r <= 'Z') || r == 'Δ' || r == 'Σ' || r == 'Π'
 }
 
 func IsSpace(r rune) bool {

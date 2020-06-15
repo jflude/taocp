@@ -2,7 +2,7 @@ package mix
 
 func (c *Computer) add(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
-		panic(ErrNotImplemented)
+		panic(ErrNotImplemented) // TODO: see Section 4.2.1
 	}
 	c.addAccum(A, c.Contents[mBase+m].Field(f).Int())
 	return 2
@@ -10,7 +10,7 @@ func (c *Computer) add(aa Word, i, f, op, m int) int64 {
 
 func (c *Computer) sub(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
-		panic(ErrNotImplemented)
+		panic(ErrNotImplemented) // TODO: see Section 4.2.1
 	}
 	c.addAccum(A, -c.Contents[mBase+m].Field(f).Int())
 	return 2
@@ -18,7 +18,7 @@ func (c *Computer) sub(aa Word, i, f, op, m int) int64 {
 
 func (c *Computer) mul(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
-		panic(ErrNotImplemented)
+		panic(ErrNotImplemented) // TODO: see Section 4.2.1
 	}
 	c.Reg[A], c.Reg[X] = MulWord(c.Reg[A],
 		c.Contents[mBase+m].Field(f).Int())
@@ -27,7 +27,7 @@ func (c *Computer) mul(aa Word, i, f, op, m int) int64 {
 
 func (c *Computer) div(aa Word, i, f, op, m int) int64 {
 	if f == 6 {
-		panic(ErrNotImplemented)
+		panic(ErrNotImplemented) // TODO: see Section 4.2.1
 	}
 	var ov bool
 	c.Reg[A], c.Reg[X], ov =

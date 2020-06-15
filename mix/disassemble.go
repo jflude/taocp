@@ -4,13 +4,14 @@ import "fmt"
 
 var (
 	regs   = []string{"A", "1", "2", "3", "4", "5", "6", "X", "J", "Z"}
-	arith  = []string{"ADD", "SUB", "MUL", "DIV"}
-	nums   = []string{"NUM", "CHAR", "HLT", "", "", "", "", "INT"}
-	shifts = []string{"SLA", "SRA", "SLAX", "SRAX",
-		"SLC", "SRC", "SLB", "SRB"}
+	ariths = []string{"ADD", "SUB", "MUL", "DIV"}
+	nums   = []string{"NUM", "CHAR", "HLT", "AND", "OR", "XOR", "FLOT",
+		"FIX", "", "INT"}
+	shifts = []string{"SLA", "SRA", "SLAX", "SRAX", "SLC", "SRC", "SLB",
+		"SRB"}
 	ios   = []string{"JBUS", "IOC", "IN", "OUT", "JRED"}
-	jumps = []string{"JMP", "JSJ", "JOV", "JNV",
-		"JL", "JE", "JG", "JGE", "JNE", "JLE"}
+	jumps = []string{"JMP", "JSJ", "JOV", "JNV", "JL", "JE", "JG", "JGE",
+		"JNE", "JLE"}
 	conds = []string{"N", "Z", "P", "NN", "NE", "NP", "E", "O"}
 	incs  = []string{"INC", "DEC", "ENT", "ENN"}
 )
@@ -21,7 +22,7 @@ func Disassemble(w Word) string {
 	case op == NOP:
 		return noArg("NOP")
 	case op >= ADD && op <= DIV:
-		s := arith[op-ADD]
+		s := ariths[op-ADD]
 		if f == 6 {
 			s = "F" + s
 		}

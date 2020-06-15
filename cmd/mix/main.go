@@ -47,5 +47,7 @@ func run() (err error) {
 			}
 		}
 	}()
-	return c.GoButton(16)
+	err = c.GoButton(16)
+	log.Print("mix: elapsed: ", c.Elapsed, "u")
+	return err
 }

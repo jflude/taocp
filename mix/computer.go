@@ -1,5 +1,5 @@
-// Package mix simulates the MIX computer described in
-// Donald Knuth's "The Art of Computer Programming".
+// Package mix simulates the MIX computer that is described in Donald Knuth's
+// "The Art of Computer Programming" (third edition).
 package mix
 
 import "log"
@@ -30,13 +30,13 @@ const (
 
 type Computer struct {
 	*Binding
-	Reg         [10]Word
 	Overflow    bool
 	Comparison  int
+	Elapsed     int64
+	Reg         [10]Word
 	Contents    []Word
 	Devices     []Peripheral
 	busyUntil   []int64
-	elapsed     int64
 	m, next     int
 	ctrl, trace bool
 }

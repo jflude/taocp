@@ -22,7 +22,7 @@ func TestConvertToMIX(t *testing.T) {
 }
 
 var (
-	egUTF8 = "HELLOWΦRLD"
+	egUTF8 = "HELLOWΣRLD"
 	egMIX  = []Word{
 		NewWord(01005151520),
 		NewWord(03224231504),

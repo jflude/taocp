@@ -88,7 +88,7 @@ func (c *Computer) Cycle() (err error) {
 	if err != nil {
 		return err
 	}
-	c.elapsed += t
+	c.Elapsed += t
 	c.next++
 	if !c.ctrl {
 		// TODO: check for an interrupt
