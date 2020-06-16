@@ -2,7 +2,6 @@ package mix
 
 import (
 	"io"
-	"os"
 	"strings"
 )
 
@@ -11,11 +10,7 @@ type Printer struct {
 }
 
 // see https://en.wikipedia.org/wiki/IBM_1403
-func NewPrinter(file string) (*Printer, error) {
-	wc, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		return nil, err
-	}
+func NewPrinter(wc io.WriteCloser) (*Printer, error) {
 	return &Printer{wc}, nil
 }
 

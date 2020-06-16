@@ -5,13 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
 )
 
 const maxTapeBlock = 46000
 
 type Tape struct {
-	f    *os.File
+	rwsc readWriteSeekCloser
 	name string
 	here int64
 }
@@ -19,12 +18,8 @@ type Tape struct {
 var ErrInvalidBlock = errors.New("mix: invalid block")
 
 // see Section 5.4.6
-func NewTape(file string, unit int) (*Tape, error) {
-	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		return nil, err
-	}
-	return &Tape{f, fmt.Sprintf("TAPE%02d", unit), 0}, nil
+func NewTape(rwsc readWriteSeekCloser, unit int) (*Tape, error) {
+	return &Tape{rwsc, fmt.Sprintf("TAPE%02d", unit), 0}, nil
 }
 
 func (t *Tape) Name() string {
@@ -40,7 +35,7 @@ func (t *Tape) Read(block []Word) (int64, error) {
 		return 0, ErrInvalidBlock
 	}
 	buf := make([]byte, 4*len(block))
-	if _, err := io.ReadFull(t.f, buf); err != nil {
+	if _, err := io.ReadFull(t.rwsc, buf); err != nil {
 		return 0, err
 	}
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
@@ -58,7 +53,7 @@ func (t *Tape) Write(block []Word) (int64, error) {
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
-	_, err := t.f.Write(buf)
+	_, err := t.rwsc.Write(buf)
 	if err == nil {
 		t.here += int64(4 * t.BlockSize())
 	}
@@ -84,12 +79,12 @@ func (t *Tape) Control(m int) (int64, error) {
 		delay = 5000 * abs64(int64(m))
 	}
 	var err error
-	t.here, err = t.f.Seek(off, wh)
+	t.here, err = t.rwsc.Seek(off, wh)
 	return delay, err
 }
 
 func (t *Tape) Close() error {
-	return t.f.Close()
+	return t.rwsc.Close()
 }
 
 func (t *Tape) isPastEnd(offset int64) bool {

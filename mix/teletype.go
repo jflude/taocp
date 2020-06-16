@@ -1,12 +1,14 @@
 package mix
 
-import "os"
+import "io"
 
-type Teletype struct{}
+type Teletype struct {
+	rwc io.ReadWriteCloser
+}
 
 // see https://en.wikipedia.org/wiki/Teletype_Model_33
-func NewTeletype(file string) (*Teletype, error) {
-	return &Teletype{}, nil
+func NewTeletype(rwc io.ReadWriteCloser) (*Teletype, error) {
+	return &Teletype{rwc}, nil
 }
 
 func (*Teletype) Name() string {
@@ -19,7 +21,7 @@ func (*Teletype) BlockSize() int {
 
 func (t *Teletype) Read(block []Word) (int64, error) {
 	buf := make([]byte, 5*t.BlockSize())
-	if n, err := os.Stdin.Read(buf); n == 0 {
+	if n, err := t.rwc.Read(buf); n == 0 {
 		return 0, err
 	}
 	if buf[len(buf)-1] == '\010' {
@@ -37,7 +39,7 @@ func (t *Teletype) Read(block []Word) (int64, error) {
 }
 
 func (t *Teletype) Write(block []Word) (int64, error) {
-	return 7000000, trimWrite(os.Stdout, block)
+	return 7000000, trimWrite(t.rwc, block)
 }
 
 func (t *Teletype) Control(m int) (int64, error) {
@@ -45,5 +47,5 @@ func (t *Teletype) Control(m int) (int64, error) {
 }
 
 func (t *Teletype) Close() error {
-	return nil
+	return t.rwc.Close()
 }

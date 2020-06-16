@@ -2,7 +2,6 @@ package mix
 
 import (
 	"io"
-	"os"
 	"strings"
 )
 
@@ -11,11 +10,7 @@ type CardPunch struct {
 }
 
 // see https://en.wikipedia.org/wiki/IBM_2540
-func NewCardPunch(file string) (*CardPunch, error) {
-	wc, err := os.OpenFile(file, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
-	if err != nil {
-		return nil, err
-	}
+func NewCardPunch(wc io.WriteCloser) (*CardPunch, error) {
 	return &CardPunch{wc}, nil
 }
 

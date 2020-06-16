@@ -1,8 +1,18 @@
 package mix
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"io"
+	"os"
+)
 
-type Binding [21]string
+type Binding [21]interface{}
+
+type readWriteSeekCloser interface {
+	io.ReadWriteSeeker
+	io.Closer
+}
 
 var (
 	defBind = Binding{
@@ -25,11 +35,12 @@ var (
 		"reader.mix",
 		"punch.mix",
 		"printer.mix",
-		"",
+		nil,
 		"paper.mix",
 	}
 	DefaultBinding   = &defBind
 	ErrInvalidDevice = errors.New("mix: invalid I/O device")
+	ErrNoDevice      = errors.New("mix: no I/O device")
 )
 
 func (c *Computer) bindDevice(unit int) error {
@@ -39,26 +50,49 @@ func (c *Computer) bindDevice(unit int) error {
 	if c.Devices[unit] != nil {
 		return nil
 	}
-	f := c.Binding[unit]
-	var p Peripheral
+	if c.bind == nil {
+		c.bind = DefaultBinding
+	}
 	var err error
+	backing := c.bind[unit]
+	if file, ok := backing.(string); ok {
+		var flags int
+		switch unit {
+		case 16:
+			flags = os.O_RDONLY
+		case 17, 18:
+			flags = os.O_WRONLY | os.O_APPEND
+		default:
+			flags = os.O_RDWR
+		}
+		backing, err = os.OpenFile(file, os.O_CREATE|flags, 0644)
+		if err != nil {
+			return err
+		}
+	} else if unit == 19 && backing == nil {
+		backing = console{}
+	}
+	if backing == nil {
+		return fmt.Errorf("%w: unit %d", ErrNoDevice, unit)
+	}
+	var p Peripheral
 	switch {
 	case unit >= 0 && unit <= 7:
-		p, err = NewTape(f, unit)
+		p, err = NewTape(backing.(readWriteSeekCloser), unit)
 	case unit >= 8 && unit <= 11:
-		p, err = NewDrum(f, unit, c)
+		p, err = NewDrum(backing.(readWriteSeekCloser), unit, c)
 	case unit >= 12 && unit <= 15:
-		p, err = NewDisc(f, unit, c)
+		p, err = NewDisc(backing.(readWriteSeekCloser), unit, c)
 	case unit == 16:
-		p, err = NewCardReader(f)
+		p, err = NewCardReader(backing.(io.ReadCloser))
 	case unit == 17:
-		p, err = NewCardPunch(f)
+		p, err = NewCardPunch(backing.(io.WriteCloser))
 	case unit == 18:
-		p, err = NewPrinter(f)
+		p, err = NewPrinter(backing.(io.WriteCloser))
 	case unit == 19:
-		p, err = NewTeletype(f)
+		p, err = NewTeletype(backing.(io.ReadWriteCloser))
 	case unit == 20:
-		p, err = NewPaperTape(f)
+		p, err = NewPaperTape(backing.(readWriteSeekCloser))
 	}
 	if err == nil {
 		c.Devices[unit] = p
