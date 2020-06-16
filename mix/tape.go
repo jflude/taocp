@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-const maxTapeBlock = 300000
+const maxTapeBlock = 46000
 
 type Tape struct {
 	f    *os.File
@@ -18,7 +18,7 @@ type Tape struct {
 
 var ErrInvalidBlock = errors.New("mix: invalid block")
 
-// see https://www.ibm.com/ibm/history/exhibits/storage/storage_2420.html
+// see Section 5.4.6
 func NewTape(file string, unit int) (*Tape, error) {
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
@@ -47,7 +47,7 @@ func (t *Tape) Read(block []Word) (int64, error) {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
 	t.here += int64(4 * t.BlockSize())
-	return 6000, nil // TODO: check timing
+	return 8000, nil
 }
 
 func (t *Tape) Write(block []Word) (int64, error) {
@@ -62,16 +62,16 @@ func (t *Tape) Write(block []Word) (int64, error) {
 	if err == nil {
 		t.here += int64(4 * t.BlockSize())
 	}
-	return 6000, err // TODO: check timing
+	return 8000, err
 }
 
 func (t *Tape) Control(m int) (int64, error) {
-	var off, dur int64
+	var off, delay int64
 	var wh int
 	if m == 0 {
 		off = 0
 		wh = io.SeekStart
-		dur = 60000000 // TODO: check timing
+		delay = 5000 * t.here / int64(4*t.BlockSize())
 	} else {
 		off = int64(4 * t.BlockSize() * m)
 		if t.isPastEnd(off) {
@@ -81,11 +81,11 @@ func (t *Tape) Control(m int) (int64, error) {
 			off = -t.here
 		}
 		wh = io.SeekCurrent
-		dur = 30000 // TODO: check timing
+		delay = 5000 * abs64(int64(m))
 	}
 	var err error
 	t.here, err = t.f.Seek(off, wh)
-	return dur, err
+	return delay, err
 }
 
 func (t *Tape) Close() error {

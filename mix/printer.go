@@ -32,7 +32,7 @@ func (*Printer) Read([]Word) (int64, error) {
 }
 
 func (p *Printer) Write(block []Word) (int64, error) {
-	return 400000, trimWrite(p.wc, block)
+	return 100000, trimWrite(p.wc, block)
 }
 
 func (p *Printer) Control(m int) (int64, error) {

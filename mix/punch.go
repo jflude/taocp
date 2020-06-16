@@ -37,7 +37,7 @@ func (p *CardPunch) Write(block []Word) (int64, error) {
 		return 0, charError(r)
 	}
 	_, err := io.WriteString(p.wc, s)
-	return 600000, err
+	return 200000, err
 }
 
 func (p *CardPunch) Control(m int) (int64, error) {

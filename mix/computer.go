@@ -30,15 +30,15 @@ const (
 
 type Computer struct {
 	*Binding
-	Overflow    bool
-	Comparison  int
-	Elapsed     int64
-	Reg         [10]Word
-	Contents    []Word
-	Devices     []Peripheral
-	busyUntil   []int64
-	m, next     int
-	ctrl, trace bool
+	Overflow      bool
+	Comparison    int
+	Elapsed, Idle int64
+	Reg           [10]Word
+	Contents      []Word
+	Devices       []Peripheral
+	busyUntil     []int64
+	m, next       int
+	ctrl, trace   bool
 }
 
 func NewComputer(bind *Binding) *Computer {
@@ -48,8 +48,8 @@ func NewComputer(bind *Binding) *Computer {
 	return &Computer{
 		Binding:   bind,
 		Contents:  make([]Word, 2*MemorySize-1),
-		Devices:   make([]Peripheral, 20),
-		busyUntil: make([]int64, 20),
+		Devices:   make([]Peripheral, 21),
+		busyUntil: make([]int64, 21),
 	}
 }
 

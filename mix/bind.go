@@ -2,7 +2,7 @@ package mix
 
 import "errors"
 
-type Binding [20]string
+type Binding [21]string
 
 var (
 	defBind = Binding{
@@ -14,10 +14,10 @@ var (
 		"tape05.mix",
 		"tape06.mix",
 		"tape07.mix",
-		"disc08.mix",
-		"disc09.mix",
-		"disc10.mix",
-		"disc11.mix",
+		"drum08.mix",
+		"drum09.mix",
+		"drum10.mix",
+		"drum11.mix",
 		"disc12.mix",
 		"disc13.mix",
 		"disc14.mix",
@@ -26,13 +26,14 @@ var (
 		"punch.mix",
 		"printer.mix",
 		"",
+		"paper.mix",
 	}
 	DefaultBinding   = &defBind
 	ErrInvalidDevice = errors.New("mix: invalid I/O device")
 )
 
 func (c *Computer) bindDevice(unit int) error {
-	if unit < 0 || unit >= 20 {
+	if unit < 0 || unit > 20 {
 		return ErrInvalidDevice
 	}
 	if c.Devices[unit] != nil {
@@ -44,7 +45,9 @@ func (c *Computer) bindDevice(unit int) error {
 	switch {
 	case unit >= 0 && unit <= 7:
 		p, err = NewTape(f, unit)
-	case unit >= 8 && unit <= 15:
+	case unit >= 8 && unit <= 11:
+		p, err = NewDrum(f, unit, c)
+	case unit >= 12 && unit <= 15:
 		p, err = NewDisc(f, unit, c)
 	case unit == 16:
 		p, err = NewCardReader(f)
@@ -54,6 +57,8 @@ func (c *Computer) bindDevice(unit int) error {
 		p, err = NewPrinter(f)
 	case unit == 19:
 		p, err = NewTeletype(f)
+	case unit == 20:
+		p, err = NewPaperTape(f)
 	}
 	if err == nil {
 		c.Devices[unit] = p
@@ -62,7 +67,7 @@ func (c *Computer) bindDevice(unit int) error {
 }
 
 func (c *Computer) unbindDevice(unit int) error {
-	if unit < 0 || unit >= 20 {
+	if unit < 0 || unit > 20 {
 		return ErrInvalidDevice
 	}
 	d := c.Devices[unit]

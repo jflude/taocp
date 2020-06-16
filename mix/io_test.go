@@ -6,7 +6,7 @@ func TestIO(t *testing.T) {
 	c, tmpDir := newSandbox(t, "")
 	defer closeSandbox(t, c, tmpDir)
 
-	// DISK10
+	// DRUM10
 	if err := c.bindDevice(10); err != nil {
 		t.Fatal("error:", err)
 	}

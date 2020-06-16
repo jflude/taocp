@@ -40,7 +40,7 @@ func (r *CardReader) Read(block []Word) (int64, error) {
 		return 0, err
 	}
 	copy(block, m)
-	return 400000, nil
+	return 60000, nil
 }
 
 func (*CardReader) Write([]Word) (int64, error) {

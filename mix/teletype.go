@@ -1,25 +1,12 @@
 package mix
 
-import (
-	"io"
-	"os"
-)
+import "os"
 
-type Teletype struct {
-	rwc io.ReadWriteCloser
-}
+type Teletype struct{}
 
 // see https://en.wikipedia.org/wiki/Teletype_Model_33
 func NewTeletype(file string) (*Teletype, error) {
-	var rwc io.ReadWriteCloser
-	if file != "" {
-		var err error
-		rwc, err = os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return &Teletype{rwc}, nil
+	return &Teletype{}, nil
 }
 
 func (*Teletype) Name() string {
@@ -31,14 +18,8 @@ func (*Teletype) BlockSize() int {
 }
 
 func (t *Teletype) Read(block []Word) (int64, error) {
-	var r io.Reader
-	if t.rwc != nil {
-		r = t.rwc
-	} else {
-		r = os.Stdin
-	}
 	buf := make([]byte, 5*t.BlockSize())
-	if n, err := r.Read(buf); n == 0 {
+	if n, err := os.Stdin.Read(buf); n == 0 {
 		return 0, err
 	}
 	if buf[len(buf)-1] == '\010' {
@@ -56,35 +37,13 @@ func (t *Teletype) Read(block []Word) (int64, error) {
 }
 
 func (t *Teletype) Write(block []Word) (int64, error) {
-	var w io.Writer
-	if t.rwc != nil {
-		w = t.rwc
-	} else {
-		w = os.Stdout
-	}
-	return 7000000, trimWrite(w, block)
+	return 7000000, trimWrite(os.Stdout, block)
 }
 
 func (t *Teletype) Control(m int) (int64, error) {
-	if m != 0 {
-		return 0, ErrInvalidCommand
-	}
-	var rwc io.ReadWriteCloser
-	if t.rwc != nil {
-		rwc = t.rwc
-	} else {
-		rwc = os.Stdin
-	}
-	if s, ok := rwc.(io.Seeker); ok {
-		_, err := s.Seek(0, io.SeekStart)
-		return 60000000, err
-	}
 	return 0, ErrInvalidCommand
 }
 
 func (t *Teletype) Close() error {
-	if t.rwc == nil {
-		return nil
-	}
-	return t.rwc.Close()
+	return nil
 }

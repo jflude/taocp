@@ -7,9 +7,9 @@ import (
 	"os"
 )
 
-const maxDiscBlock = 40000
+const maxDrumBlock = 4000
 
-type Disc struct {
+type Drum struct {
 	f    *os.File
 	name string
 	here int64
@@ -17,23 +17,23 @@ type Disc struct {
 }
 
 // see Section 5.4.9
-func NewDisc(file string, unit int, c *Computer) (*Disc, error) {
+func NewDrum(file string, unit int, c *Computer) (*Drum, error) {
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
 		return nil, err
 	}
-	return &Disc{f, fmt.Sprintf("DISC%02d", unit), 0, c}, nil
+	return &Drum{f, fmt.Sprintf("DRUM%02d", unit), 0, c}, nil
 }
 
-func (d *Disc) Name() string {
+func (d *Drum) Name() string {
 	return d.name
 }
 
-func (*Disc) BlockSize() int {
+func (*Drum) BlockSize() int {
 	return 100
 }
 
-func (d *Disc) Read(block []Word) (int64, error) {
+func (d *Drum) Read(block []Word) (int64, error) {
 	delay, err := d.seekToX()
 	if err != nil {
 		return 0, err
@@ -45,10 +45,10 @@ func (d *Disc) Read(block []Word) (int64, error) {
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
-	return 15000 + delay, nil
+	return 10000 + delay, nil
 }
 
-func (d *Disc) Write(block []Word) (int64, error) {
+func (d *Drum) Write(block []Word) (int64, error) {
 	delay, err := d.seekToX()
 	if err != nil {
 		return 0, err
@@ -58,29 +58,28 @@ func (d *Disc) Write(block []Word) (int64, error) {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
 	_, err = d.f.Write(buf)
-	return 15000 + delay, err
+	return 10000 + delay, err
 }
 
-func (d *Disc) Control(m int) (int64, error) {
+func (d *Drum) Control(m int) (int64, error) {
 	if m != 0 {
 		return 0, ErrInvalidCommand
 	}
 	return d.seekToX()
 }
 
-func (d *Disc) Close() error {
+func (d *Drum) Close() error {
 	return d.f.Close()
 }
 
-func (d *Disc) seekToX() (delay int64, err error) {
+func (d *Drum) seekToX() (delay int64, err error) {
 	x := abs64(int64(d.c.Reg[X].Int()))
-	if x > maxDiscBlock {
+	if x > maxDrumBlock {
 		return 0, ErrInvalidBlock
 	}
 	x *= 4 * int64(d.BlockSize())
 	if d.here != x {
 		d.here, err = d.f.Seek(x, io.SeekStart)
-		delay = 60000
 	}
-	return
+	return 0, nil
 }
