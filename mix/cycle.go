@@ -46,6 +46,7 @@ func (c *Computer) Cycle() (err error) {
 	if c.trace {
 		c.printTrace(m, c.next)
 	}
+	state := c.ctrl
 	var t int64
 	switch {
 	case op == NOP:
@@ -94,8 +95,6 @@ func (c *Computer) Cycle() (err error) {
 	}
 	c.Elapsed += t
 	c.next++
-	if !c.ctrl {
-		// TODO: check for an interrupt
-	}
+	c.interrupt(state)
 	return nil
 }

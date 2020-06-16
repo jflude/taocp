@@ -18,9 +18,11 @@ func (c *Computer) GoButton(unit int) error {
 		return err
 	}
 	c.Reg[J] = 0
-	c.next = 0
 	c.Elapsed = 0
+	c.lastTick = 0
+	c.pending = nil
 	c.busyUntil[unit] = 0
+	c.next = 0
 	return c.resume()
 }
 

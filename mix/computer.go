@@ -39,6 +39,8 @@ type Computer struct {
 	busyUntil     []int64
 	m, next       int
 	ctrl, trace   bool
+	lastTick      int64
+	pending       priority
 }
 
 func NewComputer(bind *Binding) *Computer {

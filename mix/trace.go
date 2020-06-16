@@ -3,7 +3,7 @@ package mix
 import "fmt"
 
 func (c *Computer) printTrace(m, next int) {
-	var ov, ci string
+	var ov, ci, ctrl string
 	if c.Overflow {
 		ov = "Y"
 	} else {
@@ -16,11 +16,14 @@ func (c *Computer) printTrace(m, next int) {
 	} else {
 		ci = "="
 	}
-	fmt.Printf(" A: %10v (%#v)  OP: %4d: %s\n X: %10v (%#v)  OV: %s\n"+
-		"I1:       %4v (%#v)  CI: %s\n",
-		c.Reg[A], c.Reg[A], next,
-		Disassemble(c.Contents[mBase+next]),
-		c.Reg[X], c.Reg[X], ov, c.Reg[I1], c.Reg[I1], ci)
+	if c.ctrl {
+		ctrl = fmt.Sprintf("CTRL: %d", c.pending.Len())
+	}
+	fmt.Printf(" A: %10v (%#v)  OP: %4d: %s\n"+
+		" X: %10v (%#v)  OV: %s CI: %s %s\n"+
+		"I1:       %4v (%#v)\n",
+		c.Reg[A], c.Reg[A], next, Disassemble(c.Contents[mBase+next]),
+		c.Reg[X], c.Reg[X], ov, ci, ctrl, c.Reg[I1], c.Reg[I1])
 	for i := 2; i <= 6; i, m = i+1, m+1 {
 		if c.validAddress(m) {
 			fmt.Printf("I%d:       %4v (%#v)      %4d: %#v\n",

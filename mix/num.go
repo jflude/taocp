@@ -49,9 +49,9 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	case 7: // FIX
 		panic(ErrNotImplemented) // TODO: see Section 4.2.1
 	case 9: // INT
-		panic(ErrNotImplemented) // TODO: see Ex. 18, Section 1.4.4
+		c.ctrl = !c.ctrl // see Ex. 18, Section 1.4.4
+		return 2
 	default:
 		panic(ErrInvalidOp)
 	}
-	return 1
 }
