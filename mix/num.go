@@ -37,8 +37,6 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 		}
 		return 10
 	case 2: // HLT
-		c.Elapsed++
-		c.next++
 		panic(ErrHalted)
 	case 3: // AND
 		panic(ErrNotImplemented) // TODO: see Section 4.5.4

@@ -1,6 +1,7 @@
 package mix
 
 import (
+	"errors"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -21,7 +22,7 @@ func TestGoButton(t *testing.T) {
 	if err != nil {
 		t.Fatal("error:", err)
 	}
-	if err = c.GoButton(16); err != nil {
+	if err = c.GoButton(16); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
 	b, err := ioutil.ReadFile("printer.mix")

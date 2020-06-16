@@ -31,7 +31,7 @@ func (t *Teletype) Read(block []Word) (int64, error) {
 	}
 	copy(block, m)
 	for i := len(m); i < len(block); i++ {
-		block[i] = NewWord(0)
+		block[i] = 0
 	}
 	return 7000000, nil
 }

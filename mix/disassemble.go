@@ -20,7 +20,7 @@ func Disassemble(w Word) string {
 	aa, i, f, op := w.UnpackOp()
 	switch {
 	case op == NOP:
-		return noArg("NOP")
+		return noArg("NOP", aa, i)
 	case op >= ADD && op <= DIV:
 		s := ariths[op-ADD]
 		if f == 6 {
@@ -29,7 +29,7 @@ func Disassemble(w Word) string {
 		return hasSpec(s, aa, i, f)
 	case op == NUM:
 		if f < len(nums) && nums[f] != "" {
-			return noArg(nums[f])
+			return noArg(nums[f], aa, i)
 		}
 	case op == SLA:
 		if f < len(shifts) {
@@ -75,8 +75,12 @@ func Disassemble(w Word) string {
 	return fmt.Sprintf("CON  %v", w)
 }
 
-func noArg(op string) string {
-	return fmt.Sprintf("%-4s", op)
+func noArg(op string, aa Word, i int) string {
+	if aa == 0 && i == 0 {
+		return fmt.Sprintf("%-4s", op)
+	} else {
+		return noField(op, aa, i)
+	}
 }
 
 func noField(op string, aa Word, i int) string {

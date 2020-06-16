@@ -27,9 +27,6 @@ func (c *Computer) GoButton(unit int) error {
 func (c *Computer) resume() error {
 	for {
 		if err := c.Cycle(); err != nil {
-			if errors.Is(err, ErrHalted) {
-				return nil
-			}
 			return err
 		}
 	}

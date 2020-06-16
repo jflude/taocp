@@ -158,7 +158,7 @@ func (w *Word) ShiftLeft(count int) Word {
 	}
 	if count >= 5 {
 		out := w.Field(FieldSpec(1, 5))
-		w.SetField(FieldSpec(1, 5), NewWord(0))
+		w.SetField(FieldSpec(1, 5), 0)
 		return out
 	}
 	if count < 0 {
@@ -179,7 +179,7 @@ func (w *Word) ShiftRight(count int) Word {
 	}
 	if count >= 5 {
 		out := w.Field(FieldSpec(1, 5))
-		w.SetField(FieldSpec(1, 5), NewWord(0))
+		w.SetField(FieldSpec(1, 5), 0)
 		return out
 	}
 	if count < 0 {

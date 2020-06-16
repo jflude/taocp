@@ -24,8 +24,12 @@ func (c *Computer) Cycle() (err error) {
 			}
 		}
 		if err != nil {
-			err = fmt.Errorf("%w at %04d (%#v)",
-				err, c.next, c.Contents[mBase+c.next])
+			err = fmt.Errorf("%w at %04d: %s", err, c.next,
+				Disassemble(c.Contents[mBase+c.next]))
+			if errors.Is(err, ErrHalted) {
+				c.Elapsed++
+				c.next++
+			}
 		}
 	}()
 	aa, i, f, op := c.Contents[mBase+c.next].UnpackOp()

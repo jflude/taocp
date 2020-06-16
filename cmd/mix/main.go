@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/jflude/gnuth/mix"
@@ -10,7 +12,11 @@ import (
 func main() {
 	log.SetFlags(0)
 	if err := run(); err != nil {
-		log.Fatalln("error:", err)
+		if errors.Is(err, mix.ErrHalted) {
+			log.Println(err)
+		} else {
+			log.Fatalln("error:", err)
+		}
 	}
 }
 
@@ -47,7 +53,7 @@ func run() (err error) {
 			}
 		}
 	}()
-	err = c.GoButton(16)
-	log.Print("mix: elapsed: ", c.Elapsed, "u (idle: ", c.Idle, "u)")
+	err = fmt.Errorf("%w (elapsed: %du, idle: %du)",
+		c.GoButton(16), c.Elapsed, c.Idle)
 	return err
 }

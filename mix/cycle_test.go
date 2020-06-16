@@ -1,6 +1,7 @@
 package mix
 
 import (
+	"errors"
 	"io/ioutil"
 	"strings"
 	"testing"
@@ -180,7 +181,7 @@ func TestCycle(t *testing.T) {
 	c.Contents[mBase+1009] = NewWord(2)
 	c.Reg[I1] = 10
 	c.next = 0
-	if err := c.resume(); err != nil {
+	if err := c.resume(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
 	if c.Reg[A].Int() != 7 {
@@ -197,7 +198,7 @@ func TestCycle(t *testing.T) {
 	copy(c.Contents[mBase+2024:], egCycle10c)
 	copy(c.Contents[mBase+2049:], egCycle10d)
 	c.next = 3000
-	if err := c.resume(); err != nil {
+	if err := c.resume(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
 	b, err := ioutil.ReadFile("printer.mix")
@@ -228,7 +229,7 @@ func BenchmarkProgramM(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		c.Reg[I1] = 10
 		c.next = 0
-		if err := c.resume(); err != nil {
+		if err := c.resume(); !errors.Is(err, ErrHalted) {
 			b.Fatal("error:", err)
 		}
 	}
@@ -244,7 +245,7 @@ func Benchmark1000Cycles(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		c.next = 0
-		if err := c.resume(); err != nil {
+		if err := c.resume(); !errors.Is(err, ErrHalted) {
 			b.Fatal("error:", err)
 		}
 	}
@@ -280,9 +281,9 @@ var (
 		NewWord(01234),
 		NewWord(-01234),
 		NewWord(-01234),
-		NewWord(0),
+		0,
 		NewWord(-012),
-		NewWord(0),
+		0,
 	}
 
 	egCycle3 = []Word{
@@ -323,23 +324,23 @@ var (
 		[]Word{ // #1
 			NewWord(01750000501),       // ADD  1000
 			NewWord(1234<<18 | 010226), // A (before)
-			NewWord(0),                 // X (before)
+			0,                          // X (before)
 			NewWord(100<<18 | 050062),  // CONTENTS[1000]
 			NewWord(1334<<18 | 060310), // A (after)
-			NewWord(0),                 // X (after)
+			0,                          // X (after)
 		},
 		[]Word{ // #2
 			NewWord(01750000502), // SUB  1000
 			NewWord(-(1234<<18 | 9)),
-			NewWord(0),
+			0,
 			NewWord(-(2000<<18 | (150 << 6))),
 			NewWord(766<<18 | 149<<6 | 067),
-			NewWord(0),
+			0,
 		},
 		[]Word{ // #3
 			NewWord(01750001103), // MUL  1000(1:1)
 			NewWord(-112),
-			NewWord(0),
+			0,
 			NewWord(0200000000),
 			NewWord(0).Negate(),
 			NewWord(-224),
@@ -347,14 +348,14 @@ var (
 		[]Word{ // #4
 			NewWord(01750000503), // MUL  1000
 			NewWord(-(50<<24 | 112<<6 | 4)),
-			NewWord(0),
+			0,
 			NewWord(-0200000000),
 			NewWord(100<<18 | 224),
 			NewWord(8 << 24),
 		},
 		[]Word{ // #5
 			NewWord(01750000504), // DIV  1000
-			NewWord(0),
+			0,
 			NewWord(17),
 			NewWord(3),
 			NewWord(5),

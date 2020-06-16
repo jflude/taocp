@@ -31,7 +31,7 @@ func ConvertToMIX(s string) ([]Word, error) {
 	f := 0
 	for _, r := range s {
 		if f = f%5 + 1; f == 1 {
-			w = append(w, NewWord(0))
+			w = append(w, 0)
 		}
 		c, ok := utf2mix[r]
 		if !ok {
