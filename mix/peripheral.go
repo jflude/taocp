@@ -1,9 +1,6 @@
 package mix
 
-import (
-	"container/heap"
-	"errors"
-)
+import "errors"
 
 type Peripheral interface {
 	Name() string
@@ -34,7 +31,7 @@ func (c *Computer) calcTiming(unit int, t int64, err error) (int64, error) {
 	delay++
 	c.busyUntil[unit] = c.Elapsed + delay + t
 	if c.ctrl {
-		heap.Push(&c.pending, event{c.busyUntil[unit], -20 - unit})
+		c.schedule(c.busyUntil[unit], -20-unit)
 	}
 	return delay, nil
 }

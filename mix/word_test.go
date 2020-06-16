@@ -42,17 +42,31 @@ func TestWord(t *testing.T) {
 	checkWord(t, w, NewWord(-1))
 
 	w = NewWord(-01001234567)
-	out := w.ShiftLeft(2)
+	out := w.ShiftBytesLeft(2)
 	checkWord(t, w, NewWord(-02345670000))
 	if out != 01001 {
 		t.Errorf("got: %#o, want: 01001", out)
 	}
 
 	w = NewWord(-01001234567)
-	out = w.ShiftRight(2)
+	out = w.ShiftBytesRight(2)
 	checkWord(t, w, NewWord(-0100123))
 	if out != 04567 {
 		t.Errorf("got: %#o, want: 04567", out)
+	}
+
+	w = NewWord(-01001234567)
+	out = w.ShiftBitsLeft(3)
+	checkWord(t, w, NewWord(-012345670))
+	if out != 01 {
+		t.Errorf("got: %#o, want 01", out)
+	}
+
+	w = NewWord(-01001234567)
+	out = w.ShiftBitsRight(3)
+	checkWord(t, w, NewWord(-0100123456))
+	if out != 07 {
+		t.Errorf("got: %#o, want 07", out)
 	}
 
 	w = NewWord(-01001234567)

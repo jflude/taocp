@@ -58,11 +58,16 @@ func (c *Computer) ja(aa Word, i, f, op, m int) int64 {
 		c.jump(m, r != 0)
 	case 5: // NP
 		c.jump(m, r <= 0)
-	case 6, 7: // E, O
-		if op == JA || op == JX {
-			panic(ErrNotImplemented) // TODO: see Section 4.5.2
+	case 6: // E (see Section 4.5.2)
+		if op != JA && op != JX {
+			panic(ErrInvalidOp)
 		}
-		fallthrough
+		c.jump(m, r&1 == 0)
+	case 7: // O (see Section 4.5.2)
+		if op != JA && op != JX {
+			panic(ErrInvalidOp)
+		}
+		c.jump(m, r&1 == 1)
 	default:
 		panic(ErrInvalidOp)
 	}

@@ -99,7 +99,7 @@ func TestCycle(t *testing.T) {
 		}
 	}
 
-	// SLA, SRA, SRAX, SLC, SRC
+	// SLA, SRA, SRAX, SLC, SRC, SLB, SRB
 	c.Reg[A] = NewWord(0102030405)
 	c.Reg[X] = NewWord(-0607101112)
 	c.next = 0
@@ -394,6 +394,16 @@ var (
 		},
 		{ // #5
 			NewWord(0765000406), // SLC  501
+			NewWord(06071003),
+			NewWord(-0400000500),
+		},
+		{ // #6
+			NewWord(03000606), // SLB  3
+			NewWord(060710030),
+			NewWord(-04000005000),
+		},
+		{ // #7
+			NewWord(03000706), // SRB  3
 			NewWord(06071003),
 			NewWord(-0400000500),
 		},

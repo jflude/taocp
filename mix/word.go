@@ -150,9 +150,27 @@ func abs(v int) int {
 	return v
 }
 
-// ShiftLeft shifts the MIX word w left by the given number of bytes,
+// AndWord returns the bitwise-AND of a MIX word and an integer (the sign of
+// the MIX word is preserved)
+func AndWord(w Word, v int) Word {
+	return Word(int32(w) & (int32(v) | signBit))
+}
+
+// OrWord returns the bitwise-OR of a MIX word and an integer (the sign of
+// the MIX word is preserved)
+func OrWord(w Word, v int) Word {
+	return Word(int32(w) | (int32(v) & MaxWord))
+}
+
+// XorWord returns the bitwise-XOR of a MIX word and an integer (the sign of
+// the MIX word is preserved)
+func XorWord(w Word, v int) Word {
+	return Word(int32(w) ^ (int32(v) & MaxWord))
+}
+
+// ShiftBytesLeft shifts the MIX word w left by the given number of bytes,
 // returning the bytes shifted out.
-func (w *Word) ShiftLeft(count int) Word {
+func (w *Word) ShiftBytesLeft(count int) Word {
 	if count == 0 {
 		return *w
 	}
@@ -171,9 +189,9 @@ func (w *Word) ShiftLeft(count int) Word {
 	return out
 }
 
-// ShiftRight shifts the MIX word w right by the given number of bytes,
+// ShiftBytesRight shifts the MIX word w right by the given number of bytes,
 // returning the bytes shifted out.
-func (w *Word) ShiftRight(count int) Word {
+func (w *Word) ShiftBytesRight(count int) Word {
 	if count == 0 {
 		return *w
 	}
@@ -190,4 +208,42 @@ func (w *Word) ShiftRight(count int) Word {
 	w.SetField(FieldSpec(count+1, 5), in)
 	w.SetField(FieldSpec(1, count), 0)
 	return out
+}
+
+// ShiftBitsLeft shifts the MIX word w left by the given number of bits,
+// returning the bits shifted out.
+func (w *Word) ShiftBitsLeft(count int) Word {
+	if count == 0 {
+		return *w
+	}
+	if count >= 30 {
+		out := w.Field(FieldSpec(1, 5))
+		w.SetField(FieldSpec(1, 5), 0)
+		return out
+	}
+	if count < 0 {
+		panic("invalid shift count")
+	}
+	n := uint32(*w) & MaxWord
+	*w = Word(int32((n<<count)&MaxWord) | int32(*w)&signBit)
+	return Word(n >> (30 - count))
+}
+
+// ShiftBitsRight shifts the MIX word w right by the given number of bits,
+// returning the bits shifted out.
+func (w *Word) ShiftBitsRight(count int) Word {
+	if count == 0 {
+		return *w
+	}
+	if count >= 30 {
+		out := w.Field(FieldSpec(1, 5))
+		w.SetField(FieldSpec(1, 5), 0)
+		return out
+	}
+	if count < 0 {
+		panic("invalid shift count")
+	}
+	n := uint32(*w) & MaxWord
+	*w = Word(int32(n>>count) | int32(*w)&signBit)
+	return Word(n & (1<<count - 1))
 }

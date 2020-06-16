@@ -16,12 +16,11 @@ func (c *Computer) interrupt(currentState bool) {
 	}
 	if since := c.Elapsed - c.lastTick; since >= tickRate {
 		prev := int64(c.Contents[mBase-10].Int())
-		curr := prev - since/tickRate
-		if prev > 0 && curr <= 0 {
-			heap.Push(&c.pending,
-				event{c.lastTick + prev*tickRate, -11})
+		now := prev - since/tickRate
+		if prev > 0 && now <= 0 {
+			c.schedule(c.lastTick+prev*tickRate, -11)
 		}
-		c.Contents[mBase-10] = NewWord(int(curr))
+		c.Contents[mBase-10] = NewWord(int(now))
 		c.lastTick = c.Elapsed - c.Elapsed%tickRate
 	}
 	if !c.ctrl && c.pending.Len() > 0 && c.pending[0].when <= c.Elapsed {
@@ -52,4 +51,8 @@ func (c *Computer) loadRegs() {
 	ovci := w.Field(FieldSpec(3, 3)).Int()
 	c.Overflow = (ovci/8 == 1)
 	c.Comparison = ovci%8 - 1
+}
+
+func (c *Computer) schedule(when int64, loc int) {
+	heap.Push(&c.pending, event{when, loc})
 }

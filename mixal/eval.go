@@ -16,7 +16,7 @@ func (a *asmb) evalArg(arg int) {
 	case '*':
 		_, *a.exprVal = mix.MulWord(*a.exprVal, arg)
 	case '/':
-		x := a.exprVal.ShiftRight(5)
+		x := a.exprVal.ShiftBytesRight(5)
 		*a.exprVal, _, _ = mix.DivWord(*a.exprVal, x, arg)
 	case '\\':
 		*a.exprVal, _, _ = mix.DivWord(*a.exprVal, 0, arg)
