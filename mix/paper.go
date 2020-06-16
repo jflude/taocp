@@ -1,21 +1,14 @@
 package mix
 
-import (
-	"io"
-	"os"
-)
+import "io"
 
 type PaperTape struct {
-	rwc io.ReadWriteCloser
+	rwsc readWriteSeekCloser
 }
 
 // see https://en.wikipedia.org/wiki/Teletype_Model_33
-func NewPaperTape(file string) (*PaperTape, error) {
-	rwc, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	return &PaperTape{rwc}, nil
+func NewPaperTape(rwsc readWriteSeekCloser) (*PaperTape, error) {
+	return &PaperTape{rwsc}, nil
 }
 
 func (*PaperTape) Name() string {
@@ -28,7 +21,7 @@ func (*PaperTape) BlockSize() int {
 
 func (p *PaperTape) Read(block []Word) (int64, error) {
 	buf := make([]byte, 5*p.BlockSize())
-	if _, err := io.ReadFull(p.rwc, buf); err != nil {
+	if _, err := io.ReadFull(p.rwsc, buf); err != nil {
 		return 0, err
 	}
 	m, err := ConvertToMIX(string(buf))
@@ -40,7 +33,7 @@ func (p *PaperTape) Read(block []Word) (int64, error) {
 }
 
 func (p *PaperTape) Write(block []Word) (int64, error) {
-	_, err := io.WriteString(p.rwc, ConvertToUTF8(block))
+	_, err := io.WriteString(p.rwsc, ConvertToUTF8(block))
 	return 200000, err
 }
 
@@ -48,13 +41,10 @@ func (p *PaperTape) Control(m int) (int64, error) {
 	if m != 0 {
 		return 0, ErrInvalidCommand
 	}
-	if s, ok := p.rwc.(io.Seeker); ok {
-		_, err := s.Seek(0, io.SeekStart)
-		return 60000000, err
-	}
-	return 0, ErrInvalidCommand
+	_, err := p.rwsc.Seek(0, io.SeekStart)
+	return 60000000, err
 }
 
 func (p *PaperTape) Close() error {
-	return p.rwc.Close()
+	return p.rwsc.Close()
 }

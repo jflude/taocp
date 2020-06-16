@@ -21,29 +21,48 @@ func main() {
 }
 
 func run() (err error) {
+	var opt [21]string
 	b := *mix.DefaultBinding
-	flag.StringVar(&b[0], "t00", b[0], "")
-	flag.StringVar(&b[1], "t01", b[1], "")
-	flag.StringVar(&b[2], "t02", b[2], "")
-	flag.StringVar(&b[3], "t03", b[3], "")
-	flag.StringVar(&b[4], "t04", b[4], "")
-	flag.StringVar(&b[5], "t05", b[5], "")
-	flag.StringVar(&b[6], "t06", b[6], "")
-	flag.StringVar(&b[7], "t07", b[7], "")
-	flag.StringVar(&b[8], "d08", b[8], "")
-	flag.StringVar(&b[9], "d09", b[9], "")
-	flag.StringVar(&b[10], "d10", b[10], "")
-	flag.StringVar(&b[11], "d11", b[11], "")
-	flag.StringVar(&b[12], "d12", b[12], "")
-	flag.StringVar(&b[13], "d13", b[13], "")
-	flag.StringVar(&b[14], "d14", b[14], "")
-	flag.StringVar(&b[15], "d15", b[15], "")
-	flag.StringVar(&b[16], "rdr", b[16], "")
-	flag.StringVar(&b[17], "pun", b[17], "")
-	flag.StringVar(&b[18], "prt", b[18], "")
-	flag.StringVar(&b[19], "tty", b[19], " (default stdin/stdout)")
+	for i, v := range b {
+		if v != nil {
+			opt[i] = v.(string)
+		} else {
+			opt[i] = "stdin/out"
+		}
+	}
+	flag.StringVar(&opt[0], "t0", opt[0], "")
+	flag.StringVar(&opt[1], "t1", opt[1], "")
+	flag.StringVar(&opt[2], "t2", opt[2], "")
+	flag.StringVar(&opt[3], "t3", opt[3], "")
+	flag.StringVar(&opt[4], "t4", opt[4], "")
+	flag.StringVar(&opt[5], "t5", opt[5], "")
+	flag.StringVar(&opt[6], "t6", opt[6], "")
+	flag.StringVar(&opt[7], "t7", opt[7], "")
+	flag.StringVar(&opt[8], "d8", opt[8], "")
+	flag.StringVar(&opt[9], "d9", opt[9], "")
+	flag.StringVar(&opt[10], "d10", opt[10], "")
+	flag.StringVar(&opt[11], "d11", opt[11], "")
+	flag.StringVar(&opt[12], "d12", opt[12], "")
+	flag.StringVar(&opt[13], "d13", opt[13], "")
+	flag.StringVar(&opt[14], "d14", opt[14], "")
+	flag.StringVar(&opt[15], "d15", opt[15], "")
+	flag.StringVar(&opt[16], "rdr", opt[16], "")
+	flag.StringVar(&opt[17], "pun", opt[17], "")
+	flag.StringVar(&opt[18], "prt", opt[18], "")
+	flag.StringVar(&opt[19], "tty", opt[19], "")
+	flag.StringVar(&opt[20], "pap", opt[20], "")
 	flag.Parse()
-	c := mix.NewComputer(&b)
+	for i, v := range opt {
+		if v != "" {
+			b[i] = v
+		} else {
+			b[i] = nil
+		}
+	}
+	c := mix.NewComputer()
+	if err = c.Bind(&b); err != nil {
+		return
+	}
 	defer func() {
 		if err2 := c.Shutdown(); err2 != nil {
 			if err == nil {
@@ -55,5 +74,5 @@ func run() (err error) {
 	}()
 	err = fmt.Errorf("%w (elapsed: %du, idle: %du)",
 		c.GoButton(16), c.Elapsed, c.Idle)
-	return err
+	return
 }

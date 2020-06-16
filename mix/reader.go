@@ -1,20 +1,13 @@
 package mix
 
-import (
-	"io"
-	"os"
-)
+import "io"
 
 type CardReader struct {
 	rc io.ReadCloser
 }
 
 // see https://en.wikipedia.org/wiki/IBM_2540
-func NewCardReader(file string) (*CardReader, error) {
-	rc, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
+func NewCardReader(rc io.ReadCloser) (*CardReader, error) {
 	return &CardReader{rc}, nil
 }
 

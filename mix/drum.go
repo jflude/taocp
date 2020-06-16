@@ -4,25 +4,20 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"os"
 )
 
 const maxDrumBlock = 4000
 
 type Drum struct {
-	f    *os.File
+	rwsc readWriteSeekCloser
 	name string
 	here int64
 	c    *Computer
 }
 
 // see Section 5.4.9
-func NewDrum(file string, unit int, c *Computer) (*Drum, error) {
-	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		return nil, err
-	}
-	return &Drum{f, fmt.Sprintf("DRUM%02d", unit), 0, c}, nil
+func NewDrum(rwsc readWriteSeekCloser, unit int, c *Computer) (*Drum, error) {
+	return &Drum{rwsc, fmt.Sprintf("DRUM%02d", unit), 0, c}, nil
 }
 
 func (d *Drum) Name() string {
@@ -39,7 +34,7 @@ func (d *Drum) Read(block []Word) (int64, error) {
 		return 0, err
 	}
 	buf := make([]byte, 4*len(block))
-	if _, err := io.ReadFull(d.f, buf); err != nil {
+	if _, err := io.ReadFull(d.rwsc, buf); err != nil {
 		return 0, err
 	}
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
@@ -57,7 +52,7 @@ func (d *Drum) Write(block []Word) (int64, error) {
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
-	_, err = d.f.Write(buf)
+	_, err = d.rwsc.Write(buf)
 	return 10000 + delay, err
 }
 
@@ -69,7 +64,7 @@ func (d *Drum) Control(m int) (int64, error) {
 }
 
 func (d *Drum) Close() error {
-	return d.f.Close()
+	return d.rwsc.Close()
 }
 
 func (d *Drum) seekToX() (delay int64, err error) {
@@ -79,7 +74,7 @@ func (d *Drum) seekToX() (delay int64, err error) {
 	}
 	x *= 4 * int64(d.BlockSize())
 	if d.here != x {
-		d.here, err = d.f.Seek(x, io.SeekStart)
+		d.here, err = d.rwsc.Seek(x, io.SeekStart)
 	}
 	return 0, nil
 }
