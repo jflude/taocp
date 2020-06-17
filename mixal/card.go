@@ -8,15 +8,15 @@ import (
 )
 
 var (
-	ErrFormatError   = errors.New("mixal: format error")
-	ErrInternalError = errors.New("mixal: internal error")
+	ErrFormat   = errors.New("mixal: format error")
+	ErrInternal = errors.New("mixal: internal error")
 )
 
 func (a *asmb) processCard(line string, parse parseFunc) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			err2, ok := r.(error)
-			if !ok || errors.Is(err2, ErrInternalError) {
+			if !ok || errors.Is(err2, ErrInternal) {
 				panic(r)
 			}
 			err = a.specifyError(err2, line)
@@ -25,7 +25,7 @@ func (a *asmb) processCard(line string, parse parseFunc) (err error) {
 	a.input = line
 	a.count++
 	if len(a.input) == 0 {
-		panic(ErrFormatError)
+		panic(ErrFormat)
 	}
 	if _, err := mix.ConvertToMIX(a.input); err != nil {
 		panic(err)
@@ -35,7 +35,7 @@ func (a *asmb) processCard(line string, parse parseFunc) (err error) {
 	}
 	if a.extractColumns(11, 11, true) != "" ||
 		a.extractColumns(16, 16, true) != "" {
-		panic(ErrFormatError)
+		panic(ErrFormat)
 	}
 	loc := a.extractColumns(1, 10, true)
 	op := a.extractColumns(12, 15, true)

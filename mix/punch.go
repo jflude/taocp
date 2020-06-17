@@ -27,11 +27,11 @@ func (*CardPunch) Read([]Word) (int64, error) {
 }
 
 func (p *CardPunch) Write(block []Word) (int64, error) {
-	s := ConvertToUTF8(block)
-	if r, ok := IsPunchable(s); !ok {
-		return 0, charError(r)
+	s := strings.TrimRight(ConvertToUTF8(block), " ")
+	if ch, ok := IsPunchable(s); !ok {
+		return 0, charError(ch)
 	}
-	_, err := io.WriteString(p.wc, s)
+	_, err := io.WriteString(p.wc, s+"\n")
 	return 200000, err
 }
 
@@ -45,7 +45,9 @@ func (p *CardPunch) Close() error {
 
 func IsPunchable(s string) (rune, bool) {
 	// see Ex. 26, Section 1.3.1 for characters which cannot be punched
-	if i := strings.IndexAny(s, "ΦΠ$<>@;:'"); i != -1 {
+	// (see also https://homepage.divms.uiowa.edu/~jones/cards/codes.html)
+	// I am assuming a colon can be punched as it is required by MIXAL.
+	if i := strings.IndexAny(s, "ΦΠ$<>@;'"); i != -1 {
 		return rune(s[i]), false
 	}
 	return 0, true

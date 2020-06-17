@@ -13,12 +13,12 @@ func (a *asmb) patchFixUps(sym string) {
 	}
 	val, ok := a.symbols[sym]
 	if !ok {
-		panic(ErrInternalError)
+		panic(ErrInternal)
 	}
 	for _, r := range refs {
 		w := a.obj.findWord(r)
 		if w == nil {
-			panic(ErrInternalError)
+			panic(ErrInternal)
 		}
 		w.SetField(mix.FieldSpec(0, 2), val)
 	}

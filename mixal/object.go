@@ -15,8 +15,8 @@ type object struct {
 	seg   [][]mix.Word
 }
 
-var loader = ` O O6 Y O6    I   B= D O4 Z IQ Z I3 Z EN    E   EU 0BB= H IU   EJ  CA. ACB=   EU 1A-H V A=  CEU 0AEH 1AEN    E  CLU  ABG H IH A A= J B. A  9                    `
-var transfer = `TRANS0%04d                                                                      `
+var loader = " O O6 Y O6    I   B= D O4 Z IQ Z I3 Z EN    E   EU 0BB= H IU   EJ  CA. ACB=   EU\n 1A-H V A=  CEU 0AEH 1AEN    E  CLU  ABG H IH A A= J B. A  9                    \n"
+var transfer = "TRANS0%04d                                                                      \n"
 
 func (o *object) findWord(address int) *mix.Word {
 	for i := 0; i < len(o.orig); i++ {
@@ -58,6 +58,9 @@ func (o *object) writeCards(w io.Writer) error {
 				if err != nil {
 					return err
 				}
+			}
+			if _, err := io.WriteString(w, "\n"); err != nil {
+				return err
 			}
 		}
 	}

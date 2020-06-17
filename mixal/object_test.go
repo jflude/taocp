@@ -51,4 +51,4 @@ var egObject = object{
 	},
 }
 
-var okObject = []byte(" O O6 Y O6    I   B= D O4 Z IQ Z I3 Z EN    E   EU 0BB= H IU   EJ  CA. ACB=   EU 1A-H V A=  CEU 0AEH 1AEN    E  CLU  ABG H IH A A= J B. A  9                    ABCDE33000000000118P02621451890000000133                                        ABCDE310000135582544000688250R006710886M                                        TRANS03000                                                                      ")
+var okObject = []byte(" O O6 Y O6    I   B= D O4 Z IQ Z I3 Z EN    E   EU 0BB= H IU   EJ  CA. ACB=   EU\n 1A-H V A=  CEU 0AEH 1AEN    E  CLU  ABG H IH A A= J B. A  9                    \nABCDE33000000000118P02621451890000000133                                        \nABCDE310000135582544000688250R006710886M                                        \nTRANS03000                                                                      \n")

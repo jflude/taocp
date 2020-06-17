@@ -19,7 +19,7 @@ func (a *asmb) matchNumber() bool {
 	}
 	n, err := strconv.Atoi(a.input[:i])
 	if err != nil {
-		panic(ErrInternalError)
+		panic(ErrInternal)
 	}
 	a.addToken(number, n)
 	a.input = a.input[i:]

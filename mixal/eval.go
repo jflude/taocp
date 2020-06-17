@@ -25,6 +25,6 @@ func (a *asmb) evalArg(arg int) {
 		hi.SetField(mix.FieldSpec(1, 5), lo)
 		*a.exprVal, _ = mix.AddWord(hi, arg)
 	default:
-		panic(ErrInternalError)
+		panic(ErrInternal)
 	}
 }

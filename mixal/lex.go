@@ -35,9 +35,9 @@ func (a *asmb) lastQuantity() int {
 		if n, ok := a.symbols[t.val.(string)]; ok {
 			return n.Int()
 		}
-		panic(ErrInternalError)
+		panic(ErrInternal)
 	default:
-		panic(ErrInternalError)
+		panic(ErrInternal)
 	}
 }
 

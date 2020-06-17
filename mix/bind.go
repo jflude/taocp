@@ -84,7 +84,7 @@ func (c *Computer) bindDevice(unit int) error {
 	case unit >= 12 && unit <= 15:
 		p, err = NewDisc(backing.(readWriteSeekCloser), unit, c)
 	case unit == 16:
-		p, err = NewCardReader(backing.(io.ReadCloser))
+		p, err = NewCardReader(backing.(io.Reader))
 	case unit == 17:
 		p, err = NewCardPunch(backing.(io.WriteCloser))
 	case unit == 18:

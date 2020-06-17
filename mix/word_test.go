@@ -55,9 +55,9 @@ func TestWord(t *testing.T) {
 		t.Errorf("got: %#o, want: 04567", out)
 	}
 
-	w = NewWord(-01001234567)
+	w = NewWord(01111234567)
 	out = w.ShiftBitsLeft(3)
-	checkWord(t, w, NewWord(-012345670))
+	checkWord(t, w, NewWord(01112345670))
 	if out != 01 {
 		t.Errorf("got: %#o, want 01", out)
 	}

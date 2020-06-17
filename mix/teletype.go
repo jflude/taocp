@@ -24,7 +24,7 @@ func (t *Teletype) Read(block []Word) (int64, error) {
 	if n, err := t.rwc.Read(buf); n == 0 {
 		return 0, err
 	}
-	if buf[len(buf)-1] == '\010' {
+	if buf[len(buf)-1] == '\n' {
 		buf = buf[:len(buf)-1]
 	}
 	m, err := ConvertToMIX(string(buf))

@@ -1,14 +1,20 @@
 package mix
 
-import "io"
+import (
+	"bufio"
+	"errors"
+	"io"
+)
 
 type CardReader struct {
-	rc io.ReadCloser
+	br *bufio.Reader
 }
 
+var ErrFormat = errors.New("mix: format error")
+
 // see https://en.wikipedia.org/wiki/IBM_2540
-func NewCardReader(rc io.ReadCloser) (*CardReader, error) {
-	return &CardReader{rc}, nil
+func NewCardReader(r io.Reader) (*CardReader, error) {
+	return &CardReader{bufio.NewReader(r)}, nil
 }
 
 func (*CardReader) Name() string {
@@ -20,19 +26,25 @@ func (*CardReader) BlockSize() int {
 }
 
 func (r *CardReader) Read(block []Word) (int64, error) {
-	buf := make([]byte, 5*r.BlockSize())
-	if _, err := io.ReadFull(r.rc, buf); err != nil {
+	s, err := r.br.ReadString('\n')
+	if err != nil {
 		return 0, err
 	}
-	s := string(buf)
-	if r, ok := IsPunchable(s); !ok {
-		return 0, charError(r)
+	if len(s) > 81 || s[len(s)-1] != '\n' {
+		return 0, ErrFormat
+	}
+	s = s[:len(s)-1]
+	if ch, ok := IsPunchable(s); !ok {
+		return 0, charError(ch)
 	}
 	m, err := ConvertToMIX(s)
 	if err != nil {
 		return 0, err
 	}
 	copy(block, m)
+	for i := len(m); i < len(block); i++ {
+		block[i] = 0
+	}
 	return 60000, nil
 }
 
@@ -45,5 +57,5 @@ func (r *CardReader) Control(m int) (int64, error) {
 }
 
 func (r *CardReader) Close() error {
-	return r.rc.Close()
+	return nil
 }

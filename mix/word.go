@@ -98,8 +98,8 @@ func SubWord(w Word, v int) (result Word, overflow bool) {
 	return AddWord(w, -v)
 }
 
-// MulWord multiples an integer by a MIX word, returning the product as a
-// double-precision MIX word.  See Section 1.3.1.
+// MulWord multiples a MIX word by an integer, returning the product as two
+// (double-precision) MIX words.  See Section 1.3.1.
 func MulWord(w Word, v int) (high, low Word) {
 	p := int64(w.Int()) * int64(v)
 	n := uint64(abs64(p))

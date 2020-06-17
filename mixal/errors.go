@@ -5,14 +5,14 @@ import (
 	"fmt"
 )
 
-var ErrSyntaxError = errors.New("mixal: syntax error")
+var ErrSyntax = errors.New("mixal: syntax error")
 
 func parseError(err error, text string) {
 	panic(fmt.Errorf("%w: %q", err, text))
 }
 
 func (a *asmb) syntaxError() {
-	parseError(ErrSyntaxError, a.input)
+	parseError(ErrSyntax, a.input)
 }
 
 func (a *asmb) semanticError(err error) {
