@@ -32,8 +32,8 @@ func TestGoButton(t *testing.T) {
 
 var egLoader = []string{
 	//   5   10   15   20   25   30   35   40   45   50   55   60   65   70   75   80
-	" O O6 Y O6    I   B= D O4 Z IQ Z I3 Z EN    E   EU 0BB= H IU   EJ  CA. ACB=   EU\n",
-	" 1A-H V A=  CEU 0AEH 1AEN    E  CLU  ABG H IH A A= J B. A  9                    \n",
+	" O O6 Z O6    I C O4 0 EH A  F F CF 0  E   EU 0 IH G BB   EJ  CA. Z EU   EH E BA\n",
+	"   EU 2A-H S BB  C U 1AEH 2AEN V  E  CLU  ABG Z EH E BB J B. A  9               \n",
 }
 
 var egHelloWorld = "ABCDE" +
