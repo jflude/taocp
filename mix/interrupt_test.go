@@ -17,6 +17,7 @@ func TestInterrupt(t *testing.T) {
 	copy(c.Contents[mBase-38:], egInterrupt3)
 	copy(c.Contents[mBase+1000:], egInterrupt4)
 	c.next = 1000
+	c.Interrupts = true
 	if err := c.resume(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}

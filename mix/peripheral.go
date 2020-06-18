@@ -30,7 +30,7 @@ func (c *Computer) calcTiming(unit int, t int64, err error) (int64, error) {
 	c.Idle += delay
 	delay++
 	c.busyUntil[unit] = c.Elapsed + delay + t
-	if c.ctrl {
+	if c.Interrupts && c.ctrl {
 		c.schedule(c.busyUntil[unit], -20-unit)
 	}
 	return delay, nil

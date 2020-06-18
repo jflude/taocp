@@ -42,6 +42,7 @@ type Computer struct {
 	bind          *Binding
 	m, next       int
 	ctrl, trace   bool
+	Interrupts    bool
 	lastTick      int64
 	pending       priority
 }

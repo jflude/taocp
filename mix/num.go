@@ -5,7 +5,10 @@ import (
 	"strconv"
 )
 
-var ErrHalted = errors.New("mix: halted")
+var (
+	ErrHalted       = errors.New("mix: halted")
+	ErrNoInterrupts = errors.New("mix: interrupts are disabled")
+)
 
 func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	switch f {
@@ -52,7 +55,10 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	case 7: // FIX
 		panic(ErrNotImplemented) // TODO: see Section 4.2.1
 	case 9: // INT
-		c.ctrl = !c.ctrl // see Ex. 18, Section 1.4.4
+		if !c.Interrupts { // see Ex. 18, Section 1.4.4
+			panic(ErrNoInterrupts)
+		}
+		c.ctrl = !c.ctrl
 		return 2
 	default:
 		panic(ErrInvalidOp)
