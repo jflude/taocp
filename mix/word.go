@@ -168,82 +168,58 @@ func XorWord(w Word, v int) Word {
 	return Word(int32(w) ^ (int32(v) & MaxWord))
 }
 
-// ShiftBytesLeft shifts the MIX word w left by the given number of bytes,
-// returning the bytes shifted out.
-func (w *Word) ShiftBytesLeft(count int) Word {
-	if count == 0 {
-		return *w
-	}
-	if count >= 5 {
-		out := w.Field(FieldSpec(1, 5))
-		w.SetField(FieldSpec(1, 5), 0)
-		return out
+// ShiftBitsLeft shifts a double MIX word left by the given number of bits.
+func ShiftBitsLeft(high, low *Word, count int) {
+	if count >= 60 {
+		*high = Word(int32(*high) & signBit)
+		*low = Word(int32(*high) & signBit)
+		return
 	}
 	if count < 0 {
 		panic("invalid shift count")
 	}
-	out := w.Field(FieldSpec(1, count))
-	in := w.Field(FieldSpec(count+1, 5))
-	w.SetField(FieldSpec(1, 5-count), in)
-	w.SetField(FieldSpec(6-count, 5), 0)
-	return out
+	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
+	n <<= count
+	*high = Word(int32((n>>30)&MaxWord) | (int32(*high) & signBit))
+	*low = Word(int32(n&MaxWord) | (int32(*low) & signBit))
 }
 
-// ShiftBytesRight shifts the MIX word w right by the given number of bytes,
-// returning the bytes shifted out.
-func (w *Word) ShiftBytesRight(count int) Word {
-	if count == 0 {
-		return *w
-	}
-	if count >= 5 {
-		out := w.Field(FieldSpec(1, 5))
-		w.SetField(FieldSpec(1, 5), 0)
-		return out
+// ShiftBitsRight shifts a double MIX word right by the given number of bits.
+func ShiftBitsRight(high, low *Word, count int) {
+	if count >= 60 {
+		*high = Word(int32(*high) & signBit)
+		*low = Word(int32(*high) & signBit)
+		return
 	}
 	if count < 0 {
 		panic("invalid shift count")
 	}
-	out := w.Field(FieldSpec(6-count, 5))
-	in := w.Field(FieldSpec(1, 5-count))
-	w.SetField(FieldSpec(count+1, 5), in)
-	w.SetField(FieldSpec(1, count), 0)
-	return out
+	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
+	n >>= count
+	*high = Word((n>>30)&MaxWord | (int64(*high) & signBit))
+	*low = Word((n & MaxWord) | (int64(*low) & signBit))
 }
 
-// ShiftBitsLeft shifts the MIX word w left by the given number of bits,
-// returning the bits shifted out.
-func (w *Word) ShiftBitsLeft(count int) Word {
-	if count == 0 {
-		return *w
-	}
-	if count >= 30 {
-		out := w.Field(FieldSpec(1, 5))
-		w.SetField(FieldSpec(1, 5), 0)
-		return out
-	}
+// RotateBitsLeft rotates a double MIX word left by the given number of bits.
+func RotateBitsLeft(high, low *Word, count int) {
 	if count < 0 {
 		panic("invalid shift count")
 	}
-	n := uint32(*w) & MaxWord
-	*w = Word(int32((n<<count)&MaxWord) | int32(*w)&signBit)
-	return Word(n >> (30 - count))
+	count %= 60
+	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
+	n = (n << count) | (n >> (60 - count) & (1<<count - 1))
+	*high = Word((n>>30)&MaxWord | (int64(*high) & signBit))
+	*low = Word((n & MaxWord) | (int64(*low) & signBit))
 }
 
-// ShiftBitsRight shifts the MIX word w right by the given number of bits,
-// returning the bits shifted out.
-func (w *Word) ShiftBitsRight(count int) Word {
-	if count == 0 {
-		return *w
-	}
-	if count >= 30 {
-		out := w.Field(FieldSpec(1, 5))
-		w.SetField(FieldSpec(1, 5), 0)
-		return out
-	}
+// RotateBitsRight rotates a double MIX word right by the given number of bits.
+func RotateBitsRight(high, low *Word, count int) {
 	if count < 0 {
 		panic("invalid shift count")
 	}
-	n := uint32(*w) & MaxWord
-	*w = Word(int32(n>>count) | int32(*w)&signBit)
-	return Word(n & (1<<count - 1))
+	count %= 60
+	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
+	n = (n >> count) | (n&(1<<count-1))<<(60-count)
+	*high = Word((n>>30)&MaxWord | (int64(*high) & signBit))
+	*low = Word((n & MaxWord) | (int64(*low) & signBit))
 }

@@ -41,33 +41,53 @@ func TestWord(t *testing.T) {
 	w.SetField(FieldSpec(0, 0), NewWord(-07777777777))
 	checkWord(t, w, NewWord(-1))
 
-	w = NewWord(-01001234567)
-	out := w.ShiftBytesLeft(2)
-	checkWord(t, w, NewWord(-02345670000))
-	if out != 01001 {
-		t.Errorf("got: %#o, want: 01001", out)
-	}
+	var hi Word
+	lo := NewWord(-01001234567)
+	ShiftBitsLeft(&hi, &lo, 12)
+	checkWord(t, hi, NewWord(01001))
+	checkWord(t, lo, NewWord(-02345670000))
 
-	w = NewWord(-01001234567)
-	out = w.ShiftBytesRight(2)
-	checkWord(t, w, NewWord(-0100123))
-	if out != 04567 {
-		t.Errorf("got: %#o, want: 04567", out)
-	}
+	hi = 0
+	lo = NewWord(-01001234567)
+	ShiftBitsLeft(&hi, &lo, 33)
+	checkWord(t, hi, NewWord(012345670))
+	checkWord(t, lo, NewWord(0).Negate())
 
-	w = NewWord(01111234567)
-	out = w.ShiftBitsLeft(3)
-	checkWord(t, w, NewWord(01112345670))
-	if out != 01 {
-		t.Errorf("got: %#o, want 01", out)
-	}
+	hi = NewWord(-01001234567)
+	lo = 0
+	ShiftBitsRight(&hi, &lo, 6)
+	checkWord(t, hi, NewWord(-010012345))
+	checkWord(t, lo, NewWord(06700000000))
 
-	w = NewWord(-01001234567)
-	out = w.ShiftBitsRight(3)
-	checkWord(t, w, NewWord(-0100123456))
-	if out != 07 {
-		t.Errorf("got: %#o, want 07", out)
-	}
+	hi = NewWord(-01001234567)
+	lo = 0
+	ShiftBitsRight(&hi, &lo, 36)
+	checkWord(t, hi, NewWord(0).Negate())
+	checkWord(t, lo, NewWord(010012345))
+
+	hi = NewWord(-0123456701)
+	lo = NewWord(-02345670123)
+	ShiftBitsRight(&hi, &lo, 60)
+	checkWord(t, hi, NewWord(0).Negate())
+	checkWord(t, lo, NewWord(0).Negate())
+
+	hi = NewWord(-0123456701)
+	lo = NewWord(-02345670123)
+	RotateBitsLeft(&hi, &lo, 12)
+	checkWord(t, hi, NewWord(-04567012345))
+	checkWord(t, lo, NewWord(-06701230123))
+
+	hi = NewWord(-0123456701)
+	lo = NewWord(-02345670123)
+	RotateBitsRight(&hi, &lo, 6)
+	checkWord(t, hi, NewWord(-02301234567))
+	checkWord(t, lo, NewWord(-0123456701))
+
+	hi = NewWord(-0123456701)
+	lo = NewWord(-02345670123)
+	RotateBitsRight(&hi, &lo, 120)
+	checkWord(t, hi, NewWord(-0123456701))
+	checkWord(t, lo, NewWord(-02345670123))
 
 	w = NewWord(-01001234567)
 	aa, i, f, c := w.UnpackOp()

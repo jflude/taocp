@@ -16,14 +16,15 @@ func (a *asmb) evalArg(arg int) {
 	case '*':
 		_, *a.exprVal = mix.MulWord(*a.exprVal, arg)
 	case '/':
-		x := a.exprVal.ShiftBytesRight(5)
+		var x mix.Word
+		mix.ShiftBitsRight(a.exprVal, &x, 30)
 		*a.exprVal, _, _ = mix.DivWord(*a.exprVal, x, arg)
 	case '\\':
 		*a.exprVal, _, _ = mix.DivWord(*a.exprVal, 0, arg)
 	case ':':
-		hi, lo := mix.MulWord(*a.exprVal, 8)
-		hi.SetField(mix.FieldSpec(1, 5), lo)
-		*a.exprVal, _ = mix.AddWord(hi, arg)
+		high, low := mix.MulWord(*a.exprVal, 8)
+		high.SetField(mix.FieldSpec(1, 5), low)
+		*a.exprVal, _ = mix.AddWord(high, arg)
 	default:
 		panic(ErrInternal)
 	}

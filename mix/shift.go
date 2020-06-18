@@ -6,37 +6,23 @@ func (c *Computer) sla(aa Word, i, f, op, m int) int64 {
 	}
 	switch f {
 	case 0: // SLA
-		c.Reg[A].ShiftBytesLeft(m)
+		var w Word
+		ShiftBitsLeft(&c.Reg[A], &w, 6*m)
 	case 1: // SRA
-		c.Reg[A].ShiftBytesRight(m)
+		var w Word
+		ShiftBitsRight(&c.Reg[A], &w, 6*m)
 	case 2: // SLAX
-		c.Reg[A].ShiftBytesLeft(m)
-		out := c.Reg[X].ShiftBytesLeft(m)
-		c.Reg[A].SetField(FieldSpec(6-m, 5), out)
+		ShiftBitsLeft(&c.Reg[A], &c.Reg[X], 6*m)
 	case 3: // SRAX
-		c.Reg[X].ShiftBytesRight(m)
-		out := c.Reg[A].ShiftBytesRight(m)
-		c.Reg[X].SetField(FieldSpec(1, m), out)
+		ShiftBitsRight(&c.Reg[A], &c.Reg[X], 6*m)
 	case 4: // SLC
-		m %= 5
-		outA := c.Reg[A].ShiftBytesLeft(m)
-		outX := c.Reg[X].ShiftBytesLeft(m)
-		c.Reg[A].SetField(FieldSpec(6-m, 5), outX)
-		c.Reg[X].SetField(FieldSpec(6-m, 5), outA)
+		RotateBitsLeft(&c.Reg[A], &c.Reg[X], 6*m)
 	case 5: // SRC
-		m %= 5
-		outA := c.Reg[A].ShiftBytesRight(m)
-		outX := c.Reg[X].ShiftBytesRight(m)
-		c.Reg[A].SetField(FieldSpec(1, m), outX)
-		c.Reg[X].SetField(FieldSpec(1, m), outA)
+		RotateBitsRight(&c.Reg[A], &c.Reg[X], 6*m)
 	case 6: // SLB (see Section 4.5.2)
-		c.Reg[A].ShiftBitsLeft(m)
-		out := c.Reg[X].ShiftBitsLeft(m)
-		c.Reg[A] = OrWord(c.Reg[A], out.Int())
+		ShiftBitsLeft(&c.Reg[A], &c.Reg[X], m)
 	case 7: // SRB (see Section 4.5.2)
-		c.Reg[X].ShiftBitsRight(m)
-		out := c.Reg[A].ShiftBitsRight(m)
-		c.Reg[X] = OrWord(c.Reg[X], out.Int()<<(30-m))
+		ShiftBitsRight(&c.Reg[A], &c.Reg[X], m)
 	default:
 		panic(ErrInvalidOp)
 	}
