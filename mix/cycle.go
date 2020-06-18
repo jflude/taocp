@@ -95,6 +95,6 @@ func (c *Computer) Cycle() (err error) {
 	}
 	c.Elapsed += t
 	c.next++
-	c.interrupt(state)
+	c.checkInterrupt(state)
 	return nil
 }

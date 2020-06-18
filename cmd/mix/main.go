@@ -21,7 +21,7 @@ func main() {
 }
 
 func run() (err error) {
-	var opt [21]string
+	var opt [mix.DeviceCount]string
 	b := *mix.DefaultBinding
 	for i, v := range b {
 		if v != nil {

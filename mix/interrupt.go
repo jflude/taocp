@@ -4,7 +4,7 @@ import "container/heap"
 
 const tickRate = 1000
 
-func (c *Computer) interrupt(currentState bool) {
+func (c *Computer) checkInterrupt(currentState bool) {
 	if c.ctrl != currentState {
 		if c.ctrl {
 			c.saveRegs()

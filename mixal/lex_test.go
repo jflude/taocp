@@ -10,7 +10,7 @@ func TestLexical(t *testing.T) {
 	asmbLex.symbols = make(map[string]mix.Word)
 	asmbLex.symbols["L"] = mix.NewWord(2000)
 	asmbLex.fixups = make(map[string][]int)
-	for i := 0; i < len(egMatch); i++ {
+	for i := range egMatch {
 		asmbLex.self = 3000
 		asmbLex.input = egMatch[i].input
 		asmbLex.tokens = nil

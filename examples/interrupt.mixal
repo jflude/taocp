@@ -1,0 +1,42 @@
+* EXAMPLE: INTERRUPT CAPABILITY (EX. 18, SECTION 1.4.4)
+* SUPERVISOR ROUTINE
+QUANTUM    EQU  1000
+CLOCK      EQU  -10
+PRINTER    EQU  18
+STATUS     EQU  -1
+NEXTOP     EQU  0:2
+BUF        EQU  -2000
+           ORIG -1000
+SUPER      ENTA QUANTUM
+           STA  CLOCK
+           JBUS RESUME(PRINTER)
+           LDA  STATUS(NEXTOP)
+           CHAR
+           STX  BUF
+           OUT  BUF(PRINTER)
+RESUME     INT
+* INTERRUPT VECTORS
+CLOCKVEC   EQU  -11
+PRINTVEC   EQU  -20-PRINTER
+           ORIG CLOCKVEC
+           JMP  SUPER
+           CON  QUANTUM
+           ORIG PRINTVEC
+           INT
+* WORKER ROUTINE
+           ORIG 1000
+START      LDA  =1000000=
+LOOP       NOP
+           NOP
+           NOP
+           NOP
+           NOP
+           NOP
+           NOP
+           NOP
+           NOP
+           NOP
+           DECA 1
+           JANZ LOOP
+           HLT
+           END  START

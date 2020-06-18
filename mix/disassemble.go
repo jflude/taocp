@@ -12,7 +12,7 @@ var (
 	ios   = []string{"JBUS", "IOC", "IN", "OUT", "JRED"}
 	jumps = []string{"JMP", "JSJ", "JOV", "JNV", "JL", "JE", "JG", "JGE",
 		"JNE", "JLE"}
-	conds = []string{"N", "Z", "P", "NN", "NE", "NP", "E", "O"}
+	conds = []string{"N", "Z", "P", "NN", "NZ", "NP", "E", "O"}
 	incs  = []string{"INC", "DEC", "ENT", "ENN"}
 )
 

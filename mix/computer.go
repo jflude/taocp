@@ -26,6 +26,9 @@ const (
 	// MemorySize is the number of memory cells in a regular MIX computer.
 	MemorySize = 4000
 	mBase      = MemorySize - 1
+
+	// DeviceCount is the number of I/O devices support by the computer.
+	DeviceCount = 21
 )
 
 type Computer struct {
@@ -46,8 +49,8 @@ type Computer struct {
 func NewComputer() *Computer {
 	return &Computer{
 		Contents:  make([]Word, 2*MemorySize-1),
-		Devices:   make([]Peripheral, 21),
-		busyUntil: make([]int64, 21),
+		Devices:   make([]Peripheral, DeviceCount),
+		busyUntil: make([]int64, DeviceCount),
 	}
 }
 
@@ -82,5 +85,11 @@ func (c *Computer) validAddress(address int) bool {
 		return address > -MemorySize && address < MemorySize
 	} else {
 		return address >= 0 && address < MemorySize
+	}
+}
+
+func (c *Computer) zeroContents() {
+	for i := range c.Contents {
+		c.Contents[i] = 0
 	}
 }

@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-type Binding [21]interface{}
+type Binding [DeviceCount]interface{}
 
 type readWriteSeekCloser interface {
 	io.ReadWriteSeeker

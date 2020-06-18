@@ -1,32 +1,97 @@
 package mix
 
-import "testing"
+import (
+	"errors"
+	"io/ioutil"
+	"strings"
+	"testing"
+)
 
 func TestInterrupt(t *testing.T) {
 	c, tmpDir := newSandbox(t, "")
 	defer closeSandbox(t, c, tmpDir)
-	for i := 0; i < len(c.Reg); i++ {
-		c.Reg[i] = NewWord(10 * (i + 1))
-	}
-	c.Contents[mBase-10] = NewWord(10)
-	printIntr(t, c, 500)
-	printIntr(t, c, 1000)
-	printIntr(t, c, 5001)
-	printIntr(t, c, 20002)
-	if _, err := c.ioc(0, 0, 18, IOC, 0); err != nil {
+	c.trace = testing.Verbose()
+
+	copy(c.Contents[mBase-1000:], egInterrupt1)
+	copy(c.Contents[mBase-11:], egInterrupt2)
+	copy(c.Contents[mBase-38:], egInterrupt3)
+	copy(c.Contents[mBase+1000:], egInterrupt4)
+	c.next = 1000
+	if err := c.resume(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
-	c.ctrl = false
-	printIntr(t, c, 35000)
-	printIntr(t, c, 100000)
-	printIntr(t, c, 1020002)
-	printIntr(t, c, 1020004)
+	if c.Elapsed != 12000289 {
+		t.Errorf("got: %du elapsed, want: 12000289u", c.Elapsed)
+	}
+	b, err := ioutil.ReadFile("printer.mix")
+	if err != nil {
+		t.Fatal("error:", err)
+	}
+	if strings.Compare(string(b), okInterrupt) != 0 {
+		t.Error("got: incorrect printer output")
+	}
 }
 
-func printIntr(t *testing.T, c *Computer, elapsed int64) {
-	c.Elapsed = elapsed
-	c.interrupt(c.ctrl)
-	t.Log("next:", c.next, "ctrl:", c.ctrl, "Elapsed:", c.Elapsed,
-		"lastTick:", c.lastTick, "pending:", c.pending,
-		"Contents:", c.Contents[mBase-10:mBase])
+var egInterrupt1 = []Word{ //     * EXAMPLE: INTERRUPT CAPABILITY
+	//                        * SUPERVISOR ROUTINE
+	//                        QUANTUM    EQU  1000
+	//                        CLOCK      EQU  -10
+	//                        PRINTER    EQU  18
+	//                        STATUS     EQU  -1
+	//                        NEXTOP     EQU  0:2
+	//                        BUF        EQU  -2000
+	//                                   ORIG -1000
+	NewWord(01750000260),  // SUPER      ENTA QUANTUM
+	NewWord(-012000530),   //            STA  CLOCK
+	NewWord(-01741002242), //            JBUS RESUME(PRINTER)
+	NewWord(-01000210),    //            LDA  STATUS(NEXTOP)
+	NewWord(0105),         //            CHAR
+	NewWord(-03720000537), //            STX  BUF
+	NewWord(-03720002245), //            OUT  BUF(PRINTER)
+	NewWord(01105),        // RESUME     INT
 }
+
+var egInterrupt2 = []Word{ //     * INTERRUPT VECTORS
+	//                        CLOCKVEC   EQU  -11
+	//                        PRINTVEC   EQU  -20-PRINTER
+	//                                   ORIG CLOCKVEC
+	NewWord(-01750000047), //            JMP  SUPER
+	NewWord(01750),        //            CON  QUANTUM
+}
+
+var egInterrupt3 = []Word{ //                ORIG PRINTVEC
+	NewWord(01105), //                   INT
+}
+
+var egInterrupt4 = []Word{ //     * WORKER ROUTINE
+	//                                   ORIG 1000
+	NewWord(01766000510), //  START      LDA  =1000000=
+	NewWord(0500),        //  LOOP       NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(0500),        //             NOP
+	NewWord(01000160),    //             DECA 1
+	NewWord(01751000450), //             JANZ LOOP
+	NewWord(0205),        //             HLT
+	NewWord(03641100),    //             END  START
+}
+
+var okInterrupt = `01003
+01007
+01011
+01003
+01007
+01011
+01003
+01007
+01011
+01003
+01007
+01011
+`

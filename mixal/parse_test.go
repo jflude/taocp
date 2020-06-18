@@ -40,12 +40,12 @@ func TestParsing(t *testing.T) {
 			a.obj.orig, okParsing.orig)
 	}
 outer:
-	for i := 0; i < len(okParsing.seg); i++ {
+	for i := range okParsing.seg {
 		if i >= len(a.obj.seg) {
 			t.Errorf("seg[%d]: got: nil", i)
 			break
 		}
-		for j := 0; j < len(okParsing.seg[i]); j++ {
+		for j := range okParsing.seg[i] {
 			if j >= len(a.obj.seg[i]) {
 				t.Errorf("seg[%d][%d]: got: nil", i, j)
 				break outer

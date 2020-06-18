@@ -17,3 +17,10 @@ func (a *asmb) emit(w mix.Word) {
 		panic(mix.ErrInvalidAddress)
 	}
 }
+
+func abs(v int) int {
+	if v < 0 {
+		return -v
+	}
+	return v
+}

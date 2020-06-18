@@ -23,7 +23,7 @@ func (c *Computer) calcTiming(unit int, t int64, err error) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	delay := c.busyUntil[unit] - c.Elapsed
+	delay := c.busyUntil[unit] - c.Elapsed // interlock time
 	if delay < 0 {
 		delay = 0
 	}

@@ -206,14 +206,12 @@ func TestCycle(t *testing.T) {
 	}
 
 	// Program P, Section 1.3.2
-	for i := 0; i < len(c.Contents); i++ {
-		c.Contents[i] = 0
-	}
-	copy(c.Contents[mBase+3000:], egCycle11)
-	copy(c.Contents[mBase+0:], egCycle11a)
-	copy(c.Contents[mBase+1995:], egCycle11b)
-	copy(c.Contents[mBase+2024:], egCycle11c)
-	copy(c.Contents[mBase+2049:], egCycle11d)
+	c.zeroContents()
+	copy(c.Contents[mBase+3000:], egCycle11a)
+	copy(c.Contents[mBase+0:], egCycle11b)
+	copy(c.Contents[mBase+1995:], egCycle11c)
+	copy(c.Contents[mBase+2024:], egCycle11d)
+	copy(c.Contents[mBase+2049:], egCycle11e)
 	c.next = 3000
 	if err := c.resume(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
@@ -496,7 +494,7 @@ var (
 	//                                    PRIME     EQU  -1
 	//                                    BUF0      EQU  2000
 	//                                    BUF1      EQU  BUF0+25
-	egCycle11 = []Word{ //                          ORIG 3000
+	egCycle11a = []Word{ //                          ORIG 3000
 		NewWord(02243),            // START     IOC  0(PRINTER)
 		NewWord(2050<<18 | 0511),  //           LD1  =1-L=
 		NewWord(2051<<18 | 0512),  //           LD2  =3=
@@ -529,20 +527,20 @@ var (
 		NewWord(0205),             //           HLT
 	}
 	//                                    * TABLES AND BUFFERS
-	egCycle11a = []Word{ //                         ORIG PRIME+1 (=0)
+	egCycle11b = []Word{ //                         ORIG PRIME+1 (=0)
 		NewWord(2), //                          CON  2
 	}
-	egCycle11b = []Word{ //                         ORIG BUF0-5 (=1995)
+	egCycle11c = []Word{ //                         ORIG BUF0-5 (=1995)
 		NewWord(0611232627),  //      TITLE     ALF  FIRST
 		NewWord(06113105),    //                ALF   FIVE
 		NewWord(010301704),   //                ALF   HUND
 		NewWord(02305040021), //                ALF  RED P
 		NewWord(02311160526), //                ALF  RIMES
 	}
-	egCycle11c = []Word{ //                         ORIG BUF0+24 (=2024)
+	egCycle11d = []Word{ //                         ORIG BUF0+24 (=2024)
 		NewWord(2035), //                       CON  BUF1+10
 	}
-	egCycle11d = []Word{ //                         ORIG BUF1+24 (=2049)
+	egCycle11e = []Word{ //                         ORIG BUF1+24 (=2049)
 		NewWord(2010), //                       CON  BUF0+10
 		NewWord(-499), //                       CON  1-L
 		NewWord(3),    //                       CON  3
