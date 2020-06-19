@@ -9,7 +9,7 @@ func FieldSpec(left, right int) int {
 	return 8*left + right
 }
 
-func validateFieldSpec(f int) {
+func checkFieldSpec(f int) {
 	if f >= len(fields) || fields[f].shift == -1 {
 		panic(ErrInvalidFieldSpec)
 	}
@@ -20,7 +20,7 @@ func (w Word) Field(f int) Word {
 	if f == 5 {
 		return w
 	}
-	validateFieldSpec(f)
+	checkFieldSpec(f)
 	return Word((int32(w) >> fields[f].shift) & fields[f].reg)
 }
 
@@ -30,7 +30,7 @@ func (w *Word) SetField(f int, val Word) {
 		*w = val
 		return
 	}
-	validateFieldSpec(f)
+	checkFieldSpec(f)
 	*w = Word((int32(*w) &^ fields[f].mem) |
 		((int32(val) << fields[f].shift) & fields[f].mem) |
 		(int32(val) & fields[f].sign))

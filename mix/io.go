@@ -21,7 +21,7 @@ func (c *Computer) in(aa Word, i, f, op, m int) (int64, error) {
 		return 0, err
 	}
 	n := m + c.Devices[f].BlockSize()
-	if !c.validAddress(m) {
+	if !c.validAddress(m) || !c.validAddress(n) {
 		return 0, ErrInvalidAddress
 	}
 	t, err := c.Devices[f].Read(c.Contents[mBase+m : mBase+n])
@@ -33,7 +33,7 @@ func (c *Computer) out(aa Word, i, f, op, m int) (int64, error) {
 		return 0, err
 	}
 	n := m + c.Devices[f].BlockSize()
-	if !c.validAddress(m) {
+	if !c.validAddress(m) || !c.validAddress(n) {
 		return 0, ErrInvalidAddress
 	}
 	t, err := c.Devices[f].Write(c.Contents[mBase+m : mBase+n])
