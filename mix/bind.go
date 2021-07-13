@@ -73,7 +73,7 @@ func (c *Computer) bindDevice(unit int) error {
 		backing = console{}
 	}
 	if backing == nil {
-		return fmt.Errorf("%w: unit %d", ErrNoDevice, unit)
+		return ErrNoDevice
 	}
 	var p Peripheral
 	switch {
@@ -100,14 +100,26 @@ func (c *Computer) bindDevice(unit int) error {
 	return err
 }
 
-func (c *Computer) unbindDevice(unit int) error {
+func (c *Computer) unbindDevice(unit int) (err error) {
+	defer func() {
+		err = wrapUnitError(unit, err)
+	}()
 	if unit < 0 || unit > 20 {
-		return ErrInvalidDevice
+		err = ErrInvalidDevice
+		return
 	}
 	d := c.Devices[unit]
 	if d == nil {
-		return nil
+		return
 	}
 	c.Devices[unit] = nil
-	return d.Close()
+	err = d.Close()
+	return
+}
+
+func wrapUnitError(unit int, err error) error {
+	if err != nil {
+		err = fmt.Errorf("unit %d: %w", unit, err)
+	}
+	return err
 }

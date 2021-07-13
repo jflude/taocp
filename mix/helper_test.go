@@ -1,7 +1,6 @@
 package mix
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 )
@@ -10,7 +9,7 @@ func newSandbox(t *testing.T, tmpDir string) (*Computer, string) {
 	var ret string
 	var err error
 	if tmpDir == "" {
-		tmpDir, err = ioutil.TempDir("", "gnuth-mix-test")
+		tmpDir, err = os.MkdirTemp("", "gnuth-mix-test")
 		if err != nil {
 			t.Fatal("error:", err)
 		}

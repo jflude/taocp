@@ -59,7 +59,7 @@ func Disassemble(w Word) string {
 		if f < len(conds) {
 			return noField("J"+regs[op-JA]+conds[f], aa, i)
 		}
-	case op >= INCA || op <= INCX:
+	case op >= INCA && op <= INCX:
 		if f < len(incs) {
 			return noField(incs[f]+regs[op-INCA], aa, i)
 		}

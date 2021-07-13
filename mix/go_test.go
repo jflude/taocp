@@ -2,7 +2,7 @@ package mix
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -14,14 +14,14 @@ func TestGoButton(t *testing.T) {
 
 	deck := append(append([]byte(nil), egLoader[0]...), egLoader[1]...)
 	deck = append(append(deck, egHelloWorld...), egTransfer...)
-	err := ioutil.WriteFile("reader.mix", deck, 0644)
+	err := os.WriteFile("reader.mix", deck, 0644)
 	if err != nil {
 		t.Fatal("error:", err)
 	}
 	if err = c.GoButton(16); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
-	b, err := ioutil.ReadFile("printer.mix")
+	b, err := os.ReadFile("printer.mix")
 	if err != nil {
 		t.Fatal("error:", err)
 	}

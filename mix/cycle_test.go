@@ -2,7 +2,7 @@ package mix
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -216,7 +216,7 @@ func TestCycle(t *testing.T) {
 	if err := c.resume(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
-	b, err := ioutil.ReadFile("printer.mix")
+	b, err := os.ReadFile("printer.mix")
 	if err != nil {
 		t.Fatal("error:", err)
 	}
@@ -336,7 +336,7 @@ var (
 	}
 
 	egCycle5 = [][]Word{
-		[]Word{ // #1
+		{ // #1
 			NewWord(01750000501),       // ADD  1000
 			NewWord(1234<<18 | 010226), // A (before)
 			0,                          // X (before)
@@ -344,7 +344,7 @@ var (
 			NewWord(1334<<18 | 060310), // A (after)
 			0,                          // X (after)
 		},
-		[]Word{ // #2
+		{ // #2
 			NewWord(01750000502), // SUB  1000
 			NewWord(-(1234<<18 | 9)),
 			0,
@@ -352,7 +352,7 @@ var (
 			NewWord(766<<18 | 149<<6 | 067),
 			0,
 		},
-		[]Word{ // #3
+		{ // #3
 			NewWord(01750001103), // MUL  1000(1:1)
 			NewWord(-112),
 			0,
@@ -360,7 +360,7 @@ var (
 			NewWord(0).Negate(),
 			NewWord(-224),
 		},
-		[]Word{ // #4
+		{ // #4
 			NewWord(01750000503), // MUL  1000
 			NewWord(-(50<<24 | 112<<6 | 4)),
 			0,
@@ -368,7 +368,7 @@ var (
 			NewWord(100<<18 | 224),
 			NewWord(8 << 24),
 		},
-		[]Word{ // #5
+		{ // #5
 			NewWord(01750000504), // DIV  1000
 			0,
 			NewWord(17),
@@ -376,7 +376,7 @@ var (
 			NewWord(5),
 			NewWord(2),
 		},
-		[]Word{ // #6
+		{ // #6
 			NewWord(01750000504), // DIV  1000
 			NewWord(0).Negate(),
 			NewWord(1235<<18 | 0301),
@@ -494,7 +494,7 @@ var (
 	//                                    PRIME     EQU  -1
 	//                                    BUF0      EQU  2000
 	//                                    BUF1      EQU  BUF0+25
-	egCycle11a = []Word{ //                          ORIG 3000
+	egCycle11a = []Word{ //                         ORIG 3000
 		NewWord(02243),            // START     IOC  0(PRINTER)
 		NewWord(2050<<18 | 0511),  //           LD1  =1-L=
 		NewWord(2051<<18 | 0512),  //           LD2  =3=

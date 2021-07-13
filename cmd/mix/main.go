@@ -68,7 +68,7 @@ func run() (err error) {
 			if err == nil {
 				err = err2
 			} else {
-				log.Println("error:", err)
+				log.Println("error:", err2)
 			}
 		}
 	}()

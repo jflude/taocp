@@ -2,7 +2,7 @@ package mix
 
 import (
 	"errors"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 )
@@ -24,7 +24,7 @@ func TestInterrupt(t *testing.T) {
 	if c.Elapsed != 12000289 {
 		t.Errorf("got: %du elapsed, want: 12000289u", c.Elapsed)
 	}
-	b, err := ioutil.ReadFile("printer.mix")
+	b, err := os.ReadFile("printer.mix")
 	if err != nil {
 		t.Fatal("error:", err)
 	}
