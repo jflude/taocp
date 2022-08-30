@@ -1,3 +1,5 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 package mix
 
 import (
@@ -9,7 +11,7 @@ func newSandbox(t *testing.T, tmpDir string) (*Computer, string) {
 	var ret string
 	var err error
 	if tmpDir == "" {
-		tmpDir, err = os.MkdirTemp("", "gnuth-mix-test")
+		tmpDir, err = os.MkdirTemp("", "taocp-mix-test")
 		if err != nil {
 			t.Fatal("error:", err)
 		}

@@ -1,3 +1,5 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 package main
 
 import (
@@ -7,7 +9,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/jflude/gnuth/mixal"
+	"github.com/jflude/taocp/mixal"
 )
 
 func main() {

@@ -1,3 +1,5 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 // Package mix simulates the MIX computer that is described in Donald Knuth's
 // "The Art of Computer Programming" (third edition).
 package mix

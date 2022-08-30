@@ -1,9 +1,11 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 package mixal
 
 import (
 	"strconv"
 
-	"github.com/jflude/gnuth/mix"
+	"github.com/jflude/taocp/mix"
 )
 
 func (a *asmb) matchNumber() bool {

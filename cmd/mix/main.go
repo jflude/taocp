@@ -1,3 +1,5 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 package main
 
 import (
@@ -6,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jflude/gnuth/mix"
+	"github.com/jflude/taocp/mix"
 )
 
 func main() {
@@ -30,6 +32,8 @@ func run() (err error) {
 			opt[i] = "stdin/out"
 		}
 	}
+	c := mix.NewComputer()
+	flag.BoolVar(&c.Interrupts, "int", false, "enable interrupts")
 	flag.StringVar(&opt[0], "t0", opt[0], "")
 	flag.StringVar(&opt[1], "t1", opt[1], "")
 	flag.StringVar(&opt[2], "t2", opt[2], "")
@@ -59,7 +63,6 @@ func run() (err error) {
 			b[i] = nil
 		}
 	}
-	c := mix.NewComputer()
 	if err = c.Bind(&b); err != nil {
 		return
 	}

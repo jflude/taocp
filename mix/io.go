@@ -1,3 +1,5 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 package mix
 
 func (c *Computer) jbus(aa Word, i, f, op, m int) (delay int64, err error) {

@@ -1,6 +1,8 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 package mixal
 
-import "github.com/jflude/gnuth/mix"
+import "github.com/jflude/taocp/mix"
 
 // The opcodes for the MIX computer (see Table 1, Section 1.3.1)
 var opcodes = map[string]struct {

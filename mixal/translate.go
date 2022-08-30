@@ -1,3 +1,5 @@
+// Copyright (c) 2020 Justin Flude. All rights reserved.
+// Use of this source code is governed by the COPYING.md file.
 package mixal
 
 import (
@@ -5,7 +7,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/jflude/gnuth/mix"
+	"github.com/jflude/taocp/mix"
 )
 
 type parseFunc func(*asmb, string, string, string)
