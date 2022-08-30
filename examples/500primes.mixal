@@ -2,7 +2,7 @@
 *
 L          EQU  500
 PRINTER    EQU  18
-PRIME      EQU  -1
+PRIME      EQU  99
 BUF0       EQU  2000
 BUF1       EQU  BUF0+25
            ORIG 3000
