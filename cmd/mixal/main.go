@@ -24,19 +24,23 @@ func run() (err error) {
 		err = errors.New("mixal [input file]")
 		return
 	}
-	in, err := os.Open(os.Args[1])
-	if err != nil {
-		return
-	}
-	defer func() {
-		if err2 := in.Close(); err2 != nil {
-			if err == nil {
-				err = err2
-			} else {
-				log.Println("error:", err2)
-			}
+	var in io.ReadCloser
+	if os.Args[1] == "-" {
+		in = os.Stdin
+	} else {
+		if in, err = os.Open(os.Args[1]); err != nil {
+			return
 		}
-	}()
+		defer func() {
+			if err2 := in.Close(); err2 != nil {
+				if err == nil {
+					err = err2
+				} else {
+					log.Println("error:", err2)
+				}
+			}
+		}()
+	}
 	var buf bytes.Buffer
 	if err = mixal.Assemble(in, &buf); err != nil {
 		return

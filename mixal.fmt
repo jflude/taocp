@@ -1,0 +1,29 @@
+#!/bin/sh
+# Reformat a MIXAL program so tabs are expanded to spaces, all letters are
+# upper case, spaces are substituted for non-MIX characters and fields start
+# in the correct columns.
+PATH="/bin:/usr/bin:$PATH"
+expand "$@" |
+    tr '[:lower:]' '[:upper:]' |
+    tr -C " ABCDEFGHIΔJKLMNOPQRΣΠSTUVWXYZ0123456789.,()+-*/=$<>@;:'\n" ' ' |
+    awk '
+{
+    c1 = substr($0, 1, 1)
+    addr = substr($0, 17, 5)
+    if (c1 == "*") {
+        print
+        next
+    } else if (c1 == " ") {
+        op = $1
+        loc = $1 = ""
+    } else {
+        op = $2
+        loc = $1
+        $1 = $2 = ""
+    }
+    if (op != "ALF") {
+        gsub(/^[ \t]+|[ \t]+$/, "")
+        addr = $0
+    }
+    printf("%-10s %-4s %s\n", loc, op, addr)
+}'
