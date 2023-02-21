@@ -75,7 +75,9 @@ func run() (err error) {
 			}
 		}
 	}()
-	err = fmt.Errorf("%w (elapsed: %du, idle: %du)",
-		c.GoButton(16), c.Elapsed, c.Idle)
+	if err = c.GoButton(16); c.Elapsed > 0 {
+		err = fmt.Errorf("%w (elapsed: %du, idle: %du)",
+			err, c.Elapsed, c.Idle)
+	}
 	return
 }

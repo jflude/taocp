@@ -63,12 +63,11 @@ func (c *Computer) bindDevice(unit int) error {
 		case 16:
 			flags = os.O_RDONLY
 		case 17, 18:
-			flags = os.O_WRONLY | os.O_APPEND
+			flags = os.O_WRONLY | os.O_APPEND | os.O_CREATE
 		default:
-			flags = os.O_RDWR
+			flags = os.O_RDWR | os.O_CREATE
 		}
-		backing, err = os.OpenFile(file, os.O_CREATE|flags, 0644)
-		if err != nil {
+		if backing, err = os.OpenFile(file, flags, 0644); err != nil {
 			return err
 		}
 	} else if unit == 19 && backing == nil {

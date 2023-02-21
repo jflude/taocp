@@ -78,5 +78,5 @@ func (d *Drum) seekToX() (delay int64, err error) {
 	if d.here != x {
 		d.here, err = d.rwsc.Seek(x, io.SeekStart)
 	}
-	return 0, nil
+	return 0, err
 }
