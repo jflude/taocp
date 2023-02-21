@@ -4,7 +4,7 @@ package mixal
 
 import "github.com/jflude/taocp/mix"
 
-// The opcodes for the MIX computer (see Table 1, Section 1.3.1)
+// The opcodes for the MIX 1009 computer (see Table 1, Section 1.3.1)
 var opcodes = map[string]struct {
 	c, f int // C-value and default F-value
 }{

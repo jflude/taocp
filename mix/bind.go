@@ -9,6 +9,32 @@ import (
 	"os"
 )
 
+const (
+	// The I/O devices supported by the MIX 1009 computer.
+	Tape0Unit = iota
+	Tape1Unit
+	Tape2Unit
+	Tape3Unit
+	Tape4Unit
+	Tape5Unit
+	Tape6Unit
+	Tape7Unit
+	Drum8Unit
+	Drum9Unit
+	Drum10Unit
+	Drum11Unit
+	Disc12Unit
+	Disc13Unit
+	Disc14Unit
+	Disc15Unit
+	CardReaderUnit
+	CardPunchUnit
+	PrinterUnit
+	TeletypeUnit
+	PaperTapeUnit
+	DeviceCount
+)
+
 type Binding [DeviceCount]interface{}
 
 type readWriteSeekCloser interface {
@@ -40,14 +66,14 @@ var (
 		nil,
 		"paper.mix",
 	}
-	DefaultBinding   = &defBind
-	ErrInvalidDevice = errors.New("mix: invalid I/O device")
-	ErrNoDevice      = errors.New("mix: no I/O device")
+	DefaultBinding = &defBind
+	ErrInvalidUnit = errors.New("mix: invalid I/O unit")
+	ErrNoDevice    = errors.New("mix: no I/O device")
 )
 
 func (c *Computer) bindDevice(unit int) error {
-	if unit < 0 || unit > 20 {
-		return ErrInvalidDevice
+	if unit < Tape0Unit || unit > PaperTapeUnit {
+		return ErrInvalidUnit
 	}
 	if c.Devices[unit] != nil {
 		return nil
@@ -57,12 +83,14 @@ func (c *Computer) bindDevice(unit int) error {
 	}
 	var err error
 	backing := c.bind[unit]
-	if file, ok := backing.(string); ok {
+	if unit == TeletypeUnit && backing == nil {
+		backing = console{}
+	} else if file, ok := backing.(string); ok {
 		var flags int
 		switch unit {
-		case 16:
+		case CardReaderUnit:
 			flags = os.O_RDONLY
-		case 17, 18:
+		case CardPunchUnit, PrinterUnit:
 			flags = os.O_WRONLY | os.O_APPEND | os.O_CREATE
 		default:
 			flags = os.O_RDWR | os.O_CREATE
@@ -70,29 +98,26 @@ func (c *Computer) bindDevice(unit int) error {
 		if backing, err = os.OpenFile(file, flags, 0644); err != nil {
 			return err
 		}
-	} else if unit == 19 && backing == nil {
-		backing = console{}
-	}
-	if backing == nil {
+	} else {
 		return ErrNoDevice
 	}
 	var p Peripheral
 	switch {
-	case unit >= 0 && unit <= 7:
+	case unit >= Tape0Unit && unit <= Tape7Unit:
 		p, err = NewTape(backing.(readWriteSeekCloser), unit)
-	case unit >= 8 && unit <= 11:
+	case unit >= Drum8Unit && unit <= Drum11Unit:
 		p, err = NewDrum(backing.(readWriteSeekCloser), unit, c)
-	case unit >= 12 && unit <= 15:
+	case unit >= Disc12Unit && unit <= Disc15Unit:
 		p, err = NewDisc(backing.(readWriteSeekCloser), unit, c)
-	case unit == 16:
+	case unit == CardReaderUnit:
 		p, err = NewCardReader(backing.(io.Reader))
-	case unit == 17:
+	case unit == CardPunchUnit:
 		p, err = NewCardPunch(backing.(io.WriteCloser))
-	case unit == 18:
+	case unit == PrinterUnit:
 		p, err = NewPrinter(backing.(io.WriteCloser))
-	case unit == 19:
+	case unit == TeletypeUnit:
 		p, err = NewTeletype(backing.(io.ReadWriteCloser))
-	case unit == 20:
+	case unit == PaperTapeUnit:
 		p, err = NewPaperTape(backing.(readWriteSeekCloser))
 	}
 	if err == nil {
@@ -105,8 +130,8 @@ func (c *Computer) unbindDevice(unit int) (err error) {
 	defer func() {
 		err = wrapUnitError(unit, err)
 	}()
-	if unit < 0 || unit > 20 {
-		err = ErrInvalidDevice
+	if unit < Tape0Unit || unit > PaperTapeUnit {
+		err = ErrInvalidUnit
 		return
 	}
 	d := c.Devices[unit]

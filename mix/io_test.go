@@ -8,11 +8,10 @@ func TestIO(t *testing.T) {
 	c, tmpDir := newSandbox(t, "")
 	defer closeSandbox(t, c, tmpDir)
 
-	// DRUM10
-	if err := c.bindDevice(10); err != nil {
+	if err := c.bindDevice(Drum10Unit); err != nil {
 		t.Fatal("error:", err)
 	}
-	drum := c.Devices[10]
+	drum := c.Devices[Drum10Unit]
 	buf := make([]Word, drum.BlockSize())
 	for i := 0; i < 10; i++ {
 		for j := range buf {
@@ -38,11 +37,10 @@ func TestIO(t *testing.T) {
 		}
 	}
 
-	// TAPE02
-	if err := c.bindDevice(2); err != nil {
+	if err := c.bindDevice(Tape2Unit); err != nil {
 		t.Fatal("error:", err)
 	}
-	tape := c.Devices[2]
+	tape := c.Devices[Tape2Unit]
 	buf = make([]Word, tape.BlockSize())
 	for i := 0; i < 10; i++ {
 		for j := range buf {

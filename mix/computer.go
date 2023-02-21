@@ -1,13 +1,14 @@
 // Copyright (c) 2020 Justin Flude. All rights reserved.
 // Use of this source code is governed by the COPYING.md file.
-// Package mix simulates the MIX computer that is described in Donald Knuth's
-// "The Art of Computer Programming" (third edition).
+
+// Package mix simulates the MIX 1009 computer as described in
+// Donald Knuth's "The Art of Computer Programming" (third edition).
 package mix
 
 import "log"
 
 const (
-	// The CPU registers of the MIX computer.
+	// The registers of the MIX 1009 CPU.
 	A = iota
 	I1
 	I2
@@ -28,9 +29,6 @@ const (
 	// MemorySize is the number of memory cells in a regular MIX computer.
 	MemorySize = 4000
 	mBase      = MemorySize - 1
-
-	// DeviceCount is the number of I/O devices support by the computer.
-	DeviceCount = 21
 )
 
 type Computer struct {

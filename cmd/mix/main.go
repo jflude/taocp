@@ -75,7 +75,7 @@ func run() (err error) {
 			}
 		}
 	}()
-	if err = c.GoButton(16); c.Elapsed > 0 {
+	if err = c.GoButton(mix.CardReaderUnit); c.Elapsed > 0 {
 		err = fmt.Errorf("%w (elapsed: %du, idle: %du)",
 			err, c.Elapsed, c.Idle)
 	}

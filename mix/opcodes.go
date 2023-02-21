@@ -3,7 +3,7 @@
 package mix
 
 const (
-	// The opcodes for the MIX computer (see Table 1, Section 1.3.1)
+	// The opcodes for the MIX 1009 computer (see Table 1, Section 1.3.1)
 	NOP = iota
 	ADD // FADD
 	SUB // FSUB

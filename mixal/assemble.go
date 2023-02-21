@@ -1,7 +1,8 @@
 // Copyright (c) 2020 Justin Flude. All rights reserved.
 // Use of this source code is governed by the COPYING.md file.
-// Package mixal is an assembler for the MIX computer that is described in
-// Donald Knuth's "The Art of Computer Programming" (third edition).
+
+// Package mixal is an assembler for the MIX 1009 computer as described
+// in Donald Knuth's "The Art of Computer Programming" (third edition).
 package mixal
 
 import (

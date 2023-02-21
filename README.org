@@ -1,24 +1,30 @@
 * taocp
 
-A simulator and assembler for the MIX computer described in Donald Knuth's
-"The Art of Computer Programming, Volume 1".
+A simulator and assembler for the MIX 1009 computer described in
+Donald Knuth's "The Art of Computer Programming, Volume 1".
 
-A full complement of attached I/O devices, as described in Section 1.3.1,
-are also simulated: disks, drums, magnetic and paper tapes, a printer,
-a card reader, a card punch and a teletype (console). Each device is backed
-by a file, or stdin/out for the console. The latencies of the devices are
-accounted for and based upon what might be expected in the era of the
-book's first publication.
+The machine is faithfully mimicked in all its aspects, including a
+full complement of attached I/O devices, as described in Section
+1.3.1: disks, drums, magnetic and paper tapes, a printer, a card
+reader, a card punch and a teletype (console). Each device is backed
+by a file, or stdin/out for the console. The latencies of the devices
+are accounted for when calculating execution times, and based upon
+what might have been expected in the era of the book's first
+publication.
 
-The assembler takes as an argument a MIXAL program file written in
-the UTF-8 encoding, and emits simulated cards for the card reader, containing
-the translated object code. The MIX simulator loads the object code from the
-card reader and runs until a HLT instruction or error condition is encountered.
-Loading of object code from the reader is achieved by prepending a "loader"
-card, as described in Exercise 26 of Section 1.3.1.
+The assembler takes as an argument a MIXAL program file written in the
+UTF-8 encoding, and emits simulated cards for the card reader,
+containing the translated object code (Note that this exacting
+implementation of MIXAL requires the input file conform to the format
+as described by the book, eg. no tabs or other non-MIX characters are
+allowed.) The MIX simulator loads the object code from the card reader
+and runs until a HLT instruction or error condition is encountered.
+(Loading of object code from the reader is achieved by prepending a
+"loader" card, as described in Exercise 26 of Section 1.3.1.)
 
-The interrupt facility and supervisor mode described in Exercise 18,
-Section 1.4.4 can be simulated by specifying the `-int` argument.
+The interrupt facility and supervisor mode for the expanded computer,
+described in Exercise 18, Section 1.4.4, can be simulated by
+specifying the `-int` argument.
 
 : $ go test ./...
 : ?   	github.com/jflude/taocp/cmd/mix	[no test files]
