@@ -5,6 +5,7 @@ package mix
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 var (
@@ -26,8 +27,9 @@ func (c *Computer) Cycle() (err error) {
 			}
 		}
 		if err != nil {
+			asm := Disassemble(c.Contents[mBase+c.next])
 			err = fmt.Errorf("%w at %04d: %s", err, c.next,
-				Disassemble(c.Contents[mBase+c.next]))
+				strings.TrimSpace(asm))
 			if errors.Is(err, ErrHalted) {
 				c.Elapsed++
 				c.next++

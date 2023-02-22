@@ -1,0 +1,28 @@
+#!/bin/sh
+# As a convenience, this script will reformat a MIXAL program, run it in a
+# sandbox, then output (optionally tailing) a MIX device (default: printer).
+PATH="/bin:/usr/bin:$PATH"
+device=printer
+tail=0
+while true
+do
+    case "x$1" in
+        x-d|x--device) device=$2 ; shift 2 ;;
+        x-t|x--tail) tail=1 ; shift ;;
+        *) break ;;
+    esac
+done
+mixal.fmt "$@" |
+    ( d=`mktemp -d`
+      trap 'rm -rf "$d"' EXIT HUP INT TERM
+      if test "x$tail" = "x1"
+      then
+          cd "$d" && mixal - &&
+              if mix &
+              then
+                  tail -F "$device".mix
+                  wait
+              fi
+      else
+          cd "$d" && mixal - && mix && cat "$device".mix
+      fi )
