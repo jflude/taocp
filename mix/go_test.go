@@ -20,7 +20,7 @@ func TestGoButton(t *testing.T) {
 	if err != nil {
 		t.Fatal("error:", err)
 	}
-	if err = c.GoButton(CardReaderUnit); !errors.Is(err, ErrHalted) {
+	if err = c.GoButton(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
 	b, err := os.ReadFile("printer.mix")

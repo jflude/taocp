@@ -32,19 +32,20 @@ const (
 )
 
 type Computer struct {
-	Overflow      bool
-	Comparison    int
-	Elapsed, Idle int64
-	Reg           [10]Word
-	Contents      []Word
-	Devices       []Peripheral
-	busyUntil     []int64
-	bind          *Binding
-	m, next       int
-	ctrl, trace   bool
-	Interrupts    bool
-	lastTick      int64
-	pending       priority
+	Overflow            bool
+	Comparison          int
+	Elapsed, Idle       int64
+	Reg                 [10]Word
+	Contents            []Word
+	Devices             []Peripheral
+	busyUntil           []int64
+	bind                *Binding
+	m, next             int
+	ctrl, trace, halted bool
+	Interrupts          bool
+	lastTick            int64
+	pending             priority
+	BootFrom            int
 }
 
 func NewComputer() *Computer {
@@ -52,18 +53,11 @@ func NewComputer() *Computer {
 		Contents:  make([]Word, 2*MemorySize-1),
 		Devices:   make([]Peripheral, DeviceCount),
 		busyUntil: make([]int64, DeviceCount),
+		BootFrom:  CardReaderUnit,
 	}
 }
 
 func (c *Computer) Bind(b *Binding) error {
-	if err := c.unbindAll(); err != nil {
-		return err
-	}
-	c.bind = b
-	return nil
-}
-
-func (c *Computer) unbindAll() error {
 	var err error
 	for i := range c.Devices {
 		if err2 := c.unbindDevice(i); err2 != nil {
@@ -74,11 +68,12 @@ func (c *Computer) unbindAll() error {
 			}
 		}
 	}
+	c.bind = b
 	return err
 }
 
 func (c *Computer) Shutdown() error {
-	return c.unbindAll()
+	return c.Bind(nil)
 }
 
 func (c *Computer) validAddress(address int) bool {

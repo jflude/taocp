@@ -28,8 +28,8 @@ func (c *Computer) Cycle() (err error) {
 		}
 		if err != nil {
 			asm := Disassemble(c.Contents[mBase+c.next])
-			err = fmt.Errorf("%w at %04d: %s", err, c.next,
-				strings.TrimSpace(asm))
+			err = fmt.Errorf("%w at %04d: %s",
+				err, c.next, strings.TrimSpace(asm))
 			if errors.Is(err, ErrHalted) {
 				c.Elapsed++
 				c.next++

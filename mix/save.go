@@ -2,10 +2,14 @@
 // Use of this source code is governed by the COPYING.md file.
 package mix
 
-func (c *Computer) Save() error {
+import "errors"
+
+var ErrNotImplemented = errors.New("mix: not implemented")
+
+func (c *Computer) Save(filename string) error {
 	return ErrNotImplemented // TODO
 }
 
-func (c *Computer) Restore() error {
-	return ErrNotImplemented // TODO
+func Load(filename string) (*Computer, error) {
+	return nil, ErrNotImplemented // TODO
 }

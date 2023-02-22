@@ -42,6 +42,14 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 		}
 		return 10
 	case 2: // HLT
+		now := c.Elapsed
+		for i := range c.Devices { // finish any I/O operations
+			if c.busyUntil[i] > c.Elapsed  {
+				c.Elapsed = c.busyUntil[i]
+			}
+		}
+		c.Idle += c.Elapsed - now
+		c.halted = true
 		panic(ErrHalted)
 	case 3: // AND (see Section 4.5.4)
 		c.Reg[A] = AndWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))

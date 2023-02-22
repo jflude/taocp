@@ -7,9 +7,9 @@ import "errors"
 type Peripheral interface {
 	Name() string
 	BlockSize() int
-	Read(block []Word) (timing int64, err error)
-	Write(block []Word) (timing int64, err error)
-	Control(m int) (timing int64, err error)
+	Read(block []Word) (delay int64, err error)
+	Write(block []Word) (delay int64, err error)
+	Control(m int) (delay int64, err error)
 	Close() error
 }
 

@@ -23,8 +23,8 @@ func TestInterrupt(t *testing.T) {
 	if err := c.resume(); !errors.Is(err, ErrHalted) {
 		t.Error("error:", err)
 	}
-	if c.Elapsed != 12000289 {
-		t.Errorf("got: %du elapsed, want: 12000289u", c.Elapsed)
+	if c.Elapsed != 12100021 {
+		t.Errorf("got: %du elapsed, want: 12100021u", c.Elapsed)
 	}
 	b, err := os.ReadFile("printer.mix")
 	if err != nil {
