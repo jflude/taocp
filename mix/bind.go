@@ -134,12 +134,11 @@ func (c *Computer) unbindDevice(unit int) (err error) {
 		err = ErrInvalidUnit
 		return
 	}
-	d := c.Devices[unit]
-	if d == nil {
-		return
+	if c.Devices[unit] != nil {
+		d := c.Devices[unit]
+		c.Devices[unit] = nil
+		err = d.Close()
 	}
-	c.Devices[unit] = nil
-	err = d.Close()
 	return
 }
 

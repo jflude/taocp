@@ -7,22 +7,23 @@ tail=0
 while true
 do
     case "x$1" in
-        x-d|x--device) device=$2 ; shift 2 ;;
+        x-d|x--device) device="$2" ; shift 2 ;;
         x-t|x--tail) tail=1 ; shift ;;
         *) break ;;
     esac
 done
-mixal.fmt "$@" |
-    ( d=`mktemp -d`
-      trap 'rm -rf "$d"' EXIT HUP INT TERM
-      if test "x$tail" = "x1"
-      then
-          cd "$d" && mixal - &&
-              if mix &
-              then
-                  tail -F "$device".mix
-                  wait
-              fi
-      else
-          cd "$d" && mixal - && mix && cat "$device".mix
-      fi )
+prog="${1?Syntax: `basename $0` [--device|--tail] MIXAL-FILE [MIX options]}"
+shift
+
+d=`mktemp -d`
+trap 'rm -rf "$d"' EXIT HUP INT TERM
+mixal.fmt "$prog" > "$d"/clean.mixal || exit $?
+cd "$d" && mixal clean.mixal &&
+    if test "x$tail" = "x1"
+    then
+        mix "$@" &
+        tail -F "$device".mix
+        wait
+    else
+        mix "$@" && cat "$device".mix
+    fi

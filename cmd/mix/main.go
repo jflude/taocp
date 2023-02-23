@@ -29,8 +29,6 @@ func run() (err error) {
 	for i, v := range binding {
 		if v != nil {
 			unit[i] = v.(string)
-		} else {
-			unit[i] = "stdin/stdout"
 		}
 	}
 	c := mix.NewComputer()
@@ -79,18 +77,18 @@ func run() (err error) {
 			}
 		}
 	}()
-	if op {
-		for {
-			var y bool
-			if y, err = yesOrNo("Go (Y/n)? "); err != nil || !y {
-				break
-			}
-			if err = reportGo(c); !errors.Is(err, mix.ErrHalted) {
-				break
-			}
-		}
-	} else {
+	if !op {
 		err = reportGo(c)
+		return
+	}
+	for {
+		var y bool
+		if y, err = yesOrNo("Go (Y/n)? "); err != nil || !y {
+			break
+		}
+		if err = reportGo(c); !errors.Is(err, mix.ErrHalted) {
+			break
+		}
 	}
 	return
 }

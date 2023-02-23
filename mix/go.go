@@ -12,6 +12,9 @@ func (c *Computer) GoButton() error {
 	if c.BootFrom != CardReaderUnit && c.BootFrom != PaperTapeUnit {
 		return ErrInvalidUnit
 	}
+	for i := range c.Reg {
+		c.Reg[i] = 0
+	}
 	c.zeroContents()
 	if _, err := c.in(0, 0, c.BootFrom, IN, 0); err != nil {
 		return err
@@ -20,7 +23,9 @@ func (c *Computer) GoButton() error {
 	c.Elapsed = 0
 	c.lastTick = 0
 	c.pending = nil
-	c.busyUntil[c.BootFrom] = 0
+	for i := range c.busyUntil {
+		c.busyUntil[i] = 0
+	}
 	c.next = 0
 	return c.resume()
 }

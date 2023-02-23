@@ -23,10 +23,11 @@ func (*Teletype) BlockSize() int {
 
 func (t *Teletype) Read(block []Word) (int64, error) {
 	buf := make([]byte, 5*t.BlockSize())
-	if n, err := t.rwc.Read(buf); n == 0 {
+	n, err := t.rwc.Read(buf)
+	if err != nil || n == 0 {
 		return 0, err
 	}
-	if buf[len(buf)-1] == '\n' {
+	if buf = buf[:n]; buf[len(buf)-1] == '\n' {
 		buf = buf[:len(buf)-1]
 	}
 	m, err := ConvertToMIX(string(buf))

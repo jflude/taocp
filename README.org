@@ -95,7 +95,6 @@ shell script can correct most formatting errors.
 :   -t7 string
 :     	 (default "tape07.mix")
 :   -tty string
-:     	 (default "stdin/stdout")
 : 
 : $ mixal examples/500primes.mixal
 : $ ls -l *.mix
