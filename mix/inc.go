@@ -6,13 +6,13 @@ func (c *Computer) inca(aa Word, i, f, op, m int) int64 {
 	switch f {
 	case 0: // INC
 		if op == INCA || op == INCX {
-			c.addAccum(op-INCA, m)
+			c.addReg(op-INCA, m)
 		} else {
 			c.addIndex(op-INCA, m)
 		}
 	case 1: // DEC
 		if op == INCA || op == INCX {
-			c.addAccum(op-INCA, -m)
+			c.addReg(op-INCA, -m)
 		} else {
 			c.addIndex(op-INCA, -m)
 		}

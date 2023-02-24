@@ -5,7 +5,10 @@
 // Donald Knuth's "The Art of Computer Programming" (third edition).
 package mix
 
-import "log"
+import (
+	"io"
+	"log"
+)
 
 const (
 	// The registers of the MIX 1009 CPU.
@@ -32,20 +35,22 @@ const (
 )
 
 type Computer struct {
-	Overflow            bool
-	Comparison          int
-	Elapsed, Idle       int64
-	Reg                 [10]Word
-	Contents            []Word
-	Devices             []Peripheral
-	busyUntil           []int64
-	bind                *Binding
-	m, next             int
-	ctrl, trace, halted bool
-	Interrupts          bool
-	lastTick            int64
-	pending             priority
-	BootFrom            int
+	Overflow      bool
+	Comparison    int
+	Elapsed, Idle int64
+	Reg           [10]Word
+	Contents      []Word
+	Devices       []Peripheral
+	busyUntil     []int64
+	bind          *Binding
+	m, next       int
+	ctrl, halted  bool
+	Tracer        io.WriteCloser
+	lastMask      uint
+	Interrupts    bool
+	lastTick      int64
+	pending       priority
+	BootFrom      int
 }
 
 func NewComputer() *Computer {

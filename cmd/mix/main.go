@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/jflude/taocp/mix"
@@ -31,11 +32,13 @@ func run() (err error) {
 			unit[i] = v.(string)
 		}
 	}
-	c := mix.NewComputer()
 	var op bool
+	var trace string
+	c := mix.NewComputer()
 	flag.IntVar(&c.BootFrom, "boot", c.BootFrom, "unit to boot from")
 	flag.BoolVar(&c.Interrupts, "int", c.Interrupts, "enable interrupts")
 	flag.BoolVar(&op, "op", op, "involve the operator")
+	flag.StringVar(&trace, "trace", trace, "output trace to file")
 	flag.StringVar(&unit[0], "t0", unit[0], "")
 	flag.StringVar(&unit[1], "t1", unit[1], "")
 	flag.StringVar(&unit[2], "t2", unit[2], "")
@@ -77,6 +80,22 @@ func run() (err error) {
 			}
 		}
 	}()
+	if trace != "" {
+		c.Tracer, err =
+			os.OpenFile(trace, os.O_WRONLY|os.O_CREATE, 0644)
+		if err != nil {
+			return
+		}
+		defer func() {
+			if err2 := c.Tracer.Close(); err2 != nil {
+				if err == nil {
+					err = err2
+				} else {
+					log.Println("error:", err2)
+				}
+			}
+		}()
+	}
 	if !op {
 		err = reportGo(c)
 		return

@@ -42,9 +42,10 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 		}
 		return 10
 	case 2: // HLT
+		c.Elapsed += 10
 		now := c.Elapsed
 		for i := range c.Devices { // finish any I/O operations
-			if c.busyUntil[i] > c.Elapsed  {
+			if c.busyUntil[i] > c.Elapsed {
 				c.Elapsed = c.busyUntil[i]
 			}
 		}
@@ -61,9 +62,11 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 		c.Reg[A] = XorWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
 		return 2
 	case 6: // FLOT
-		panic(ErrNotImplemented) // TODO: see Section 4.2.1
+		c.callWithOvCheck1(FixedToFloat)
+		return 3
 	case 7: // FIX
-		panic(ErrNotImplemented) // TODO: see Section 4.2.1
+		c.callWithOvCheck1(FloatToFixed)
+		return 3
 	case 9: // INT
 		if !c.Interrupts { // see Ex. 18, Section 1.4.4
 			panic(ErrNoInterrupts)
@@ -73,4 +76,10 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	default:
 		panic(ErrInvalidOp)
 	}
+}
+
+func (c *Computer) callWithOvCheck1(f func(Word) (Word, bool)) {
+	var ov bool
+	c.Reg[A], ov = f(c.Reg[A])
+	c.Overflow = c.Overflow || ov
 }

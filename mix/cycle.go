@@ -47,7 +47,7 @@ func (c *Computer) Cycle() (err error) {
 			return ErrInvalidIndex
 		}
 	}
-	if c.trace {
+	if c.Tracer != nil {
 		c.printTrace(m, c.next)
 	}
 	state := c.ctrl

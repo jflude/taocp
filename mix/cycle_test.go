@@ -12,7 +12,9 @@ import (
 func TestCycle(t *testing.T) {
 	c, tmpDir := newSandbox(t, "")
 	defer closeSandbox(t, c, tmpDir)
-	c.trace = testing.Verbose()
+	if testing.Verbose() {
+		c.Tracer = os.Stdout
+	}
 
 	// LDA
 	copy(c.Contents[mBase+0:], egCycle1)

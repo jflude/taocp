@@ -79,7 +79,7 @@ func (w Word) GoString() string {
 }
 
 // AddWord adds an integer to a MIX word, returning the result as a MIX word,
-// and whether overflow occured.  See Section 1.3.1.
+// and whether overflow occurred.  See Section 1.3.1.
 func AddWord(w Word, v int) (result Word, overflow bool) {
 	v += w.Int()
 	if v < MinWord || v > MaxWord {
@@ -95,12 +95,12 @@ func AddWord(w Word, v int) (result Word, overflow bool) {
 }
 
 // SubWord subtracts an integer from a MIX word, returning the result as a
-// MIX word, and whether overflow occured.  See Section 1.3.1.
+// MIX word, and whether overflow occurred.  See Section 1.3.1.
 func SubWord(w Word, v int) (result Word, overflow bool) {
 	return AddWord(w, -v)
 }
 
-// MulWord multiples a MIX word by an integer, returning the product as two
+// MulWord multiplies a MIX word by an integer, returning the product as two
 // (double-precision) MIX words.  See Section 1.3.1.
 func MulWord(w Word, v int) (high, low Word) {
 	p := int64(w.Int()) * int64(v)
@@ -123,7 +123,7 @@ func abs64(v int64) int64 {
 
 // DivWord divides a double-precision MIX word by an integer, returning the
 // quotient and remainder as MIX words, and whether overflow or division by
-// zero occured.  See Section 1.3.1.
+// zero occurred.  See Section 1.3.1.
 func DivWord(high, low Word, v int) (quot, rem Word, overflow bool) {
 	if v == 0 || abs(high.Int()) >= abs(v) {
 		overflow = true

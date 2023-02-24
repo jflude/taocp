@@ -12,7 +12,9 @@ import (
 func TestGoButton(t *testing.T) {
 	c, tmpDir := newSandbox(t, "")
 	defer closeSandbox(t, c, tmpDir)
-	c.trace = testing.Verbose()
+	if testing.Verbose() {
+		c.Tracer = os.Stdout
+	}
 
 	deck := append(append([]byte(nil), egLoader[0]...), egLoader[1]...)
 	deck = append(append(deck, egHelloWorld...), egTransfer...)
