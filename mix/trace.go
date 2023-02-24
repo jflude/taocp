@@ -46,21 +46,27 @@ func (c *Computer) printTrace(m, next int) {
 			c.Reg[J], c.Reg[J], m)
 	}
 	b := make([]byte, len(c.Devices))
-	var mask uint
+	var devMask uint
 	for i := 0; i < DeviceCount; i++ {
 		if c.isBusy(i) {
 			b[i] += c.Devices[i].Name()[0]
-			mask |= 1
+			devMask |= 1
 		} else {
 			b[i] += '.'
 		}
-		mask <<= 1
+		devMask <<= 1
 	}
-	changed := ":"
-	if mask != c.lastMask {
-		changed = "!"
-		c.lastMask = mask
+	devChanged := ":"
+	if devMask != c.lastDevMask {
+		devChanged = "!"
+		c.lastDevMask = devMask
 	}
-	fmt.Fprintf(c.Tracer, "Device%s %s    Elapsed: %d\n",
-		changed, string(b), c.Elapsed)
+	idleChanged := ":"
+	if c.Idle != c.lastIdle {
+		idleChanged = "!"
+		c.lastIdle = c.Idle
+	}
+	fmt.Fprintf(c.Tracer,
+		"Device%s %s\n  Idle%s         %12d     Elapsed: %12d\n",
+		devChanged, string(b), idleChanged, c.Idle, c.Elapsed)
 }

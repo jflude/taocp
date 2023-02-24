@@ -58,6 +58,20 @@ func (w Word) UnpackOp() (aa Word, i, f, c int) {
 	return
 }
 
+// PackFloat composes a MIX word from a floating point number's exponent
+// and fraction.
+func (w *Word) PackFloat(e, f int) {
+	*w = Word(0) // TODO
+}
+
+// UnpackFloat extracts the exponent and fraction of a floating point number
+// in a MIX word.
+func (w Word) UnpackFloat() (e, f int) {
+	e = int((int32(w) & fields[011].mem) >> fields[011].shift) // ??
+	f = int(0) // TODO
+	return
+}
+
 var fields = [...]struct {
 	mem   int32 // memory mask
 	reg   int32 // register mask

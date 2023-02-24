@@ -90,8 +90,10 @@ func (c *Computer) bindDevice(unit int) error {
 		switch unit {
 		case CardReaderUnit:
 			flags = os.O_RDONLY
-		case CardPunchUnit, PrinterUnit:
-			flags = os.O_WRONLY | os.O_APPEND | os.O_CREATE
+		case CardPunchUnit:
+			flags = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+		case PrinterUnit:
+			flags = os.O_WRONLY | os.O_CREATE | os.O_APPEND
 		default:
 			flags = os.O_RDWR | os.O_CREATE
 		}

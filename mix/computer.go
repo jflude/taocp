@@ -46,7 +46,9 @@ type Computer struct {
 	m, next       int
 	ctrl, halted  bool
 	Tracer        io.WriteCloser
-	lastMask      uint
+	Trigger       int
+	lastDevMask   uint
+	lastIdle      int64
 	Interrupts    bool
 	lastTick      int64
 	pending       priority
@@ -59,6 +61,7 @@ func NewComputer() *Computer {
 		Devices:   make([]Peripheral, DeviceCount),
 		busyUntil: make([]int64, DeviceCount),
 		BootFrom:  CardReaderUnit,
+		Trigger:   32,
 	}
 }
 

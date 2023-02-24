@@ -100,7 +100,7 @@ shell script can correct most formatting errors.
 : $ ls -l *.mix
 : -rw-r--r--  1 justin  staff  972 Aug 30 13:19 reader.mix
 : $ mix
-: mix: halted at 3029: HLT (elapsed: 6762026u, idle: 5969154u)
+: mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
 : $ ls -l *.mix
 : -rw-r--r--  1 justin  staff  2777 Aug 30 13:20 printer.mix
 : -rw-r--r--  1 justin  staff   972 Aug 30 13:19 reader.mix
@@ -116,7 +116,7 @@ reformat, assemble and execute its input file within a temporary
 sandbox, and output (or tail) an I/O device's backing file.
 
 : $ mix.run examples/500primes.mixal
-: mix: halted at 3029: HLT (elapsed: 6762026u, idle: 5969154u)
+: mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
 : 
 : FIRST FIVE HUNDRED PRIMES
 :      0002 0233 0547 0877 1229 1597 1993 2371 2749 3187

@@ -7,6 +7,7 @@ package mix
 func (c *Computer) GoButton() error {
 	if c.halted {
 		c.halted = false
+		c.next++
 		return c.resume()
 	}
 	if c.BootFrom != CardReaderUnit && c.BootFrom != PaperTapeUnit {

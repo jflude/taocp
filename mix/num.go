@@ -42,7 +42,7 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 		}
 		return 10
 	case 2: // HLT
-		c.Elapsed += 10
+		c.Elapsed++
 		now := c.Elapsed
 		for i := range c.Devices { // finish any I/O operations
 			if c.busyUntil[i] > c.Elapsed {

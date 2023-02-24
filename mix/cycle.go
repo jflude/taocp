@@ -30,10 +30,6 @@ func (c *Computer) Cycle() (err error) {
 			asm := Disassemble(c.Contents[mBase+c.next])
 			err = fmt.Errorf("%w at %04d: %s",
 				err, c.next, strings.TrimSpace(asm))
-			if errors.Is(err, ErrHalted) {
-				c.Elapsed++
-				c.next++
-			}
 		}
 	}()
 	aa, i, f, op := c.Contents[mBase+c.next].UnpackOp()
@@ -47,7 +43,7 @@ func (c *Computer) Cycle() (err error) {
 			return ErrInvalidIndex
 		}
 	}
-	if c.Tracer != nil {
+	if c.Tracer != nil && c.next >= c.Trigger {
 		c.printTrace(m, c.next)
 	}
 	state := c.ctrl
