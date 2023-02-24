@@ -4,16 +4,16 @@ package mix
 
 import "errors"
 
-var ErrInvalidFieldSpec = errors.New("mix: invalid field specification")
+var ErrInvalidSpec = errors.New("mix: invalid field specification")
 
-// FieldSpec returns the integer equivalent of a MIX field specification.
-func FieldSpec(left, right int) int {
+// Spec returns the integer equivalent of a MIX field specification.
+func Spec(left, right int) int {
 	return 8*left + right
 }
 
-func checkFieldSpec(f int) {
+func checkSpec(f int) {
 	if f >= len(fields) || fields[f].shift == -1 {
-		panic(ErrInvalidFieldSpec)
+		panic(ErrInvalidSpec)
 	}
 }
 
@@ -22,7 +22,7 @@ func (w Word) Field(f int) Word {
 	if f == 5 {
 		return w
 	}
-	checkFieldSpec(f)
+	checkSpec(f)
 	return Word((int32(w) >> fields[f].shift) & fields[f].reg)
 }
 
@@ -32,7 +32,7 @@ func (w *Word) SetField(f int, val Word) {
 		*w = val
 		return
 	}
-	checkFieldSpec(f)
+	checkSpec(f)
 	*w = Word((int32(*w) &^ fields[f].mem) |
 		((int32(val) << fields[f].shift) & fields[f].mem) |
 		(int32(val) & fields[f].sign))

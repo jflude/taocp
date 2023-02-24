@@ -19,13 +19,13 @@ func (c *Computer) inca(aa Word, i, f, op, m int) int64 {
 	case 2: // ENT
 		c.Reg[op-INCA] = NewWord(m)
 		if m == 0 {
-			c.Reg[op-INCA].SetField(FieldSpec(0, 0), aa)
+			c.Reg[op-INCA].SetField(Spec(0, 0), aa)
 		}
 	case 3: // ENN
 		c.Reg[op-INCA] = NewWord(-m)
 		if m == 0 {
 			c.Reg[op-INCA].
-				SetField(FieldSpec(0, 0), aa.Negate())
+				SetField(Spec(0, 0), aa.Negate())
 		}
 	default:
 		panic(ErrInvalidOp)
@@ -39,7 +39,7 @@ func (c *Computer) addIndex(reg, v int) {
 		panic(ErrInvalidIndex)
 	}
 	if v == 0 {
-		c.Reg[reg].SetField(FieldSpec(1, 5), 0)
+		c.Reg[reg].SetField(Spec(1, 5), 0)
 	} else {
 		c.Reg[reg] = NewWord(v)
 	}

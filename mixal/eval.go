@@ -25,7 +25,7 @@ func (a *asmb) evalArg(arg int) {
 		*a.exprVal, _, _ = mix.DivWord(*a.exprVal, 0, arg)
 	case ':':
 		high, low := mix.MulWord(*a.exprVal, 8)
-		high.SetField(mix.FieldSpec(1, 5), low)
+		high.SetField(mix.Spec(1, 5), low)
 		*a.exprVal, _ = mix.AddWord(high, arg)
 	default:
 		panic(ErrInternal)

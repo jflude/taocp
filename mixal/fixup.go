@@ -22,7 +22,7 @@ func (a *asmb) patchFixUps(sym string) {
 		if w == nil {
 			panic(ErrInternal)
 		}
-		w.SetField(mix.FieldSpec(0, 2), val)
+		w.SetField(mix.Spec(0, 2), val)
 	}
 	delete(a.fixups, sym)
 }

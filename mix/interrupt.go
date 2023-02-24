@@ -36,21 +36,21 @@ func (c *Computer) checkInterrupt(currentState bool) {
 func (c *Computer) saveRegs() {
 	copy(c.Contents[mBase-9:], c.Reg[:J])
 	w := c.Reg[J]
-	w.SetField(FieldSpec(0, 2), NewWord(c.next))
+	w.SetField(Spec(0, 2), NewWord(c.next))
 	ov := 0
 	if c.Overflow {
 		ov = 1
 	}
-	w.SetField(FieldSpec(3, 3), NewWord(FieldSpec(ov, c.Comparison+1)))
+	w.SetField(Spec(3, 3), NewWord(Spec(ov, c.Comparison+1)))
 	c.Contents[mBase-1] = w
 }
 
 func (c *Computer) loadRegs() {
 	copy(c.Reg[:J], c.Contents[mBase-9:])
 	w := c.Contents[mBase-1]
-	c.Reg[J] = w.Field(FieldSpec(4, 5))
-	c.next = w.Field(FieldSpec(1, 2)).Int()
-	ovci := w.Field(FieldSpec(3, 3)).Int()
+	c.Reg[J] = w.Field(Spec(4, 5))
+	c.next = w.Field(Spec(1, 2)).Int()
+	ovci := w.Field(Spec(3, 3)).Int()
 	c.Overflow = (ovci/8 == 1)
 	c.Comparison = ovci%8 - 1
 }

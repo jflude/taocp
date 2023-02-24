@@ -22,7 +22,7 @@ func ConvertToUTF8(w []Word) string {
 	var r []rune
 	for _, v := range w {
 		for f := 1; f <= 5; f++ {
-			r = append(r, mix2utf[v.Field(FieldSpec(f, f))])
+			r = append(r, mix2utf[v.Field(Spec(f, f))])
 		}
 	}
 	return string(r)
@@ -39,7 +39,7 @@ func ConvertToMIX(s string) ([]Word, error) {
 		if !ok {
 			return nil, charError(r)
 		}
-		w[len(w)-1].SetField(FieldSpec(f, f), NewWord(c))
+		w[len(w)-1].SetField(Spec(f, f), NewWord(c))
 	}
 	return w, nil
 }

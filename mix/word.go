@@ -87,7 +87,7 @@ func AddWord(w Word, v int) (result Word, overflow bool) {
 		v &= MaxWord
 	}
 	if v == 0 {
-		w.SetField(FieldSpec(1, 5), 0)
+		w.SetField(Spec(1, 5), 0)
 	} else {
 		w = NewWord(v)
 	}

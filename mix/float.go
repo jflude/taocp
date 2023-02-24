@@ -3,7 +3,8 @@ package mix
 // AddFloatWord returns the sum of two floating point MIX words, and
 // whether overflow occurred.  See Section 4.2.1.
 func AddFloatWord(u, v Word) (result Word, overflow bool) {
-	panic(ErrNotImplemented)
+	// TODO
+	return normalizeFloat(u)
 }
 
 func SubFloatWord(u, v Word) (result Word, overflow bool) {
@@ -11,11 +12,13 @@ func SubFloatWord(u, v Word) (result Word, overflow bool) {
 }
 
 func MulFloatWord(u, v Word) (result Word, overflow bool) {
-	panic(ErrNotImplemented)
+	// TODO
+	return normalizeFloat(u)
 }
 
 func DivFloatWord(u, v Word) (result Word, overflow bool) {
-	panic(ErrNotImplemented)
+	// TODO
+	return normalizeFloat(u)
 }
 
 func CompareFloatWord(u, v Word) int {
@@ -27,7 +30,8 @@ func FloatToFixed(w Word) (result Word, overflow bool) {
 }
 
 func FixedToFloat(w Word) (result Word, overflow bool) {
-	panic(ErrNotImplemented)
+	// TODO
+	return normalizeFloat(w)
 }
 
 func normalizeFloat(w Word) (result Word, overflow bool) {
