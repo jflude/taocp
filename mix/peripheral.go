@@ -7,9 +7,9 @@ import "errors"
 type Peripheral interface {
 	Name() string
 	BlockSize() int
-	Read(block []Word) (delay int64, err error)
-	Write(block []Word) (delay int64, err error)
-	Control(m int) (delay int64, err error)
+	Read(block []Word) (duration int64, err error)
+	Write(block []Word) (duration int64, err error)
+	Control(m int) (duration int64, err error)
 	Close() error
 }
 
@@ -21,19 +21,21 @@ func (c *Computer) isBusy(unit int) bool {
 	return c.busyUntil[unit] > c.Elapsed
 }
 
-func (c *Computer) calcTiming(unit int, t int64, err error) (int64, error) {
+func (c *Computer) waitIfBusy(unit int) {
+	if wait := c.busyUntil[unit] - c.Elapsed; wait > 0 {
+		c.Idle += wait
+		c.Elapsed = c.busyUntil[unit]
+	}
+}
+
+func (c *Computer) interlock(unit int, dur int64, m, n int, err error) error {
 	if err != nil {
-		return 0, err
+		return err
 	}
-	delay := c.busyUntil[unit] - c.Elapsed // interlock time
-	if delay < 0 {
-		delay = 0
-	}
-	c.Idle += delay
-	delay++
-	c.busyUntil[unit] = c.Elapsed + delay + t
+	c.busyUntil[unit] = c.Elapsed + dur + 1
+	c.lockContents(m, n, c.busyUntil[unit])
 	if c.Interrupts && c.ctrl {
 		c.schedule(c.busyUntil[unit], -20-unit)
 	}
-	return delay, nil
+	return nil
 }

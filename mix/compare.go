@@ -3,6 +3,7 @@
 package mix
 
 func (c *Computer) cmpa(aa Word, i, f, op, m int) int64 {
+	c.checkInterlock(m, m)
 	if op == CMPA && f == 6 {
 		c.Comparison = CompareFloatWord(c.Reg[A], c.Contents[mBase+m])
 		return 4

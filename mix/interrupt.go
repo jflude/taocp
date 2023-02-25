@@ -6,6 +6,7 @@ import "container/heap"
 
 const tickRate = 1000
 
+// see Ex. 18, Section 1.4.4
 func (c *Computer) checkInterrupt(currentState bool) {
 	if c.ctrl != currentState {
 		if c.ctrl {
@@ -17,6 +18,7 @@ func (c *Computer) checkInterrupt(currentState bool) {
 		return
 	}
 	if since := c.Elapsed - c.lastTick; since >= tickRate {
+		c.checkInterlock(-10, -10)
 		prev := int64(c.Contents[mBase-10].Int())
 		now := prev - since/tickRate
 		if prev > 0 && now <= 0 {
@@ -34,6 +36,7 @@ func (c *Computer) checkInterrupt(currentState bool) {
 }
 
 func (c *Computer) saveRegs() {
+	c.checkInterlock(-9, 0)
 	copy(c.Contents[mBase-9:], c.Reg[:J])
 	w := c.Reg[J]
 	w.SetField(Spec(0, 2), NewWord(c.next))
@@ -46,6 +49,7 @@ func (c *Computer) saveRegs() {
 }
 
 func (c *Computer) loadRegs() {
+	c.checkInterlock(-9, 0)
 	copy(c.Reg[:J], c.Contents[mBase-9:])
 	w := c.Contents[mBase-1]
 	c.Reg[J] = w.Field(Spec(4, 5))

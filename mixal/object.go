@@ -5,6 +5,7 @@ package mixal
 import (
 	"fmt"
 	"io"
+
 	//"log"
 
 	"github.com/jflude/taocp/mix"
@@ -18,7 +19,8 @@ type object struct {
 	seg   [][]mix.Word
 }
 
-var loader = " O O6 Z O6    I C O4 0 EH A  F F CF 0  E   EU 0 IH G BB   EJ  CA. Z EU   EH E BA\n" +
+// see the answer to Ex. 26, Section 1.3.1
+var regularLoader = " O O6 Z O6    I C O4 0 EH A  F F CF 0  E   EU 0 IH G BB   EJ  CA. Z EU   EH E BA\n" +
 	"   EU 2A-H S BB  C U 1AEH 2AEN V  E  CLU  ABG Z EH E BB J B. A  9               \n"
 var transfer = "TRANS0%04d                                                                      \n"
 
@@ -31,8 +33,8 @@ func (o *object) findWord(address int) *mix.Word {
 	return nil
 }
 
-func (o *object) writeCards(w io.Writer) error {
-	if _, err := io.WriteString(w, loader); err != nil {
+func (o *object) writeCards(w io.Writer) error { // TODO interrupt loader
+	if _, err := io.WriteString(w, regularLoader); err != nil {
 		return err
 	}
 	for i := range o.orig {
@@ -51,7 +53,10 @@ func (o *object) writeSeg(w io.Writer, n int) error {
 		if c > wordsPerCard {
 			c = wordsPerCard
 		}
-		s := fmt.Sprintf("ABCDE%1d%04d", c, orig)
+		s := fmt.Sprintf("ABCDE%1d%04d", c, abs(orig))
+		if orig < 0 {
+			s = overPunchNegative(s)
+		}
 		if _, err := io.WriteString(w, s); err != nil {
 			return err
 		}
@@ -60,8 +65,7 @@ func (o *object) writeSeg(w io.Writer, n int) error {
 			//log.Printf("NewWord(%#o), // %5d:", v.Int(), orig+j)
 			s = fmt.Sprintf("%010d", abs(v.Int()))
 			if v.Sign() == -1 {
-				d := mix.OverPunch(rune(s[len(s)-1]))
-				s = s[:len(s)-1] + string(d)
+				s = overPunchNegative(s)
 			}
 			if _, err := io.WriteString(w, s); err != nil {
 				return err
@@ -79,4 +83,8 @@ func (o *object) writeSeg(w io.Writer, n int) error {
 		}
 	}
 	return nil
+}
+
+func overPunchNegative(n string) string {
+	return s[:len(s)-1] + string(mix.OverPunch(rune(s[len(s)-1])))
 }

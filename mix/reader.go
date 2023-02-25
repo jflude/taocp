@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"unicode/utf8"
 )
 
 type CardReader struct {
@@ -29,10 +30,10 @@ func (*CardReader) BlockSize() int {
 
 func (r *CardReader) Read(block []Word) (int64, error) {
 	s, err := r.br.ReadString('\n')
-	if err != nil {
+	if err != nil || s == "" {
 		return 0, err
 	}
-	if len(s) > 81 || s[len(s)-1] != '\n' {
+	if s[len(s)-1] != '\n' || utf8.RuneCountInString(s) > 81 {
 		return 0, ErrFormat
 	}
 	s = s[:len(s)-1]

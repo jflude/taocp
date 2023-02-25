@@ -53,12 +53,15 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 		c.halted = true
 		panic(ErrHalted)
 	case 3: // AND (see Section 4.5.4)
+		c.checkInterlock(m, m)
 		c.Reg[A] = AndWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
 		return 2
 	case 4: // OR (see Section 6.4)
+		c.checkInterlock(m, m)
 		c.Reg[A] = OrWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
 		return 2
 	case 5: // XOR (see Ex. 28, Section 2.5)
+		c.checkInterlock(m, m)
 		c.Reg[A] = XorWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
 		return 2
 	case 6: // FLOT

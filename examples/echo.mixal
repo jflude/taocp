@@ -3,6 +3,7 @@ TTY        EQU  19
            ORIG 1000
 OUTPUT     OUT  BUF(TTY)
 START      IN   BUF(TTY)
+           JBUS *(TTY)
            LDA  BUF
            CMPA PERIOD
            JNE  OUTPUT

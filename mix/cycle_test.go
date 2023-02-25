@@ -211,6 +211,9 @@ func TestCycle(t *testing.T) {
 
 	// Program P, Section 1.3.2
 	c.zeroContents()
+	c.unlockContents()
+	c.Elapsed = 0
+	c.Idle = 0
 	copy(c.Contents[mBase+3000:], egCycle11a)
 	copy(c.Contents[mBase+0:], egCycle11b)
 	copy(c.Contents[mBase+1995:], egCycle11c)
@@ -226,6 +229,12 @@ func TestCycle(t *testing.T) {
 	}
 	if strings.Compare(string(b), okCycle11) != 0 {
 		t.Error("got: incorrect printer output")
+	}
+	if c.Elapsed != 6100052 {
+		t.Fatalf("got: elapsed %d, want %d", c.Elapsed, 6100052)
+	}
+	if c.Idle != 5909153 {
+		t.Fatalf("got: idle %d, want %d", c.Idle, 5909153)
 	}
 }
 

@@ -84,7 +84,10 @@ func (c *Computer) bindDevice(unit int) error {
 	var err error
 	backing := c.bind[unit]
 	if unit == TeletypeUnit && backing == nil {
-		backing = console{}
+		backing = struct {
+			io.ReadCloser
+			io.Writer
+		}{io.NopCloser(os.Stdin), os.Stdout}
 	} else if file, ok := backing.(string); ok {
 		var flags int
 		switch unit {

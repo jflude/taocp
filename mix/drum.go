@@ -31,7 +31,7 @@ func (*Drum) BlockSize() int {
 }
 
 func (d *Drum) Read(block []Word) (int64, error) {
-	delay, err := d.seekToX()
+	duration, err := d.seekToX()
 	if err != nil {
 		return 0, err
 	}
@@ -42,11 +42,11 @@ func (d *Drum) Read(block []Word) (int64, error) {
 	for i, j := 0, 0; i < len(block); i, j = i+1, j+4 {
 		block[i] = Word(binary.LittleEndian.Uint32(buf[j : j+4]))
 	}
-	return 10000 + delay, nil
+	return 10000 + duration, nil
 }
 
 func (d *Drum) Write(block []Word) (int64, error) {
-	delay, err := d.seekToX()
+	duration, err := d.seekToX()
 	if err != nil {
 		return 0, err
 	}
@@ -55,7 +55,7 @@ func (d *Drum) Write(block []Word) (int64, error) {
 		binary.LittleEndian.PutUint32(buf[j:j+4], uint32(block[i]))
 	}
 	_, err = d.rwsc.Write(buf)
-	return 10000 + delay, err
+	return 10000 + duration, err
 }
 
 func (d *Drum) Control(m int) (int64, error) {
@@ -69,7 +69,7 @@ func (d *Drum) Close() error {
 	return d.rwsc.Close()
 }
 
-func (d *Drum) seekToX() (delay int64, err error) {
+func (d *Drum) seekToX() (duration int64, err error) {
 	x := abs64(int64(d.c.Reg[X].Int()))
 	if x > maxDrumBlock {
 		return 0, ErrInvalidBlock

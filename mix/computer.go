@@ -40,6 +40,7 @@ type Computer struct {
 	Elapsed, Idle int64
 	Reg           [10]Word
 	Contents      []Word
+	attributes    []attribute
 	Devices       []Peripheral
 	busyUntil     []int64
 	bind          *Binding
@@ -55,13 +56,18 @@ type Computer struct {
 	BootFrom      int
 }
 
+type attribute struct {
+	lockUntil int64
+}
+
 func NewComputer() *Computer {
 	return &Computer{
-		Contents:  make([]Word, 2*MemorySize-1),
-		Devices:   make([]Peripheral, DeviceCount),
-		busyUntil: make([]int64, DeviceCount),
-		BootFrom:  CardReaderUnit,
-		Trigger:   32,
+		Contents:   make([]Word, 2*MemorySize-1),
+		attributes: make([]attribute, 2*MemorySize-1),
+		Devices:    make([]Peripheral, DeviceCount),
+		busyUntil:  make([]int64, DeviceCount),
+		BootFrom:   CardReaderUnit,
+		Trigger:    32,
 	}
 }
 
@@ -92,8 +98,40 @@ func (c *Computer) validAddress(address int) bool {
 	}
 }
 
+func (c *Computer) checkAddress(m int) {
+	if !c.validAddress(m) {
+		panic(ErrInvalidAddress)
+	}
+}
+
 func (c *Computer) zeroContents() {
 	for i := range c.Contents {
 		c.Contents[i] = 0
+	}
+}
+
+func (c *Computer) unlockContents() {
+	for i := range c.attributes {
+		c.attributes[i].lockUntil = 0
+	}
+}
+
+func (c *Computer) lockContents(m, n int, until int64) {
+	for i := m; i < n; i++ {
+		c.attributes[i].lockUntil = until
+	}
+}
+
+func (c *Computer) checkInterlock(m, n int) {
+	if m == n {
+		if c.attributes[mBase+m].lockUntil > c.Elapsed {
+			panic(ErrContentsInterlock)
+		}
+	} else {
+		for i := mBase + m; i < mBase+n; i++ {
+			if c.attributes[i].lockUntil > c.Elapsed {
+				panic(ErrContentsInterlock)
+			}
+		}
 	}
 }

@@ -7,10 +7,11 @@ func (c *Computer) move(aa Word, i, f, op, m int) int64 {
 		return 1
 	}
 	to := c.Reg[I1].Int()
-	if !c.validAddress(m) || !c.validAddress(m+f) ||
-		!c.validAddress(to) || !c.validAddress(to+f) {
-		panic(ErrInvalidAddress)
-	}
+	c.checkAddress(m)
+	c.checkAddress(m + f)
+	c.checkAddress(to)
+	c.checkAddress(to + f)
+	c.checkInterlock(to, m+f)
 	for j := 0; j < f; j++ {
 		c.Contents[mBase+to+j] = c.Contents[mBase+m+j]
 	}

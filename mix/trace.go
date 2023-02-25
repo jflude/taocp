@@ -21,17 +21,21 @@ func (c *Computer) printTrace(m, next int) {
 	if c.ctrl {
 		ctrl = fmt.Sprintf("CTRL: %d", c.pending.Len())
 	}
-	fmt.Fprintf(c.Tracer, "\014\n A: %10v (%#v)   OP: %4d: %s\n"+
+	asm := Disassemble(c.Contents[mBase+next])
+	fmt.Fprintf(c.Tracer,
+		"\014_______________________________________________________\n"+
+		" A: %10v (%#v)   OP: %4d%s %s\n"+
 		" X: %10v (%#v)   OV: %s CI: %s %s\n"+
 		"I1:       %4v (%#v)                   M\n",
-		c.Reg[A], c.Reg[A], next, Disassemble(c.Contents[mBase+next]),
-		c.Reg[X], c.Reg[X], ov, ci, ctrl, c.Reg[I1], c.Reg[I1])
+		c.Reg[A], c.Reg[A], next, c.lockChar(next), asm,
+		c.Reg[X], c.Reg[X], ov, ci, ctrl,
+		c.Reg[I1], c.Reg[I1])
 	for i := 2; i <= 6; i, m = i+1, m+1 {
 		if c.validAddress(m) {
 			fmt.Fprintf(c.Tracer,
-				"I%d:       %4v (%#v)      %5d: %#v\n",
+				"I%d:       %4v (%#v)      %5d%s %#v\n",
 				i, c.Reg[i], c.Reg[i], m,
-				c.Contents[mBase+m])
+				c.lockChar(m), c.Contents[mBase+m])
 		} else {
 			fmt.Fprintf(c.Tracer,
 				"I%d:       %4v (%#v)      %5d: ?\n",
@@ -39,8 +43,8 @@ func (c *Computer) printTrace(m, next int) {
 		}
 	}
 	if c.validAddress(m) {
-		fmt.Fprintf(c.Tracer, "J:        %4v (%#v)      %5d: %#v\n",
-			c.Reg[J], c.Reg[J], m, c.Contents[mBase+m])
+		fmt.Fprintf(c.Tracer, "J:        %4v (%#v)      %5d%s %#v\n",
+			c.Reg[J], c.Reg[J], m, c.lockChar(m), c.Contents[mBase+m])
 	} else {
 		fmt.Fprintf(c.Tracer, "J:        %4v (%#v)      %5d: ?\n",
 			c.Reg[J], c.Reg[J], m)
@@ -56,17 +60,25 @@ func (c *Computer) printTrace(m, next int) {
 		}
 		devMask <<= 1
 	}
-	devChanged := ":"
+	flipped := ":"
 	if devMask != c.lastDevMask {
-		devChanged = "!"
+		flipped = "!"
 		c.lastDevMask = devMask
 	}
-	idleChanged := ":"
+	idled := ":"
 	if c.Idle != c.lastIdle {
-		idleChanged = "!"
+		idled = "!"
 		c.lastIdle = c.Idle
 	}
 	fmt.Fprintf(c.Tracer,
-		"Device%s %s\n  Idle%s         %12d     Elapsed: %12d\n",
-		devChanged, string(b), idleChanged, c.Idle, c.Elapsed)
+		"Device%s %s\n  Idle%s         %12du    Elapsed: %12du\n",
+		flipped, string(b), idled, c.Idle, c.Elapsed)
+}
+
+func (c *Computer) lockChar(m int) string {
+	if c.attributes[mBase+m].lockUntil > c.Elapsed {
+		return "#"
+	} else {
+		return ":"
+	}
 }

@@ -9,15 +9,13 @@ import (
 )
 
 var (
-	ErrInvalidAddress = errors.New("mix: invalid address")
-	ErrInvalidIndex   = errors.New("mix: invalid index")
-	ErrInvalidOp      = errors.New("mix: invalid operation")
+	ErrInvalidAddress    = errors.New("mix: invalid address")
+	ErrInvalidIndex      = errors.New("mix: invalid index")
+	ErrInvalidOp         = errors.New("mix: invalid operation")
+	ErrContentsInterlock = errors.New("mix: contents interlock")
 )
 
 func (c *Computer) Cycle() (err error) {
-	if !c.validAddress(c.next) {
-		return ErrInvalidAddress
-	}
 	defer func() {
 		if r := recover(); r != nil {
 			if err2, ok := r.(error); ok {
@@ -27,11 +25,16 @@ func (c *Computer) Cycle() (err error) {
 			}
 		}
 		if err != nil {
-			asm := Disassemble(c.Contents[mBase+c.next])
+			asm := "?"
+			if c.validAddress(c.next) {
+				asm = Disassemble(c.Contents[mBase+c.next])
+			}
 			err = fmt.Errorf("%w at %04d: %s",
 				err, c.next, strings.TrimSpace(asm))
 		}
 	}()
+	c.checkAddress(c.next)
+	c.checkInterlock(c.next, c.next)
 	aa, i, f, op := c.Contents[mBase+c.next].UnpackOp()
 	if i > 6 {
 		return ErrInvalidOp

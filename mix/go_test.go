@@ -14,6 +14,7 @@ func TestGoButton(t *testing.T) {
 	defer closeSandbox(t, c, tmpDir)
 	if testing.Verbose() {
 		c.Tracer = os.Stdout
+		c.Trigger = 0
 	}
 
 	deck := append(append([]byte(nil), egLoader[0]...), egLoader[1]...)
@@ -23,7 +24,7 @@ func TestGoButton(t *testing.T) {
 		t.Fatal("error:", err)
 	}
 	if err = c.GoButton(); !errors.Is(err, ErrHalted) {
-		t.Error("error:", err)
+		t.Fatal("error:", err)
 	}
 	b, err := os.ReadFile("printer.mix")
 	if err != nil {

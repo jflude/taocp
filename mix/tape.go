@@ -63,12 +63,12 @@ func (t *Tape) Write(block []Word) (int64, error) {
 }
 
 func (t *Tape) Control(m int) (int64, error) {
-	var off, delay int64
+	var off, duration int64
 	var wh int
 	if m == 0 {
 		off = 0
 		wh = io.SeekStart
-		delay = 5000 * t.here / int64(4*t.BlockSize())
+		duration = 5000 * t.here / int64(4*t.BlockSize())
 	} else {
 		off = int64(4 * t.BlockSize() * m)
 		if t.isPastEnd(off) {
@@ -78,11 +78,11 @@ func (t *Tape) Control(m int) (int64, error) {
 			off = -t.here
 		}
 		wh = io.SeekCurrent
-		delay = 5000 * abs64(int64(m))
+		duration = 5000 * abs64(int64(m))
 	}
 	var err error
 	t.here, err = t.rwsc.Seek(off, wh)
-	return delay, err
+	return duration, err
 }
 
 func (t *Tape) Close() error {

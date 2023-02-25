@@ -17,9 +17,12 @@ func (c *Computer) GoButton() error {
 		c.Reg[i] = 0
 	}
 	c.zeroContents()
+	c.unlockContents()
 	if _, err := c.in(0, 0, c.BootFrom, IN, 0); err != nil {
 		return err
 	}
+	c.unlockContents()
+	c.ctrl = c.Interrupts
 	c.Reg[J] = 0
 	c.Elapsed = 0
 	c.lastTick = 0
