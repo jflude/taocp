@@ -5,9 +5,11 @@ package main
 import (
 	"bytes"
 	"errors"
+	"flag"
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/jflude/taocp/mixal"
 )
@@ -20,15 +22,22 @@ func main() {
 }
 
 func run() (err error) {
-	if len(os.Args) != 2 {
-		err = errors.New("mixal [input file]")
+	var interrupts bool
+	if env, ok := os.LookupEnv("MIX_ENABLE_INTERRUPTS"); ok {
+		env = strings.ToLower(env)
+		interrupts = (env[0] == '1' || env[0] == 'y' || env == "true")
+	}
+	flag.BoolVar(&interrupts, "int", interrupts, "enable interrupts")
+	flag.Parse()
+	if flag.NArg() != 1 {
+		err = errors.New("mixal [-int] INPUT-FILE")
 		return
 	}
 	var in io.ReadCloser
-	if os.Args[1] == "-" {
+	if flag.Arg(0) == "-" {
 		in = os.Stdin
 	} else {
-		if in, err = os.Open(os.Args[1]); err != nil {
+		if in, err = os.Open(flag.Arg(1)); err != nil {
 			return
 		}
 		defer func() {
@@ -42,7 +51,7 @@ func run() (err error) {
 		}()
 	}
 	var buf bytes.Buffer
-	if err = mixal.Assemble(in, &buf); err != nil {
+	if err = mixal.Assemble(in, &buf, interrupts); err != nil {
 		return
 	}
 	out, err := os.Create("reader.mix")

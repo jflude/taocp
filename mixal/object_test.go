@@ -30,7 +30,7 @@ func TestFindAddress(t *testing.T) {
 
 func TestWriteCards(t *testing.T) {
 	var buf bytes.Buffer
-	egObject.writeCards(&buf)
+	egObject.writeCards(&buf, false)
 	if bytes.Compare(buf.Bytes(), okObject) != 0 {
 		t.Errorf("got: %q\nwant: %q", buf.Bytes(), okObject)
 	}

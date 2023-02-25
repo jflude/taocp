@@ -33,10 +33,10 @@ type asmb struct {
 	i, f, c  int
 }
 
-func Assemble(r io.Reader, w io.Writer) error {
+func Assemble(r io.Reader, w io.Writer, interrupts bool) error {
 	var a asmb
 	if err := a.translate(r, parseLine); err != nil {
 		return err
 	}
-	return a.obj.writeCards(w)
+	return a.obj.writeCards(w, interrupts)
 }

@@ -25,6 +25,11 @@ func main() {
 }
 
 func run() (err error) {
+	c := mix.NewComputer()
+	if env, ok := os.LookupEnv("MIX_ENABLE_INTERRUPTS"); ok {
+		env = strings.ToLower(env)
+		c.Interrupts = (env[0] == '1' || env[0] == 'y' || env == "true")
+	}
 	var unit [mix.DeviceCount]string
 	binding := *mix.DefaultBinding
 	for i, v := range binding {
@@ -34,7 +39,6 @@ func run() (err error) {
 	}
 	var op bool
 	var trace string
-	c := mix.NewComputer()
 	flag.IntVar(&c.BootFrom, "boot", c.BootFrom, "unit to boot from")
 	flag.BoolVar(&c.Interrupts, "int", c.Interrupts, "enable interrupts")
 	flag.BoolVar(&op, "op", op, "involve the operator")
