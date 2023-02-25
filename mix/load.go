@@ -2,7 +2,7 @@
 // Use of this source code is governed by the COPYING.md file.
 package mix
 
-func (c *Computer) lda(aa Word, i, f, op, m int) int64 {
+func (c *Computer) lda(aa Word, i, f, op, m int) (int64, error) {
 	c.checkInterlock(m, m)
 	v := c.Contents[mBase+m].Field(f)
 	r := op - LDA
@@ -12,10 +12,10 @@ func (c *Computer) lda(aa Word, i, f, op, m int) int64 {
 		}
 	}
 	c.Reg[r] = v
-	return 2
+	return 2, nil
 }
 
-func (c *Computer) ldan(aa Word, i, f, op, m int) int64 {
+func (c *Computer) ldan(aa Word, i, f, op, m int) (int64, error) {
 	c.checkInterlock(m, m)
 	v := c.Contents[mBase+m].Field(f).Negate()
 	r := op - LDAN
@@ -25,11 +25,11 @@ func (c *Computer) ldan(aa Word, i, f, op, m int) int64 {
 		}
 	}
 	c.Reg[r] = v
-	return 2
+	return 2, nil
 }
 
-func (c *Computer) sta(aa Word, i, f, op, m int) int64 {
+func (c *Computer) sta(aa Word, i, f, op, m int) (int64, error) {
 	c.checkInterlock(m, m)
 	c.Contents[mBase+m].SetField(f, c.Reg[op-STA])
-	return 2
+	return 2, nil
 }

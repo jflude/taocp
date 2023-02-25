@@ -2,7 +2,7 @@
 // Use of this source code is governed by the COPYING.md file.
 package mix
 
-func (c *Computer) sla(aa Word, i, f, op, m int) int64 {
+func (c *Computer) sla(aa Word, i, f, op, m int) (int64, error) {
 	if m < 0 {
 		panic(ErrInvalidOp)
 	}
@@ -28,5 +28,5 @@ func (c *Computer) sla(aa Word, i, f, op, m int) int64 {
 	default:
 		panic(ErrInvalidOp)
 	}
-	return 2
+	return 2, nil
 }

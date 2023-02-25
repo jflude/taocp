@@ -2,7 +2,7 @@
 // Use of this source code is governed by the COPYING.md file.
 package mix
 
-func (c *Computer) inca(aa Word, i, f, op, m int) int64 {
+func (c *Computer) inca(aa Word, i, f, op, m int) (int64, error) {
 	switch f {
 	case 0: // INC
 		if op == INCA || op == INCX {
@@ -30,7 +30,7 @@ func (c *Computer) inca(aa Word, i, f, op, m int) int64 {
 	default:
 		panic(ErrInvalidOp)
 	}
-	return 1
+	return 1, nil
 }
 
 func (c *Computer) addIndex(reg, v int) {

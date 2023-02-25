@@ -37,7 +37,7 @@ func run() (err error) {
 	if flag.Arg(0) == "-" {
 		in = os.Stdin
 	} else {
-		if in, err = os.Open(flag.Arg(1)); err != nil {
+		if in, err = os.Open(flag.Arg(0)); err != nil {
 			return
 		}
 		defer func() {

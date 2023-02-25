@@ -12,7 +12,7 @@ var (
 	ErrNoInterrupts = errors.New("mix: interrupts are disabled")
 )
 
-func (c *Computer) num(aa Word, i, f, op, m int) int64 {
+func (c *Computer) num(aa Word, i, f, op, m int) (int64, error) {
 	switch f {
 	case 0: // NUM
 		var a, x int64
@@ -27,7 +27,7 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 			c.Overflow = true
 		}
 		c.Reg[A].SetField(Spec(1, 5), NewWord(int(a)))
-		return 10
+		return 10, nil
 	case 1: // CHAR
 		v := strconv.Itoa(c.Reg[A].Field(Spec(1, 5)).Int())
 		if l := len(v); l < 10 {
@@ -40,7 +40,7 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 			c.Reg[A].SetField(f, a)
 			c.Reg[X].SetField(f, x)
 		}
-		return 10
+		return 10, nil
 	case 2: // HLT
 		c.Elapsed++
 		now := c.Elapsed
@@ -55,27 +55,27 @@ func (c *Computer) num(aa Word, i, f, op, m int) int64 {
 	case 3: // AND (see Section 4.5.4)
 		c.checkInterlock(m, m)
 		c.Reg[A] = AndWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
-		return 2
+		return 2, nil
 	case 4: // OR (see Section 6.4)
 		c.checkInterlock(m, m)
 		c.Reg[A] = OrWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
-		return 2
+		return 2, nil
 	case 5: // XOR (see Ex. 28, Section 2.5)
 		c.checkInterlock(m, m)
 		c.Reg[A] = XorWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
-		return 2
+		return 2, nil
 	case 6: // FLOT
 		c.callWithOvCheck1(FixedToFloat)
-		return 3
+		return 3, nil
 	case 7: // FIX
 		c.callWithOvCheck1(FloatToFixed)
-		return 3
+		return 3, nil
 	case 9: // INT
 		if !c.Interrupts { // see Ex. 18, Section 1.4.4
 			panic(ErrNoInterrupts)
 		}
 		c.ctrl = !c.ctrl
-		return 2
+		return 2, nil
 	default:
 		panic(ErrInvalidOp)
 	}

@@ -208,6 +208,9 @@ func TestCycle(t *testing.T) {
 	if c.Reg[A].Int() != 7 {
 		t.Errorf("got: %#o (%v), want: 7", c.Reg[A], c.Reg[A])
 	}
+	if c.Elapsed != 226 {
+		t.Fatalf("got: elapsed %d, want %d", c.Elapsed, 226)
+	}
 
 	// Program P, Section 1.3.2
 	c.zeroContents()
@@ -263,18 +266,21 @@ func BenchmarkProgramM(b *testing.B) {
 	}
 }
 
-func Benchmark1000Cycles(b *testing.B) {
+func BenchmarkProgramP(b *testing.B) {
 	c := NewComputer()
-	for i := 0; i < 998; i += 2 {
-		c.Contents[mBase+i] = NewWord(0501)   // ADD 0
-		c.Contents[mBase+i+1] = NewWord(0502) // SUB 0
-	}
-	c.Contents[mBase+999] = NewWord(0205) // HLT
+	binding := DefaultBinding
+	binding[PrinterUnit] = "/dev/null"
+	c.Bind(binding)
+	copy(c.Contents[mBase+3000:], egCycle11a)
+	copy(c.Contents[mBase+0:], egCycle11b)
+	copy(c.Contents[mBase+1995:], egCycle11c)
+	copy(c.Contents[mBase+2024:], egCycle11d)
+	copy(c.Contents[mBase+2049:], egCycle11e)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		c.next = 0
+		c.next = 3000
 		if err := c.resume(); !errors.Is(err, ErrHalted) {
-			b.Fatal("error:", err)
+			b.Error("error:", err)
 		}
 	}
 }

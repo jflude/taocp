@@ -3,7 +3,6 @@
 # upper case, spaces are substituted for non-MIX characters and fields start
 # in the correct columns (1, 12, 17).
 PATH="/bin:/usr/bin:$PATH"
-set -o pipefail
 expand "$@" |
     tr '[:lower:]' '[:upper:]' |
     tr -C " ABCDEFGHIΔJKLMNOPQRΣΠSTUVWXYZ0123456789.,()+*-/=$<>@;:'\n" ' ' |
