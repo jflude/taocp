@@ -1,15 +1,15 @@
 * taocp
 
-*** A simulator and assembler for the MIX 1009 computer described in Donald Knuth's /The Art of Computer Programming, Volume 1/.
+** A simulator and assembler for the MIX 1009 computer described in Donald Knuth's /The Art of Computer Programming, Volume 1/.
 
-The ~mix~ simulator faithfully mimics the computer in all its aspects,
-including a full complement of attached I/O devices, as described in
-Section 1.3.1: disks, drums, magnetic and paper tapes, a printer, a
-card reader, a card punch and a teletype (console). Each device is
-backed by a file, or by standard input/output for the console. The
-latencies of the devices are accounted for when calculating execution
-times, and based upon what might have been expected in the era of the
-book's first publication.
+The ~mix~ simulator faithfully mimics the hypothetical computer in all
+its aspects, including a full complement of attached I/O devices, as
+described in Section 1.3.1: disks, drums, magnetic and paper tapes, a
+printer, a card reader, a card punch and a teletype (console). Each
+device is backed by a file, or by standard input/output for the
+console. The latencies of the devices are accounted for when
+calculating execution times, and based upon what might have been
+expected in the era of the book's first publication.
 
 Normally upon starting, the simulator will immediately boot MIX, and
 continue to run until a ~HLT~ instruction is executed.  It will then
@@ -31,7 +31,7 @@ is encountered.  (Loading of object code from the reader is achieved
 by prepending a "loader" card, as described in Exercise 26 of Section
 1.3.1.)
 
-Note that this exacting implementation of the assembler requires the
+Note that this unforgiving implementation of the assembler requires the
 input file conform to the MIXAL format as described by the book,
 eg. no tabs or other non-MIX characters are allowed, instruction
 fields span columns 1-10, 12-15, 17-80, etc.  The included ~mixal.fmt~
@@ -94,6 +94,10 @@ shell script can correct most formatting errors.
 :     	 (default "tape06.mix")
 :   -t7 string
 :     	 (default "tape07.mix")
+:   -trace string
+:     	output trace to file
+:   -trigger int
+:     	trace addresses above this (default 32)
 :   -tty string
 : 
 : $ mixal examples/500primes.mixal
@@ -122,6 +126,52 @@ sandbox, and output (or tail) an I/O device's backing file.
 :      0002 0233 0547 0877 1229 1597 1993 2371 2749 3187
 :      0003 0239 0557 0881 1231 1601 1997 2377 2753 3191
 :      ...etc...
+
+~mix~ can write an execution trace to a file.  Register contents are
+displayed in decimal and octal.
+
+: $ mix -trace 500primes.trace examples/500primes.mixal 
+: mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
+: $ head -36 500primes.trace 
+: 
+: _______________________________________________________
+:  A:          0 (+00000000000)   OP: 3000: IOC  0(18)
+:  X:    8775582 (+00041363636)   OV: N CI: = 
+: I1:          0 (+00000000000)                   M
+: I2:          0 (+00000000000)          0: +00000005670
+: I3:       3000 (+00000005670)          1: +00035002044
+: I4:          0 (+00000000000)          2: +00000000011
+: I5:          0 (+00000000000)          3: +00003002042
+: I6:          0 (+00000000000)          4: +00036000510
+: J:          13 (+00000000015)          5: +00001000006
+: Device: .....................
+:   Idle!                60000u    Elapsed:       661973u
+: 
+: _______________________________________________________
+:  A:          0 (+00000000000)   OP: 3001: LD1  2050
+:  X:    8775582 (+00041363636)   OV: N CI: = 
+: I1:          0 (+00000000000)                   M
+: I2:          0 (+00000000000)       2050: -00000000763
+: I3:       3000 (+00000005670)       2051: +00000000003
+: I4:          0 (+00000000000)       2052: +00000000000
+: I5:          0 (+00000000000)       2053: +00000000000
+: I6:          0 (+00000000000)       2054: +00000000000
+: J:          13 (+00000000015)       2055: +00000000000
+: Device! ..................P..
+:   Idle:                60000u    Elapsed:       661974u
+: 
+: _______________________________________________________
+:  A:          0 (+00000000000)   OP: 3002: LD2  2051
+:  X:    8775582 (+00041363636)   OV: N CI: = 
+: I1:       -499 (-00000000763)                   M
+: I2:          0 (+00000000000)       2051: +00000000003
+: I3:       3000 (+00000005670)       2052: +00000000000
+: I4:          0 (+00000000000)       2053: +00000000000
+: I5:          0 (+00000000000)       2054: +00000000000
+: I6:          0 (+00000000000)       2055: +00000000000
+: J:          13 (+00000000015)       2056: +00000000000
+: Device: ..................P..
+:   Idle:                60000u    Elapsed:       661976u
 
 ** Resources
 - The [[https://exhibits.stanford.edu/stanford-pubs/catalog/xr254ff4308][guide]] for Knuth's implementation at Stanford, on the IBM S/360
