@@ -43,10 +43,10 @@ func (c *Computer) printTrace(m, next int) {
 		}
 	}
 	if c.validAddress(m) {
-		fmt.Fprintf(c.Tracer, "J:        %4v (%#v)      %5d%s %#v\n",
+		fmt.Fprintf(c.Tracer, " J:       %4v (%#v)      %5d%s %#v\n",
 			c.Reg[J], c.Reg[J], m, c.lockChar(m), c.Contents[mBase+m])
 	} else {
-		fmt.Fprintf(c.Tracer, "J:        %4v (%#v)      %5d: ?\n",
+		fmt.Fprintf(c.Tracer, " J:       %4v (%#v)      %5d: ?\n",
 			c.Reg[J], c.Reg[J], m)
 	}
 	b := make([]byte, len(c.Devices))
