@@ -18,10 +18,6 @@ prompt the "operator" to press the computer's *GO* button before
 booting commences, and prompt again on whether to resume execution
 following the ~HLT~, or quit.
 
-The interrupt facility and supervisor mode for the expanded computer,
-described in Exercise 18, Section 1.4.4, can be enabled by giving the
-~-int~ argument.
-
 The ~mixal~ assembler reads from the program file (encoded as UTF-8)
 given as an argument, or from standard input if ~-~ is given, and
 outputs simulated punched cards for the card reader, containing the
@@ -36,6 +32,12 @@ input file conform to the MIXAL format as described by the book,
 eg. no tabs or other non-MIX characters are allowed, instruction
 fields span columns 1-10, 12-15, 17-80, etc.  The included ~mixal.fmt~
 shell script can correct most formatting errors.
+
+The interrupt facility and supervisor mode for the expanded computer,
+described in Exercise 18, Section 1.4.4, can be enabled by giving the
+~-int~ argument to ~mix~ and ~mixal~, or by setting the environment
+variable ~MIX_ENABLE_INTERRUPTS=y~.  A program using this feature, and
+other programs of interest, can be found in the _examples_ directory.
 
 : $ go test ./...
 : ?   	github.com/jflude/taocp/cmd/mix	[no test files]
@@ -128,7 +130,7 @@ sandbox, and output (or tail) an I/O device's backing file.
 :      ...etc...
 
 ~mix~ can write an execution trace to a file.  Register contents are
-displayed in decimal and octal.
+displayed in decimal and signed octal.
 
 : $ mix -trace 500primes.trace examples/500primes.mixal 
 : mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
