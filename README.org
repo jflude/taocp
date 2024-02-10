@@ -2,6 +2,9 @@
 
 ** A simulator and assembler for the MIX 1009 computer described in Donald Knuth's /The Art of Computer Programming, Volume 1/.
 
+Copyright (c) 2020-2024 Justin Flude <justin_flude@hotmail.com>.
+Use of this source code is governed by the LICENSE file. 
+
 The ~mix~ simulator faithfully mimics the hypothetical computer in all
 its aspects, including a full complement of attached I/O devices, as
 described in Section 1.3.1: disks, drums, magnetic and paper tapes, a
