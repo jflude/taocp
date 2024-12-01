@@ -17,7 +17,7 @@ shift
 
 d=`mktemp -d`
 trap 'rm -rf "$d"' EXIT HUP INT TERM
-mixal.fmt "$prog" > "$d"/clean.mixal || exit $?
+mixal-fmt "$prog" > "$d"/clean.mixal || exit $?
 cd "$d" && mixal clean.mixal &&
     if test "x$tail" = "x1"
     then

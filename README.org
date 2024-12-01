@@ -33,7 +33,7 @@ by prepending a "loader" card, as described in Exercise 26 of Section
 Note that this unforgiving implementation of the assembler requires the
 input file conform to the MIXAL format as described by the book,
 eg. no tabs or other non-MIX characters are allowed, instruction
-fields span columns 1-10, 12-15, 17-80, etc.  The included ~mixal.fmt~
+fields span columns 1-10, 12-15, 17-80, etc.  The included ~mixal-fmt~
 shell script can correct most formatting errors.
 
 The interrupt facility and supervisor mode for the expanded computer,
@@ -120,11 +120,11 @@ other programs of interest, can be found in the _examples_ directory.
 :      0003 0239 0557 0881 1231 1601 1997 2377 2753 3191
 :      ...etc...
 
-As a convenience, the ~mix.run~ script, in a single operation, will
+As a convenience, the ~mix-run~ script, in a single operation, will
 reformat, assemble and execute its input file within a temporary
 sandbox, and output (or tail) an I/O device's backing file.
 
-: $ mix.run examples/500primes.mixal
+: $ mix-run examples/500primes.mixal
 : mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
 : 
 : FIRST FIVE HUNDRED PRIMES
