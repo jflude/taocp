@@ -1,6 +1,7 @@
 package mix
 
 import (
+	"errors"
 	"fmt"
 	"math"
 )
@@ -23,11 +24,16 @@ const (
 // and a sign bit.
 type Word int32
 
+var (
+	ErrOutOfRange        = errors.New("mix: out of range")
+	ErrInvalidShiftCount = errors.New("mix: invalid shift count")
+)
+
 // NewWord returns a MIX word with the given integer value.  It panics if
 // the value is out of range.
 func NewWord(val int) Word {
 	if val < MinWord || val > MaxWord {
-		panic("out of range")
+		panic(ErrOutOfRange)
 	}
 	if val < 0 {
 		return Word(signBit | -val)
@@ -176,7 +182,7 @@ func ShiftBitsLeft(high, low *Word, count int) {
 		return
 	}
 	if count < 0 {
-		panic("invalid shift count")
+		panic(ErrInvalidShiftCount)
 	}
 	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
 	n <<= count
@@ -192,7 +198,7 @@ func ShiftBitsRight(high, low *Word, count int) {
 		return
 	}
 	if count < 0 {
-		panic("invalid shift count")
+		panic(ErrInvalidShiftCount)
 	}
 	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
 	n >>= count
@@ -203,7 +209,7 @@ func ShiftBitsRight(high, low *Word, count int) {
 // RotateBitsLeft rotates a double MIX word left by the given number of bits.
 func RotateBitsLeft(high, low *Word, count int) {
 	if count < 0 {
-		panic("invalid shift count")
+		panic(ErrInvalidShiftCount)
 	}
 	count %= 60
 	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
@@ -215,7 +221,7 @@ func RotateBitsLeft(high, low *Word, count int) {
 // RotateBitsRight rotates a double MIX word right by the given number of bits.
 func RotateBitsRight(high, low *Word, count int) {
 	if count < 0 {
-		panic("invalid shift count")
+		panic(ErrInvalidShiftCount)
 	}
 	count %= 60
 	n := (((int64(*high) & MaxWord) << 30) | (int64(*low) & MaxWord))
