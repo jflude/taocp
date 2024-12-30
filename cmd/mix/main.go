@@ -112,6 +112,7 @@ func run() (err error) {
 		if err = reportGo(c); !errors.Is(err, mix.ErrHalted) {
 			break
 		}
+		fmt.Println(err)
 	}
 	return
 }
