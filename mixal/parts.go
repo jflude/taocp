@@ -28,10 +28,12 @@ func (a *asmb) parseIPart() bool {
 
 func (a *asmb) parseFPart() bool {
 	if a.matchChar('(') {
+		save := a.exprVal
 		if a.exprVal = nil; !a.parseExpr() || !a.matchChar(')') {
 			return false
 		}
 		a.f = a.exprVal.Int()
+		a.exprVal = save
 	}
 	return true
 }

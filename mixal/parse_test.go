@@ -8,14 +8,22 @@ import (
 	"github.com/jflude/taocp/mix"
 )
 
-func TestParsing(t *testing.T) {
-	r := strings.NewReader(egTranslate)
+func TestEvaluating(t *testing.T) {
+	checkParsing(t, egParsing1, &okParsing1)
+}
+
+func TestAssembling(t *testing.T) {
+	checkParsing(t, egTranslate, &okParsing2)
+}
+
+func checkParsing(t *testing.T, data string, expected *object) {
+	r := strings.NewReader(data)
 	lastEmit := 0
 	var a asmb
 	if err := a.translate(r, func(a *asmb, loc, op, address string) {
 		t.Logf("input: %d: %s %s %s", a.count, loc, op, address)
 		parseLine(a, loc, op, address)
-		t.Log("token:", a.tokens)
+		t.Log("  token:", a.tokens)
 		if a.obj.orig == nil {
 			return
 		}
@@ -24,43 +32,71 @@ func TestParsing(t *testing.T) {
 		if lastEmit > len(seg)-1 {
 			lastEmit = 0
 		}
-		for ; lastEmit <= len(seg)-1; lastEmit++ {
-			t.Logf(" emit: %d: %#o", orig+lastEmit,
-				seg[lastEmit])
+		for ; lastEmit < len(seg); lastEmit++ {
+			t.Logf("  emit: %d: %#v (%v)", orig+lastEmit,
+				seg[lastEmit], seg[lastEmit])
 		}
 	}); err != nil {
 		t.Fatal("error:", err)
 	}
-	if a.obj.start != okParsing.start {
+	if a.obj.start != expected.start {
 		t.Errorf("object.start: got: %v, want: %v",
-			a.obj.start, okParsing.start)
+			a.obj.start, expected.start)
 	}
-	if !reflect.DeepEqual(a.obj.orig, okParsing.orig) {
+	if !reflect.DeepEqual(a.obj.orig, expected.orig) {
 		t.Errorf("object.orig: got: %v, want: %v",
-			a.obj.orig, okParsing.orig)
+			a.obj.orig, expected.orig)
 	}
 outer:
-	for i := range okParsing.seg {
+	for i := range expected.seg {
 		if i >= len(a.obj.seg) {
 			t.Errorf("seg[%d]: got: nil", i)
 			break
 		}
-		for j := range okParsing.seg[i] {
+		for j := range expected.seg[i] {
 			if j >= len(a.obj.seg[i]) {
 				t.Errorf("seg[%d][%d]: got: nil", i, j)
 				break outer
 			}
-			if a.obj.seg[i][j] != okParsing.seg[i][j] {
-				t.Errorf("seg[%d][%d]: got: %#o, want: %#o",
+			if a.obj.seg[i][j] != expected.seg[i][j] {
+				t.Errorf("seg[%d][%d]: got: %#v, want: %#v",
 					i, j, a.obj.seg[i][j],
-					okParsing.seg[i][j])
+					expected.seg[i][j])
 				break outer
 			}
 		}
 	}
 }
 
-var okParsing = object{
+var egParsing1 = `* TEST EXPRESSION EVALUATION
+           ORIG 1000
+START      HLT  *+3
+           CON  9(1:1),18(2:2),27(3:3),36(4:4),45(5:5)
+           CON  63(2:2),22/11
+           CON  -3*8
+           CON  10/-2
+           CON  1//-3
+           CON  -1+5*20/6+*
+           END  START
+`
+
+var okParsing1 = object{
+	start: 1000,
+	orig:  []int{1000},
+	seg: [][]mix.Word{
+		[]mix.Word{
+			mix.NewWord(01753000205),
+			mix.NewWord(01122334455),
+			mix.NewWord(2),
+			mix.NewWord(-24),
+			mix.NewWord(-5),
+			mix.NewWord(-02525252525),
+			mix.NewWord(1019),
+		},
+	},
+}
+
+var okParsing2 = object{
 	start: 3000,
 	orig:  []int{3000, 0, 1995, 2024, 2049},
 	seg: [][]mix.Word{

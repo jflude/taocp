@@ -8,23 +8,26 @@ func (a *asmb) parseAtomic() bool {
 	return false
 }
 
-// MIXAL's grammar as described in TAOCP is left-recursive and therefore cannot
-// be parsed by recursive descent, so parseExpr and parseWValue are modified
-// to be right-recursive.
+// MIXAL's grammar as described in TAOCP is left-recursive and therefore
+// cannot be easily parsed top-down, so refactor it to remove the recursion.
+func (a *asmb) parseExprDash() bool {
+	if a.matchBinaryOp() {
+		a.exprOp = a.lastKind()
+		return a.parseExpr() && a.parseExprDash()
+	}
+	return true
+}
+
 func (a *asmb) parseExpr() bool {
 	if a.parseAtomic() {
-		if a.matchBinaryOp() {
-			a.exprOp = a.lastKind()
-			return a.parseExpr()
-		}
-		return true
+		return a.parseExprDash()
 	}
-	if a.matchBinaryOp() {
-		if k := a.lastKind(); k == '+' || k == '-' {
-			// convert unary +/- to binary +/- with implied zero
-			a.evalArg(0)
-			a.exprOp = k
-			return a.parseExpr()
+	if a.matchUnaryOp() {
+		if k := a.lastKind(); a.parseAtomic() {
+			if k == '-' {
+				*a.exprVal = a.exprVal.Negate()
+			}
+			return a.parseExprDash()
 		}
 	}
 	return false

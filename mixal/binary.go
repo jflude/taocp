@@ -1,5 +1,15 @@
 package mixal
 
+func (a *asmb) matchUnaryOp() bool {
+	if len(a.input) > 0 {
+		switch a.input[0] {
+		case '+', '-':
+			return a.matchChar(a.input[0])
+		}
+	}
+	return false
+}
+
 func (a *asmb) matchBinaryOp() bool {
 	if len(a.input) > 1 {
 		if a.input[:2] == "//" {
