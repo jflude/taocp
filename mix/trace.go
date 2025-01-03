@@ -22,31 +22,24 @@ func (c *Computer) printTrace(m, next int) {
 	asm := Disassemble(c.Contents[mBase+next])
 	fmt.Fprintf(c.Tracer,
 		"\014_______________________________________________________\n"+
-		" A: %10v (%#v)   OP: %4d%s %s\n"+
-		" X: %10v (%#v)   OV: %s CI: %s %s\n"+
-		"I1:       %4v (%#v)                   M\n",
+			" A: %10v (%#v)   OP: %4d%s %s\n"+
+			" X: %10v (%#v)   OV: %s CI: %s %s\n",
 		c.Reg[A], c.Reg[A], next, c.lockChar(next), asm,
-		c.Reg[X], c.Reg[X], ov, ci, ctrl,
-		c.Reg[I1], c.Reg[I1])
-	for i := 2; i <= 6; i, m = i+1, m+1 {
-		if c.validAddress(m) {
-			fmt.Fprintf(c.Tracer,
-				"I%d:       %4v (%#v)      %5d%s %#v\n",
-				i, c.Reg[i], c.Reg[i], m,
-				c.lockChar(m), c.Contents[mBase+m])
-		} else {
-			fmt.Fprintf(c.Tracer,
-				"I%d:       %4v (%#v)      %5d: ?\n",
-				i, c.Reg[i], c.Reg[i], m)
+		c.Reg[X], c.Reg[X], ov, ci, ctrl)
+	_, _, _, op := c.Contents[mBase+c.next].UnpackOp()
+	for i := 1; i <= 6; i, m = i+1, m+1 {
+		mLabel := "  "
+		if i == 4 {
+			mLabel = "M:"
 		}
+		lock, mem := c.memoryStyle(m, op)
+		fmt.Fprintf(c.Tracer, "I%d:       %4v (%#v)    %s%5d%s %s\n",
+			i, c.Reg[i], c.Reg[i], mLabel, m, lock, mem)
 	}
-	if c.validAddress(m) {
-		fmt.Fprintf(c.Tracer, " J:       %4v (%#v)      %5d%s %#v\n",
-			c.Reg[J], c.Reg[J], m, c.lockChar(m), c.Contents[mBase+m])
-	} else {
-		fmt.Fprintf(c.Tracer, " J:       %4v (%#v)      %5d: ?\n",
-			c.Reg[J], c.Reg[J], m)
-	}
+	lock, mem := c.memoryStyle(m, op)
+	fmt.Fprintf(c.Tracer, " J:       %4v (%#v)      %5d%s %s\n",
+		c.Reg[J], c.Reg[J], m, lock, mem)
+	m++
 	b := make([]byte, len(c.Devices))
 	var devMask uint
 	for i := 0; i < DeviceCount; i++ {
@@ -68,13 +61,28 @@ func (c *Computer) printTrace(m, next int) {
 		idled = "!"
 		c.lastIdle = c.Idle
 	}
-	fmt.Fprintf(c.Tracer,
-		"Device%s %s\n  Idle%s         %12du    Elapsed: %12du\n",
-		flipped, string(b), idled, c.Idle, c.Elapsed)
+	lock, mem = c.memoryStyle(m, op)
+	fmt.Fprintf(c.Tracer, "  Unit%s %s      %5d%s %s\n"+
+		"  Idle%s          %11du    Elapsed: %11du\n",
+		flipped, string(b), m, lock, mem, idled, c.Idle, c.Elapsed)
+}
+
+func (c *Computer) memoryStyle(m, op int) (lock, mem string) {
+	if c.validAddress(m) {
+		if op < JRED || op > JX {
+			mem = c.Contents[mBase+m].GoString()
+		} else {
+			mem = Disassemble(c.Contents[mBase+m])
+		}
+	} else {
+		mem = "?"
+	}
+	lock = c.lockChar(m)
+	return
 }
 
 func (c *Computer) lockChar(m int) string {
-	if c.attributes[mBase+m].lockUntil > c.Elapsed {
+	if c.validAddress(m) && c.attributes[mBase+m].lockUntil > c.Elapsed {
 		return "#"
 	} else {
 		return ":"
