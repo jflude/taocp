@@ -76,11 +76,11 @@ func (w Word) String() string {
 
 // GoString returns a representation of a MIX word as an octal signed integer.
 func (w Word) GoString() string {
-	s := "+"
+	s := '+'
 	if w&signBit != 0 {
-		s = "-"
+		s = '-'
 	}
-	return fmt.Sprintf("%s%#011o", s, uint64(uint32(w&^signBit)))
+	return fmt.Sprintf("%c%#011o", s, uint64(uint32(w&^signBit)))
 }
 
 // AddWord adds an integer to a MIX word, returning the result as a MIX word,

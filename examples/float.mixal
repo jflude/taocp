@@ -175,8 +175,8 @@ EPSILON    CON  1
 START      LDA  REG
            STA  ACC
            LDA  ARG
-           JMP  FSUB
+           JMP  FADD
            HLT  *+1
 REG        CON  1(0:2),34(1:1)
-ARG        CON  1(0:2),33(1:1)
+ARG        CON  -1(0:2),33(1:1)
            END  START
