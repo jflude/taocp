@@ -27,7 +27,7 @@ func (a *asmb) processCard(line string, parse parseFunc) (err error) {
 	if len(a.input) == 0 {
 		panic(ErrFormat)
 	}
-	if _, err := mix.ConvertToMIX(a.input); err != nil {
+	if _, err := mix.EncodeAsMIX(a.input); err != nil {
 		panic(err)
 	}
 	if a.input[0] == '*' {

@@ -1,4 +1,3 @@
-
 // Package mix simulates the MIX 1009 computer as described in
 // Donald Knuth's "The Art of Computer Programming" (third edition).
 package mix
@@ -45,7 +44,8 @@ type Computer struct {
 	m, next       int
 	ctrl, halted  bool
 	Tracer        io.WriteCloser
-	Trigger       int
+	Floor         int
+	Ceiling       int
 	lastDevMask   uint
 	lastIdle      int64
 	Interrupts    bool
@@ -65,7 +65,8 @@ func NewComputer() *Computer {
 		Devices:    make([]Peripheral, DeviceCount),
 		busyUntil:  make([]int64, DeviceCount),
 		BootFrom:   CardReaderUnit,
-		Trigger:    32,
+		Floor:      32,
+		Ceiling:    MemorySize,
 	}
 }
 

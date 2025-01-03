@@ -38,11 +38,13 @@ func run() (err error) {
 	var op bool
 	var trace string
 	flag.IntVar(&c.BootFrom, "boot", c.BootFrom, "unit to boot from")
-	flag.BoolVar(&c.Interrupts, "int", c.Interrupts, "enable interrupts")
+	flag.BoolVar(&c.Interrupts, "irq", c.Interrupts, "enable interrupts")
 	flag.BoolVar(&op, "op", op, "involve the operator")
 	flag.StringVar(&trace, "trace", trace, "output trace to file")
-	flag.IntVar(&c.Trigger, "trigger", c.Trigger,
-		"trace addresses above this")
+	flag.IntVar(&c.Floor, "floor", c.Floor,
+		"don't trace addresses below this")
+	flag.IntVar(&c.Ceiling, "ceiling", c.Ceiling,
+		"only trace addresses below this")
 	flag.StringVar(&unit[0], "t0", unit[0], "")
 	flag.StringVar(&unit[1], "t1", unit[1], "")
 	flag.StringVar(&unit[2], "t2", unit[2], "")

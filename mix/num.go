@@ -63,10 +63,14 @@ func (c *Computer) num(aa Word, i, f, op, m int) (int64, error) {
 		c.Reg[A] = XorWord(c.Reg[A], abs(c.Contents[mBase+m].Int()))
 		return 2, nil
 	case 6: // FLOT
-		c.callWithOvCheck1(FixedToFloat)
+		var ov bool
+		c.Reg[A], ov = FixedToFloat(c.Reg[A])
+		c.Overflow = c.Overflow || ov
 		return 3, nil
 	case 7: // FIX
-		c.callWithOvCheck1(FloatToFixed)
+		var ov bool
+		c.Reg[A], ov = FloatToFixed(c.Reg[A])
+		c.Overflow = c.Overflow || ov
 		return 3, nil
 	case 9: // INT
 		if !c.Interrupts { // see Ex. 18, Section 1.4.4
@@ -77,10 +81,4 @@ func (c *Computer) num(aa Word, i, f, op, m int) (int64, error) {
 	default:
 		panic(ErrInvalidOp)
 	}
-}
-
-func (c *Computer) callWithOvCheck1(f func(Word) (Word, bool)) {
-	var ov bool
-	c.Reg[A], ov = f(c.Reg[A])
-	c.Overflow = c.Overflow || ov
 }

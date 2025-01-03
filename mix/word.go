@@ -17,7 +17,8 @@ const (
 	MaxIndex = 1<<12 - 1
 	MinIndex = -MaxIndex
 
-	signBit = math.MinInt32
+	signBit  = math.MinInt32
+	byteSize = 64
 )
 
 // Word represents a MIX machine word, which consists of five 6-bit bytes
@@ -65,7 +66,7 @@ func (w Word) Negate() Word {
 }
 
 // String returns a representation of the value of a MIX word as a decimal
-// number.  Note that a MIX word can have a value of negative zero.
+// integer.  Note that a MIX word can have a value of negative zero.
 func (w Word) String() string {
 	if int32(w) == signBit {
 		return "-0"
@@ -73,7 +74,7 @@ func (w Word) String() string {
 	return fmt.Sprint(w.Int())
 }
 
-// GoString returns a representation of a MIX word as an unsigned integer.
+// GoString returns a representation of a MIX word as an octal signed integer.
 func (w Word) GoString() string {
 	s := "+"
 	if w&signBit != 0 {

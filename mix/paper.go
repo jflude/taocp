@@ -24,7 +24,7 @@ func (p *PaperTape) Read(block []Word) (int64, error) {
 	if _, err := io.ReadFull(p.rwsc, buf); err != nil {
 		return 0, err
 	}
-	m, err := ConvertToMIX(string(buf))
+	m, err := EncodeAsMIX(string(buf))
 	if err != nil {
 		return 0, err
 	}
@@ -33,7 +33,7 @@ func (p *PaperTape) Read(block []Word) (int64, error) {
 }
 
 func (p *PaperTape) Write(block []Word) (int64, error) {
-	_, err := io.WriteString(p.rwsc, ConvertToUTF8(block))
+	_, err := io.WriteString(p.rwsc, EncodeAsUTF8(block))
 	return 200000, err
 }
 

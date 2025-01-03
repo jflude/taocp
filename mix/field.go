@@ -21,7 +21,7 @@ func (w Word) Field(f int) Word {
 		return w
 	}
 	checkSpec(f)
-	return Word((int32(w) >> fields[f].shift) & fields[f].reg)
+	return Word((int32(w) >> fields[f].shift) & fields[f].dest)
 }
 
 // SetField changes the field f of the MIX word w to the given value.
@@ -31,8 +31,8 @@ func (w *Word) SetField(f int, val Word) {
 		return
 	}
 	checkSpec(f)
-	*w = Word((int32(*w) &^ fields[f].mem) |
-		((int32(val) << fields[f].shift) & fields[f].mem) |
+	*w = Word((int32(*w) &^ fields[f].src) |
+		((int32(val) << fields[f].shift) & fields[f].src) |
 		(int32(val) & fields[f].sign))
 }
 
@@ -40,41 +40,47 @@ func (w *Word) SetField(f int, val Word) {
 // and opcode.
 func (w *Word) PackOp(aa Word, i, f, c int) {
 	*w = Word((int32(aa) & fields[02].sign) |
-		(int32(aa) << fields[02].shift & fields[02].mem) |
-		(int32(i) << fields[033].shift & fields[033].mem) |
-		(int32(f) << fields[044].shift & fields[044].mem) |
-		(int32(c) << fields[055].shift & fields[055].mem))
+		(int32(aa) << fields[02].shift & fields[02].src) |
+		(int32(i) << fields[033].shift & fields[033].src) |
+		(int32(f) << fields[044].shift & fields[044].src) |
+		(int32(c) << fields[055].shift & fields[055].src))
 }
 
 // UnpackOp extracts a MIX instruction's address, index, field and opcode
 // from a MIX word.
 func (w Word) UnpackOp() (aa Word, i, f, c int) {
-	aa = Word((int32(w) >> fields[02].shift) & fields[02].reg)
-	i = int((int32(w) & fields[033].mem) >> fields[033].shift)
-	f = int((int32(w) & fields[044].mem) >> fields[044].shift)
-	c = int((int32(w) & fields[055].mem) >> fields[055].shift)
+	aa = Word((int32(w) >> fields[02].shift) & fields[02].dest)
+	i = int((int32(w) & fields[033].src) >> fields[033].shift)
+	f = int((int32(w) & fields[044].src) >> fields[044].shift)
+	c = int((int32(w) & fields[055].src) >> fields[055].shift)
 	return
 }
 
 // PackFloat composes a MIX word from a floating point number's exponent
-// and fraction.
+// and fraction, having the form |±|e|f|f|f|f|
 func (w *Word) PackFloat(e, f int) {
-	*w = Word(0) // TODO
+	*w = Word((int32(f) & fields[000].sign) |
+		(int32(abs(f)) & fields[025].dest) |
+		((int32(e) & fields[011].dest) << fields[011].shift))
 }
 
 // UnpackFloat extracts the exponent and fraction of a floating point number
 // in a MIX word.
 func (w Word) UnpackFloat() (e, f int) {
-	e = int((int32(w) & fields[011].mem) >> fields[011].shift) // ??
-	f = int(0) // TODO
+	v := int32(abs(w.Int()))
+	e = int((v & fields[011].src) >> fields[011].shift)
+	f = int(v & fields[025].src)
+	if int32(w)&fields[000].sign != 0 {
+		f = -f
+	}
 	return
 }
 
 var fields = [...]struct {
-	mem   int32 // memory mask
-	reg   int32 // register mask
-	sign  int32 // sign affected
-	shift int   // how much to shift to align receiver and source
+	src   int32 // source's fields' mask
+	dest  int32 // destination fields' mask
+	sign  int32 // sign mask
+	shift int   // how much to shift to align source with destination
 }{
 	{signBit, signBit, signBit, 0},                              // [0:0]
 	{07700000000 | signBit, 00000000077 | signBit, signBit, 24}, // [0:1]

@@ -27,7 +27,7 @@ func (*CardPunch) Read([]Word) (int64, error) {
 }
 
 func (p *CardPunch) Write(block []Word) (int64, error) {
-	s := strings.TrimRight(ConvertToUTF8(block), " ")
+	s := strings.TrimRight(EncodeAsUTF8(block), " ")
 	if ch, ok := IsPunchable(s); !ok {
 		return 0, charError(ch)
 	}

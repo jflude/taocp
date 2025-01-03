@@ -27,7 +27,7 @@ func (a *asmb) parseCON() {
 }
 
 func (a *asmb) parseALF() {
-	w, err := mix.ConvertToMIX(a.input)
+	w, err := mix.EncodeAsMIX(a.input)
 	if err != nil {
 		parseError(err, a.input)
 	}

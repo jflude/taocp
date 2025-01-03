@@ -1,4 +1,3 @@
-
 // Package mixal is an assembler for the MIX 1009 computer as described
 // in Donald Knuth's "The Art of Computer Programming" (third edition).
 package mixal

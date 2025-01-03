@@ -1,18 +1,20 @@
 * taocp
 
-** A simulator and assembler for the MIX 1009 computer described in Donald Knuth's /The Art of Computer Programming, Volume 1/.
+** MIX 1009 computer from Donald Knuth's /The Art of Computer Programming/
 
-Copyright (c) 2020-2024 Justin Flude <justin_flude@hotmail.com>.
-Use of this source code is governed by the LICENSE file. 
+Copyright (c) 2020-2024 Justin Flude <justin\under{}flude@hotmail.com>.
+Use of this source code is governed by the LICENSE file.
 
-The ~mix~ simulator faithfully mimics the hypothetical computer in all
-its aspects, including a full complement of attached I/O devices, as
-described in Section 1.3.1: disks, drums, magnetic and paper tapes, a
-printer, a card reader, a card punch and a teletype (console). Each
-device is backed by a file, or by standard input/output for the
-console. The latencies of the devices are accounted for when
-calculating execution times, and based upon what might have been
-expected in the era of the book's first publication.
+** Simulator
+
+The ~mix~ simulator faithfully mimics the third edition's hypothetical
+computer in all its aspects, including a full complement of attached
+I/O devices, as described in Section 1.3.1: disks, drums, magnetic and
+paper tapes, a printer, a card reader, a card punch and a teletype
+(console). Each device is backed by a file, or by standard
+input/output for the console. The latencies of the devices are
+accounted for when calculating execution times, and based upon what
+might have been expected in the era of the book's first publication.
 
 Normally upon starting, the simulator will immediately boot MIX, and
 continue to run until a ~HLT~ instruction is executed.  It will then
@@ -20,6 +22,8 @@ quit.  However if the ~-op~ argument is given, the simulator will
 prompt the "operator" to press the computer's *GO* button before
 booting commences, and prompt again on whether to resume execution
 following the ~HLT~, or quit.
+
+** Assembler
 
 The ~mixal~ assembler reads from the program file (encoded as UTF-8)
 given as an argument, or from standard input if ~-~ is given, and
@@ -36,21 +40,24 @@ eg. no tabs or other non-MIX characters are allowed, instruction
 fields span columns 1-10, 12-15, 17-80, etc.  The included ~mixal-fmt~
 shell script can correct most formatting errors.
 
+** Supervisor
+
 The interrupt facility and supervisor mode for the expanded computer,
 described in Exercise 18, Section 1.4.4, can be enabled by giving the
-~-int~ argument to ~mix~ and ~mixal~, or by setting the environment
+~-irq~ argument to ~mix~ and ~mixal~, or by setting the environment
 variable ~MIX_ENABLE_INTERRUPTS=y~.  A program using this feature, and
 other programs of interest, can be found in the _examples_ directory.
+
+** Walkthrough
 
 : $ go test ./...
 : ?   	github.com/jflude/taocp/cmd/mix	[no test files]
 : ?   	github.com/jflude/taocp/cmd/mixal	[no test files]
-: ok  	github.com/jflude/taocp/mix	0.371s
-: ok  	github.com/jflude/taocp/mixal	0.056s
+: ok  	github.com/jflude/taocp/mix	0.444s
+: ok  	github.com/jflude/taocp/mixal	0.168s
 : $ go install ./...
-: 
 : $ mixal
-: error: mixal [input file]
+: error: mixal [-irq] INPUT-FILE
 : $ mix -help
 : Usage of mix:
 :   -boot int
@@ -71,7 +78,7 @@ other programs of interest, can be found in the _examples_ directory.
 :     	 (default "drum08.mix")
 :   -d9 string
 :     	 (default "drum09.mix")
-:   -int
+:   -irq
 :     	enable interrupts
 :   -op
 :     	involve the operator
@@ -99,45 +106,63 @@ other programs of interest, can be found in the _examples_ directory.
 :     	 (default "tape06.mix")
 :   -t7 string
 :     	 (default "tape07.mix")
+:   -floor int
+:     	don't trace addresses below this (default 32)
 :   -trace string
 :     	output trace to file
-:   -trigger int
-:     	trace addresses above this (default 32)
 :   -tty string
-: 
+:
 : $ mixal examples/500primes.mixal
 : $ ls -l *.mix
-: -rw-r--r--  1 justin  staff  972 Aug 30 13:19 reader.mix
+: -rw-r--r--  1 justin  staff  972 Jan  1 00:00 reader.mix
 : $ mix
 : mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
 : $ ls -l *.mix
-: -rw-r--r--  1 justin  staff  2777 Aug 30 13:20 printer.mix
-: -rw-r--r--  1 justin  staff   972 Aug 30 13:19 reader.mix
-: $ cat printer.mix
+: -rw-r--r--  1 justin  staff  2777 Jan  1 00:00 printer.mix
+: -rw-r--r--  1 justin  staff   972 Jan  1 00:00 reader.mix
+: $ head -5 printer.mix
 : 
 : FIRST FIVE HUNDRED PRIMES
 :      0002 0233 0547 0877 1229 1597 1993 2371 2749 3187
 :      0003 0239 0557 0881 1231 1601 1997 2377 2753 3191
-:      ...etc...
+:      0005 0241 0563 0883 1237 1607 1999 2381 2767 3203
+:      0007 0251 0569 0887 1249 1609 2003 2383 2777 3209
+
+** Sandbox
 
 As a convenience, the ~mix-run~ script, in a single operation, will
 reformat, assemble and execute its input file within a temporary
 sandbox, and output (or tail) an I/O device's backing file.
 
-: $ mix-run examples/500primes.mixal
-: mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
-: 
-: FIRST FIVE HUNDRED PRIMES
-:      0002 0233 0547 0877 1229 1597 1993 2371 2749 3187
-:      0003 0239 0557 0881 1231 1601 1997 2377 2753 3191
-:      ...etc...
+: $ cat examples/echo.mixal
+: * EXAMPLE: ECHO LINES ENTERED ON THE TELETYPE, UNTIL AN INITIAL PERIOD.
+: TTY        EQU  19
+:            ORIG 1000
+: OUTPUT     OUT  BUF(TTY)
+: START      IN   BUF(TTY)
+:            JBUS *(TTY)
+:            LDA  BUF
+:            CMPA PERIOD
+:            JNE  OUTPUT
+:            HLT
+: PERIOD     ALF  .
+:            END  START
+: $ mix-run examples/echo.mixal
+: HELLO
+: HELLO
+: BYE
+: BYE
+: .
+: mix: halted at 1006: HLT (elapsed: 35240489u, idle: 14060000u)
+
+** Tracing
 
 ~mix~ can write an execution trace to a file.  Register contents are
 displayed in decimal and signed octal.
 
-: $ mix -trace 500primes.trace examples/500primes.mixal 
+: $ mix -trace foo.out
 : mix: halted at 3029: HLT (elapsed: 6762025u, idle: 5969153u)
-: $ head -36 500primes.trace 
+: $ head -36 foo.out
 : 
 : _______________________________________________________
 :  A:          0 (+00000000000)   OP: 3000: IOC  0(18)
@@ -179,6 +204,7 @@ displayed in decimal and signed octal.
 :   Idle:                60000u    Elapsed:       661976u
 
 ** Resources
+
 - The [[https://exhibits.stanford.edu/stanford-pubs/catalog/xr254ff4308][guide]] for Knuth's implementation at Stanford, on the IBM S/360
 - The [[https://www.cs.utexas.edu/ftp/techreports/tr77-64.pdf][manual]] for UT Austin's implementation, on the CDC 6000
 - James L. Peterson's /[[http://www.jklp.org/profession/books/mix/index.html][Computer Organization & Assembly Language

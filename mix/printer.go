@@ -43,7 +43,7 @@ func (p *Printer) Close() error {
 }
 
 func trimWrite(w io.Writer, block []Word) error {
-	line := strings.TrimRight(ConvertToUTF8(block), " ") + "\n"
+	line := strings.TrimRight(EncodeAsUTF8(block), " ") + "\n"
 	_, err := io.WriteString(w, line)
 	return err
 }

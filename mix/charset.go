@@ -16,7 +16,7 @@ func init() {
 	}
 }
 
-func ConvertToUTF8(w []Word) string {
+func EncodeAsUTF8(w []Word) string {
 	var r []rune
 	for _, v := range w {
 		for f := 1; f <= 5; f++ {
@@ -26,7 +26,7 @@ func ConvertToUTF8(w []Word) string {
 	return string(r)
 }
 
-func ConvertToMIX(s string) ([]Word, error) {
+func EncodeAsMIX(s string) ([]Word, error) {
 	var w []Word
 	f := 0
 	for _, r := range s {

@@ -5,15 +5,15 @@ import (
 	"testing"
 )
 
-func TestConvertToUTF8(t *testing.T) {
-	got := ConvertToUTF8(egMIX)
+func TestEncodeAsUTF8(t *testing.T) {
+	got := EncodeAsUTF8(egMIX)
 	if got != egUTF8 {
 		t.Errorf(`got: %q, want: %q`, got, egUTF8)
 	}
 }
 
-func TestConvertToMIX(t *testing.T) {
-	got, err := ConvertToMIX(egUTF8)
+func TestEncodeAsMIX(t *testing.T) {
+	got, err := EncodeAsMIX(egUTF8)
 	if err != nil {
 		t.Errorf("error: %v", err)
 	} else if !reflect.DeepEqual(got, egMIX) {

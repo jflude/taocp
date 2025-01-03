@@ -44,7 +44,9 @@ func (c *Computer) Cycle() (err error) {
 			return ErrInvalidIndex
 		}
 	}
-	if c.Tracer != nil && c.next >= c.Trigger {
+	if c.Tracer != nil &&
+		((c.next >= c.Floor && c.next < c.Ceiling) ||
+			(op == NUM && f == 2)) {
 		c.printTrace(m, c.next)
 	}
 	state := c.ctrl

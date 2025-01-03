@@ -28,7 +28,7 @@ func (t *Teletype) Read(block []Word) (int64, error) {
 	if buf = buf[:n]; buf[len(buf)-1] == '\n' {
 		buf = buf[:len(buf)-1]
 	}
-	m, err := ConvertToMIX(string(buf))
+	m, err := EncodeAsMIX(string(buf))
 	if err != nil {
 		return 0, err
 	}

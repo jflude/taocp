@@ -95,10 +95,21 @@ func TestWord(t *testing.T) {
 		t.Errorf("got: %#o, %#o, %#o, %#o, want: -01001, 023, 045, 067",
 			aa.Int(), i, f, c)
 	}
-
+	i++
 	w.PackOp(aa, i, f, c)
-	if w.Int() != -01001234567 {
-		t.Errorf("got: %#o, want: -01001234567", w.Int())
+	if w.Int() != -01001244567 {
+		t.Errorf("got: %#o, want: -01001244567", w.Int())
+	}
+
+	w = NewWord(-04012345670)
+	e, f := w.UnpackFloat()
+	if e != 040 || f != -012345670 {
+		t.Errorf("got: %#o, %#o, want: 040, -012345670", e, f)
+	}
+	e++
+	w.PackFloat(e, f)
+	if w.Int() != -04112345670 {
+		t.Errorf("got: %#o, want: -04112345670", w.Int())
 	}
 
 	if s := NewWord(0).Negate().String(); s != "-0" {
